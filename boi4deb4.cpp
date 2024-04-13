@@ -220,7 +220,7 @@ class ensemble {
         assert(*index <= *pix);
       }
     }
-    std::cout << "Velocità media " << meanvel(newset) << "\n";
+    std::cout << "Velocità x e y " << compx(newset) <<" "<<compy(newset)<<"\n";
     set = newset;
   }
   void brown_update(std::random_device& r){
