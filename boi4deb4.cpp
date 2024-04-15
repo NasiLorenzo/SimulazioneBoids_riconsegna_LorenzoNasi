@@ -15,13 +15,13 @@
 
 struct par {
   double repulsione{0.6};
-  double steering{0.07};
+  double steering{0.7};
   double coesione{0.01};
   double sigma{0.01}; //gli esagomi vengono se c'è un parametro di steering basso e una distanza di reticolo bassa
   static const unsigned int dim{2};  // dimensione
   double neigh_co{90};
   double neigh_align{70};//raggio visivo
-  double neigh2{5};//raggio di repulsione
+  double neigh2{10};//raggio di repulsione
   double reproduction{20};
   unsigned int interazioni{2};
   double deltaT{0.01};
