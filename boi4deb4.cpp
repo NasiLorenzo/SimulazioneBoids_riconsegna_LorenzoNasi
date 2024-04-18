@@ -12,7 +12,6 @@
 #include <functional>
 // #include "imgui.h"
 // #include "imgui-SFML.h"
-//modifica
 struct par {
   double repulsione{0.6};
   double steering{0.07};
