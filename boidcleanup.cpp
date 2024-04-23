@@ -1,61 +1,23 @@
-#include <SFML/Graphics.hpp>
-//#include <SFML/OpenGL.hpp>
-#include <algorithm>
-#include <array>
-#include <cassert>
-#include <iostream>
-#include <iterator>
-#include <random>
-#include <string>
-#include <vector>
-#include <cmath>
-#include <functional>
-// #include "imgui.h"
-// #include "imgui-SFML.h"
-struct par {
-  double repulsione{0.6};
-  double steering{0.07};
-  double coesione{0.01};
-  double sigma{0.01}; //gli esagomi vengono se c'è un parametro di steering basso e una distanza di reticolo bassa
-  static const unsigned int dim{2};  // dimensione
-  double neigh_co{90};
-  double neigh_align{70};//raggio visivo
-  double neigh2{5};//raggio di repulsione
-  double reproduction{20};
-  unsigned int interazioni{2};
-  double deltaT{0.01};
-  static const unsigned int n = 2;
-  //unsigned int vert{20};
-  //unsigned int hor{20};
-  unsigned int size{400};
-  unsigned int rate{1};//rapporto tra la dimensione dello schermo e della generazione
-  unsigned int rate2{100};
-  double vel_factor{100000};
-  std::array<unsigned int, 2> pixel{1010*rate, 710*rate};
-  double pi=3.141592;
-  double theta{pi/12};
-};
-par para;
+#include "boidcleanup.hpp"
 
-struct boidstate {
-  std::array<double, para.dim> pos;
-  std::array<double, para.dim> vel;
-};
+namespace boids{
+
+static const std::vector<unsigned int> pixel{1010*params::rate, 710*params::rate};
 
 auto generate(std::default_random_engine eng) {  //genera pos e vel di un boid distribuiti secondo
                               // una gauss centrata in 0
   boidstate boid{};
-  std::normal_distribution<double> dist(0.0, para.sigma);
+  std::normal_distribution<double> dist(0.0, params::sigma);
   for (auto it = boid.pos.begin(); it != boid.pos.end(); ++it) {
     *it = dist(eng);
   }
   for (auto it = boid.vel.begin(), last = boid.vel.end(); it != last; ++it) {
-    *it = (para.vel_factor * dist(eng));
+    *it = (params::vel_factor * dist(eng));
   }
   return boid;
 }
 
-double distance(const boidstate& a, const boidstate& b) {  // sqrt dispendiosa
+const double distance(const boidstate& a, const boidstate& b) {  // sqrt dispendiosa
   double s{};
   for (auto it = a.pos.begin(), index = b.pos.begin(); it != a.pos.end();
        ++it, ++index) {
@@ -68,8 +30,8 @@ using stormo = std::vector<boidstate>;
 
 auto generator(std::default_random_engine eng) {
   stormo set;
-  for (int i = 0; i < para.size; i++) {
-    auto pix = para.pixel.begin();
+  for (int i = 0; i < params::size; i++) {
+    auto pix = pixel.begin();
     boidstate boidprova{generate(eng)};
     for (auto it = boidprova.pos.begin(); it != boidprova.pos.end();
          ++it, ++pix) {
@@ -95,7 +57,7 @@ auto regola1(stormo& neighbors, boidstate& boidi) {
     for (auto it = boid.vel.begin(), jt = (*index).pos.begin(),
               i = boid.pos.begin();
          it != boid.vel.end(); ++it, ++jt, ++i) {
-      *it += -para.repulsione * ((*jt) - *i);
+      *it += -params::repulsione * ((*jt) - *i);
       // std::cout<<"regola1: vel boid "<<it-boid.vel.begin()+1<<*it<<"\n";
     }
   }
@@ -110,7 +72,7 @@ auto regola2(stormo& neighbors, boidstate& boidi) {
     for (auto it = boid.vel.begin(), jt = (*index).vel.begin(),
               i = boidcopia.vel.begin();
          it != boid.vel.end(); ++it, ++jt, ++i) {
-      (*it) += para.steering / (n) * ((*jt) - *i);
+      (*it) += params::steering / (n) * ((*jt) - *i);
       // std::cout<<"regola2: vel boid "<<it-boid.vel.begin()+1<<*it<<"\n";
     }
   }
@@ -124,7 +86,7 @@ auto regola3(stormo& neighbors, boidstate& boid) {
     for (auto it = boid.vel.begin(), jt = (*index).pos.begin(),
               i = boid.pos.begin();
          it != boid.vel.end(); ++it, ++jt, ++i) {
-      (*it) += para.coesione / (n) * ((*jt) - (*i));
+      (*it) += params::coesione / (n) * ((*jt) - (*i));
     }
   }
   return boid;
@@ -204,16 +166,16 @@ class ensemble {
     newset = set;
     for (auto it = set.begin(), jt = newset.begin(); it != set.end();
          ++it, ++jt) {
-      stormo neighbor{neighbors(set, *it, para.neigh_align)};
-      stormo close_neighbor{neighbors(neighbor, *it, para.neigh2)};
-      //meiosi(set,neighbor,*jt,eng,para.reproduction);
+      stormo neighbor{neighbors(set, *it, params::neigh_align)};
+      stormo close_neighbor{neighbors(neighbor, *it, params::neigh2)};
+      //meiosi(set,neighbor,*jt,eng,params::reproduction);
       *jt = regola1(close_neighbor, *jt);
       *jt = regola2(neighbor, *jt);
       *jt = regola3(neighbor, *jt);
-      auto pix = para.pixel.begin();
+      auto pix = pixel.begin();
       for (auto index = (*jt).pos.begin(), velind = (*jt).vel.begin();
            index != (*jt).pos.end(); ++index, ++velind, ++pix) {
-        (*index) += (*velind) * para.deltaT;
+        (*index) += (*velind) * params::deltaT;
         (*index) = fmod(*index, *pix); 
         if (*index <= 0) *index += *pix;
         assert(*index <= *pix);
@@ -226,19 +188,19 @@ class ensemble {
     std::default_random_engine eng(r());
     for (auto it = set.begin(), jt = newset.begin(); it != set.end();
          ++it, ++jt) {
-      stormo neighbor{neighbors(set, *it, para.neigh_co)};
-      stormo close_neighbor{neighbors(set, *it, para.neigh2)};
+      stormo neighbor{neighbors(set, *it, params::neigh_co)};
+      stormo close_neighbor{neighbors(set, *it, params::neigh2)};
       *jt = regola1(close_neighbor, *jt);
       *jt = regola2(neighbor, *jt);
       *jt = regola3(neighbor, *jt);
-      std::uniform_int_distribution<int> dist(0,para.rate2);
-      std::uniform_real_distribution<double> dist2(-para.pi/2,para.pi/2);
+      std::uniform_int_distribution<int> dist(0,params::rate2);
+      std::uniform_real_distribution<double> dist2(-params::pi/2,params::pi/2);
       std::cout<<"dist "<<dist(eng)<<"\n";
-      if(dist(eng)%para.rate2==0) *jt=rotate(*jt,dist2(eng));
-      auto pix = para.pixel.begin();
+      if(dist(eng)%params::rate2==0) *jt=rotate(*jt,dist2(eng));
+      auto pix = pixel.begin();
       for (auto index = (*jt).pos.begin(), velind = (*jt).vel.begin();
            index != (*jt).pos.end(); ++index, ++velind, ++pix) {
-        (*index) += (*velind) * para.deltaT;
+        (*index) += (*velind) * params::deltaT;
         // std::cout<<"pos "<<it-set.begin()+1<<" "<<*index<<" "<<"\n";
         (*index) = fmod(*index, *pix);  // reinserire fmod con *pix
         if (*index <= 0) *index += *pix;
@@ -250,17 +212,18 @@ class ensemble {
   }
 };
 
+}
 int main() {
   std::random_device r;  
   std::default_random_engine eng(r());
-  stormo flock = generator(eng);
-  ensemble prova(flock);
+  boids::stormo flock = boids::generator(eng);
+  boids::ensemble prova(flock);
   std::cout << "Dimensione generazione" << prova.size_() << "\n";
   auto y = prova.set_().size();
   // std::cout<<"Dimensione set "<<y<<"\n";
   prova.update(eng);
 
-  sf::RenderWindow window(sf::VideoMode(para.pixel[0]/para.rate, para.pixel[1]/para.rate),
+  sf::RenderWindow window(sf::VideoMode(boids::pixel[0]/boids::params::rate, boids::pixel[1]/boids::params::rate),
                           "Boids Simulation");
 
   // Desired frame rate
@@ -293,8 +256,8 @@ int main() {
       sf::CircleShape circle(2);
       // std::cout<<prova.set_().size()<<"\n";
       circle.setFillColor(sf::Color::Black);
-      circle.setPosition(boid.pos[0]/para.rate,
-                         boid.pos[1]/para.rate);  // Assuming x and y are in pos[0]
+      circle.setPosition(boid.pos[0]/boids::params::rate,
+                         boid.pos[1]/boids::params::rate);  // Assuming x and y are in pos[0]
                                         // and pos[1] respectively
       window.draw(circle);
     }
