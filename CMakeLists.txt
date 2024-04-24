@@ -38,6 +38,7 @@ add_executable(boidsfml boidcleanup.cpp)
 target_link_libraries(boidsfml PRIVATE sfml-graphics sfml-window sfml-system)
 target_compile_features(boidsfml PRIVATE cxx_std_17)
 
+
 #install(TARGETS progettopf)
 
 #target_link_libraries(boidsfml "/opt/homebrew/Cellar/sfml/2.6.1/lib -lsfml-window -lsfml-graphics -lsfml-system")

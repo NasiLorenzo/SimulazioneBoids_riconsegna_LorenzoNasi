@@ -21,20 +21,20 @@ struct params {
   static constexpr unsigned int dim{2};  // dimensione
   static constexpr double neigh_co{90};
   static constexpr double neigh_align{70};//raggio visivo
-  static constexpr double neigh2{5};//raggio di repulsione
+  static constexpr double neigh2{15};//raggio di repulsione
   static constexpr double reproduction{20};
   static constexpr unsigned int interazioni{2};
-  static constexpr double deltaT{0.01};
+  static constexpr float deltaT{1./20.};
   static constexpr unsigned int n = 2;
   //unsigned int vert{20};
   //unsigned int hor{20};
-  static constexpr unsigned int size{400};
+  static constexpr unsigned int size{500};
   static constexpr unsigned int rate{1};//rapporto tra la dimensione dello schermo e della generazione
-  static constexpr unsigned int rate2{100};
-  static constexpr double vel_factor{100000};
+  static constexpr unsigned int rate2{20};
+  static constexpr double vel_factor{10000};
   static constexpr double pi=3.141592;
   static constexpr double theta{pi/12};
-  static const std::vector<unsigned int> pixel;
+  //static const std::vector<unsigned int> pixel;
 };
 
 struct boidstate {

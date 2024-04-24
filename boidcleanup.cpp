@@ -190,9 +190,9 @@ class ensemble {
          ++it, ++jt) {
       stormo neighbor{neighbors(set, *it, params::neigh_co)};
       stormo close_neighbor{neighbors(set, *it, params::neigh2)};
-      *jt = regola1(close_neighbor, *jt);
-      *jt = regola2(neighbor, *jt);
-      *jt = regola3(neighbor, *jt);
+      //*jt = regola1(close_neighbor, *jt);
+      //*jt = regola2(neighbor, *jt);
+      //*jt = regola3(neighbor, *jt);
       std::uniform_int_distribution<int> dist(0,params::rate2);
       std::uniform_real_distribution<double> dist2(-params::pi/2,params::pi/2);
       std::cout<<"dist "<<dist(eng)<<"\n";
@@ -227,7 +227,7 @@ int main() {
                           "Boids Simulation");
 
   // Desired frame rate
-  const sf::Time frameTime = sf::seconds(1.f / 20.f);
+  const sf::Time frameTime = sf::seconds(boids::params::deltaT);
 
   sf::Clock clock;
   sf::Time accumulator = sf::Time::Zero;
@@ -242,9 +242,12 @@ int main() {
     accumulator += elapsedTime;
 
     // Update the simulation while we have enough time accumulated
+    int i=0;
     while (accumulator >= frameTime) {
-      prova.update(eng);
+      i++;
+      prova.brown_update(r);
       accumulator -= frameTime;
+      //std::cout<<"Ce so passato "<<i<< " volte\n";
       }
     
 
