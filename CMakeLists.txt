@@ -37,7 +37,6 @@ find_package(SFML COMPONENTS graphics window system)
 add_executable(boidsfml boidcleanup.cpp)
 target_link_libraries(boidsfml PRIVATE sfml-graphics sfml-window sfml-system)
 target_compile_features(boidsfml PRIVATE cxx_std_17)
-exec_program(boidsfml)
 
 #install(TARGETS progettopf)
 
