@@ -34,6 +34,7 @@ struct params {
   static constexpr double vel_factor{100000};
   static constexpr double pi=3.141592;
   static constexpr double theta{pi/12};
+  static const std::vector<unsigned int> pixel;
 };
 
 struct boidstate {
