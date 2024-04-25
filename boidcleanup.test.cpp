@@ -1,86 +1,42 @@
 #define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
-
-#include "boidcleanup.hpp"
 #include "doctest.h"
-
+#include "boidcleanup.hpp"
+namespace boids{
+/*struct paramms{
+  double repulsione{0.6};
+  double steering{0.07};
+  double coesione{0.01};
+  double neigh_align{70};//raggio visivo
+  double neigh2{15};//raggio di repulsione
+};  
+paramms params;
+*/
 TEST_CASE("Testing sum_norms_index")
 {
-  const std::vector<pf::Point3D> vals{{3, 1, 2}, {2, 4, 5}};
+  boids::paramms parametri;
+  parametri.repulsione=0.7;
+  parametri.steering=0.1;
+  parametri.coesione=0.1;
+  parametri.neigh2=100000;
+  parametri.neigh_align=100000;
+  boidstate boid1;
+  boid1.pos={500.,0.};
+  boid1.vel={0,0};
+  boidstate boid2;
+  boid2.pos={500.,0.};
+  boid2.vel={0,0};
+  boidstate boid3;
+  boid3.pos={1000.,0.};
+  boid3.vel={0,0};
+  boidstate boid4;
+  boid4.pos={1000.,0.};
+  boid4.vel={0,0};
+  stormo set{boid1,boid2,boid3,boid4};
+  ensemble flock{set};
+  flock.update();
+  REQUIRE(flock.size_() == 4);
 
-  REQUIRE(vals.size() == 2);
-
-  const double sum_norms = pf::sum_norms_index(vals);
-  CHECK(sum_norms == doctest::Approx(10.44986));
+  CHECK(flock.set_()[0].pos[0] == doctest::Approx(471.33));
 }
 
-TEST_CASE("Testing sum_norms_it")
-{
-  const std::vector<pf::Point3D> vals{{3, 1, 2}, {2, 4, 5}};
-
-  const double sum_norms = pf::sum_norms_it(vals);
-  CHECK(sum_norms == doctest::Approx(10.44986));
-}
-
-TEST_CASE("Testing sum_norms_range")
-{
-  const std::vector<pf::Point3D> vals{{3, 1, 2}, {2, 4, 5}};
-
-  const double sum_norms = pf::sum_norms_range(vals);
-  CHECK(sum_norms == doctest::Approx(10.44986));
-}
-
-
-TEST_CASE("Testing sort_by_x")
-{
-  std::vector<pf::Point3D> vals{{3, 1, 2}, {2, 4, 5}};
-
-  pf::sort_by_x(vals);
-  CHECK(vals[0].x == doctest::Approx(2));
-  CHECK(vals[0].y == doctest::Approx(4));
-  CHECK(vals[0].z == doctest::Approx(5));
-  CHECK(vals[1].x == doctest::Approx(3));
-  CHECK(vals[1].y == doctest::Approx(1));
-  CHECK(vals[1].z == doctest::Approx(2));
-}
-
-TEST_CASE("Testing sort_by_norm")
-{
-  std::vector<pf::Point3D> vals{{3, 1, 2}, {2, 4, 5}};
-
-  pf::sort_by_norm(vals);
-  CHECK(vals[0].x == doctest::Approx(3));
-  CHECK(vals[0].y == doctest::Approx(1));
-  CHECK(vals[0].z == doctest::Approx(2));
-  CHECK(vals[1].x == doctest::Approx(2));
-  CHECK(vals[1].y == doctest::Approx(4));
-  CHECK(vals[1].z == doctest::Approx(5));
-}
-
-TEST_CASE("Testing sum_norms_algo")
-{
-  const std::vector<pf::Point3D> vals{{3, 1, 2}, {2, 4, 5}};
-
-  const double sum_norms = pf::sum_norms_algo(vals);
-  CHECK(sum_norms == doctest::Approx(10.44986));
-}
-
-TEST_CASE("Testing sum_elems_algo")
-{
-  const std::vector<pf::Point3D> vals{{3, 1, 2}, {2, 4, 5}};
-
-  pf::Results res = pf::sum_elems_algo(vals);
-  CHECK(res.sum_norms == doctest::Approx(10.44986));
-  CHECK(res.sum_x == doctest::Approx(5));
-  CHECK(res.sum_y == doctest::Approx(5));
-  CHECK(res.sum_z == doctest::Approx(7));
-}
-
-TEST_CASE("Testing remove_basic")
-{
-  std::vector<pf::Point3D> vals{{3, 1, 2},  {2, 4, 5},  {-1, 7, 8},
-                                {0, 3, 10}, {5, -2, 1}, {1, -5, -4}};
-
-  REQUIRE(vals.size() == 6);
-  pf::remove_basic(vals, 2);
-  CHECK(vals.size() == 3);
 }

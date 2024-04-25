@@ -34,9 +34,11 @@ include_directories("/opt/homebrew/Cellar/sfml/2.6.1/include")
 include_directories("/opt/homebrew/Cellar/sfml/2.6.1/include/SFML")
 include_directories("/opt/homebrew/Cellar/sfml/2.6.1/lib")
 find_package(SFML COMPONENTS graphics window system)
-add_executable(boidsfml boidcleanup.cpp)
+add_executable(boidsfml boidsfml.cpp)
+add_executable(boidss boidcleanup.cpp)
 target_link_libraries(boidsfml PRIVATE sfml-graphics sfml-window sfml-system)
-target_compile_features(boidsfml PRIVATE cxx_std_17)
+
+#target_compile_features(boidsfml PRIVATE cxx_std_17)
 
 
 #install(TARGETS progettopf)
@@ -45,11 +47,11 @@ target_compile_features(boidsfml PRIVATE cxx_std_17)
 
 # se il testing e' abilitato...
 #   per disabilitare il testing, passare -DBUILD_TESTING=OFF a cmake durante la fase di configurazione
-#if (BUILD_TESTING)
+if (BUILD_TESTING)
 
-  # aggiungi l'eseguibile all.t
-   #add_executable(functions.t functions.test.cpp functions.cpp)
+  #aggiungi l'eseguibile all.t
+  add_executable(boidcleanup.t boidcleanup.cpp boidcleanup.test.cpp)
   # aggiungi l'eseguibile all.t alla lista dei test
-   #add_test(NAME functions.t COMMAND functions.t)
+   add_test(NAME boidcleanup.t COMMAND boidcleanup.t)
 
-#endif()
+endif()
