@@ -2,7 +2,12 @@
 
 namespace boids {
 
-paramms parames;
+double paramms::repulsione=0.7;
+double paramms::steering=0.1;
+double paramms::coesione=0.1;
+double paramms::neigh2=100000;
+double paramms::neigh_align=100000;
+
 static const std::vector<unsigned int> pixel{1010, 710};
 
 auto generate(std::default_random_engine eng)
@@ -62,7 +67,7 @@ auto regola1(stormo& neighbors, boidstate& boidi)
     for (auto it = boid.vel.begin(), jt = (*index).pos.begin(),
               i = boid.pos.begin();
          it != boid.vel.end(); ++it, ++jt, ++i) {
-      *it += -parames.repulsione * ((*jt) - *i);
+      *it += -paramms::repulsione * ((*jt) - *i);
       // std::cout<<"regola1: vel boid "<<it-boid.vel.begin()+1<<*it<<"\n";
     }
   }
@@ -78,7 +83,7 @@ auto regola2(stormo& neighbors, boidstate& boidi)
     for (auto it = boid.vel.begin(), jt = (*index).vel.begin(),
               i = boidcopia.vel.begin();
          it != boid.vel.end(); ++it, ++jt, ++i) {
-      (*it) += parames.steering / (n) * ((*jt) - *i);
+      (*it) += paramms::steering / (n) * ((*jt) - *i);
       // std::cout<<"regola2: vel boid "<<it-boid.vel.begin()+1<<*it<<"\n";
     }
   }
@@ -93,7 +98,7 @@ auto regola3(stormo& neighbors, boidstate& boidi)
     for (auto it = boid.vel.begin(), jt = (*index).pos.begin(),
               i = boid.pos.begin();
          it != boid.vel.end(); ++it, ++jt, ++i) {
-      (*it) += parames.coesione / (n) * ((*jt) - (*i));
+      (*it) += paramms::coesione / (n) * ((*jt) - (*i));
     }
   }
   return boid;
@@ -182,8 +187,8 @@ void ensemble::update()
 {
   for (auto it = set.begin(), jt = newset.begin(); it != set.end();
        ++it, ++jt) {
-    stormo neighbor{neighbors(set, *it, parames.neigh_align)};
-    stormo close_neighbor{neighbors(neighbor, *it, parames.neigh2)};
+    stormo neighbor{neighbors(set, *it, paramms::neigh_align)};
+    stormo close_neighbor{neighbors(neighbor, *it, paramms::neigh2)};
     // meiosi(set,neighbor,*jt,eng,params::reproduction);
     *jt      = regola1(close_neighbor, *jt);
     *jt      = regola2(neighbor, *jt);
@@ -198,8 +203,7 @@ void ensemble::update()
       assert(*index <= *pix * params::rate);
     }
   }
-  std::cout << "Velocità x e y " << compx(newset) << " " << compy(newset)
-            << "\n";
+  //std::cout << "Velocità x e y " << compx(newset) << " " << compy(newset)<< "\n";
   set = newset;
 }
 void ensemble::brown_update(std::random_device& r)
@@ -208,7 +212,7 @@ void ensemble::brown_update(std::random_device& r)
   for (auto it = set.begin(), jt = newset.begin(); it != set.end();
        ++it, ++jt) {
     stormo neighbor{neighbors(set, *it, params::neigh_co)};
-    stormo close_neighbor{neighbors(set, *it, parames.neigh2)};
+    stormo close_neighbor{neighbors(set, *it, paramms::neigh2)};
     //*jt = regola1(close_neighbor, *jt);
     //*jt = regola2(neighbor, *jt);
     //*jt = regola3(neighbor, *jt);
@@ -233,15 +237,14 @@ void ensemble::brown_update(std::random_device& r)
   set = newset;
 }
 } // namespace boids
-int main()
+/*int main()
 { 
   using namespace boids;
-  boids::paramms parametri;
-  parametri.repulsione=0.7;
-  parametri.steering=0.1;
-  parametri.coesione=0.1;
-  parametri.neigh2=100000;
-  parametri.neigh_align=100000;
+  paramms::repulsione=0.7;
+  paramms::steering=0.1;
+  paramms::coesione=0.1;
+  paramms::neigh2=100000;
+  paramms::neigh_align=100000;
   boidstate boid1;
   boid1.pos={500.,0.};
   boid1.vel={0,0};
@@ -259,4 +262,4 @@ int main()
   flock.update();
 
   std::cout << "Posizione " << flock.set_()[0].pos[0] << "\n";
-}
+}*/

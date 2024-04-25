@@ -34,11 +34,11 @@ struct params {
   //static const std::vector<unsigned int> pixel;
 };
 struct paramms{
-  double repulsione{0.6};
-  double steering{0.07};
-  double coesione{0.01};
-  double neigh_align{70};//raggio visivo
-  double neigh2{15};//raggio di repulsione
+  static double repulsione;
+  static double steering;
+  static double coesione;
+  static double neigh_align;//raggio visivo
+  static double neigh2;//raggio di repulsione
 };  
 
 struct boidstate {

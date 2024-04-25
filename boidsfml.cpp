@@ -3,7 +3,12 @@
 
 namespace boids{
   
-paramms parames;
+double paramms::repulsione=0.7;
+double paramms::steering=0.1;
+double paramms::coesione=0.1;
+double paramms::neigh2=100000;
+double paramms::neigh_align=100000;
+
 static const std::vector<unsigned int> pixel{1010,710};
 
 auto generate(std::default_random_engine eng) {  //genera pos e vel di un boid distribuiti secondo
@@ -58,7 +63,7 @@ auto regola1(stormo& neighbors, boidstate& boidi) {
     for (auto it = boid.vel.begin(), jt = (*index).pos.begin(),
               i = boid.pos.begin();
          it != boid.vel.end(); ++it, ++jt, ++i) {
-      *it += -parames.repulsione * ((*jt) - *i);
+      *it += -paramms::repulsione * ((*jt) - *i);
       // std::cout<<"regola1: vel boid "<<it-boid.vel.begin()+1<<*it<<"\n";
     }
   }
@@ -73,7 +78,7 @@ auto regola2(stormo& neighbors, boidstate& boidi) {
     for (auto it = boid.vel.begin(), jt = (*index).vel.begin(),
               i = boidcopia.vel.begin();
          it != boid.vel.end(); ++it, ++jt, ++i) {
-      (*it) += parames.steering / (n) * ((*jt) - *i);
+      (*it) += paramms::steering / (n) * ((*jt) - *i);
       // std::cout<<"regola2: vel boid "<<it-boid.vel.begin()+1<<*it<<"\n";
     }
   }
@@ -87,7 +92,7 @@ auto regola3(stormo& neighbors, boidstate& boidi) {
     for (auto it = boid.vel.begin(), jt = (*index).pos.begin(),
               i = boid.pos.begin();
          it != boid.vel.end(); ++it, ++jt, ++i) {
-      (*it) += parames.coesione / (n) * ((*jt) - (*i));
+      (*it) += paramms::coesione / (n) * ((*jt) - (*i));
     }
   }
   return boid;
@@ -158,8 +163,8 @@ auto rotate(boidstate& boid, const double angle){
   void ensemble::update() {
     for (auto it = set.begin(), jt = newset.begin(); it != set.end();
          ++it, ++jt) {
-      stormo neighbor{neighbors(set, *it, parames.neigh_align)};
-      stormo close_neighbor{neighbors(neighbor, *it, parames.neigh2)};
+      stormo neighbor{neighbors(set, *it, paramms::neigh_align)};
+      stormo close_neighbor{neighbors(neighbor, *it, paramms::neigh2)};
       //meiosi(set,neighbor,*jt,eng,params::reproduction);
       *jt = regola1(close_neighbor, *jt);
       *jt = regola2(neighbor, *jt);
@@ -172,8 +177,9 @@ auto rotate(boidstate& boid, const double angle){
         if (*index <= 0) *index += *pix*params::rate;
         assert(*index <= *pix*params::rate);
       }
+      std::cout<<"X boid "<<it-set.begin()+1<<"-esimo "<<(*jt).pos[0]<<"\n";
     }
-    std::cout << "Velocità x e y " << compx(newset) <<" "<<compy(newset)<<"\n";
+    //std::cout << "Velocità x e y " << compx(newset) <<" "<<compy(newset)<<"\n";
     set = newset;
   }
   void ensemble::brown_update(std::random_device& r){
@@ -181,7 +187,7 @@ auto rotate(boidstate& boid, const double angle){
     for (auto it = set.begin(), jt = newset.begin(); it != set.end();
          ++it, ++jt) {
       stormo neighbor{neighbors(set, *it, params::neigh_co)};
-      stormo close_neighbor{neighbors(set, *it, parames.neigh2)};
+      stormo close_neighbor{neighbors(set, *it, paramms::neigh2)};
       //*jt = regola1(close_neighbor, *jt);
       //*jt = regola2(neighbor, *jt);
       //*jt = regola3(neighbor, *jt);
@@ -205,6 +211,12 @@ auto rotate(boidstate& boid, const double angle){
 }
 
 int main() {
+  boids::paramms::repulsione=0.6;
+  boids::paramms::steering=0.07;
+  boids::paramms::coesione=0.01;
+  boids::paramms::neigh_align=70;
+  boids::paramms::neigh2=15;
+
   std::random_device r;  
   std::default_random_engine eng(r());
   boids::stormo flock = boids::generator(eng);
