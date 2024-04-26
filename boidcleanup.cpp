@@ -8,9 +8,9 @@ double paramms::coesione=0.1;
 double paramms::neigh2=100000;
 double paramms::neigh_align=100000;
 
-static const std::vector<unsigned int> pixel{1010, 710};
 
-auto generate(std::default_random_engine eng)
+
+boidstate generate(std::default_random_engine eng)
 { // genera pos e vel di un boid distribuiti secondo
   // una gauss centrata in 0
   boidstate boid{};
@@ -34,7 +34,7 @@ double distance(const boidstate& a, const boidstate& b)
   return s;
 }
 
-auto generator(std::default_random_engine eng)
+stormo generator(std::default_random_engine eng)
 {
   stormo set;
   for (unsigned int i = 0; i < params::size; i++) {
@@ -237,29 +237,3 @@ void ensemble::brown_update(std::random_device& r)
   set = newset;
 }
 } // namespace boids
-/*int main()
-{ 
-  using namespace boids;
-  paramms::repulsione=0.7;
-  paramms::steering=0.1;
-  paramms::coesione=0.1;
-  paramms::neigh2=100000;
-  paramms::neigh_align=100000;
-  boidstate boid1;
-  boid1.pos={500.,0.};
-  boid1.vel={0,0};
-  boidstate boid2;
-  boid2.pos={500.,0.};
-  boid2.vel={0,0};
-  boidstate boid3;
-  boid3.pos={1000.,0.};
-  boid3.vel={0,0};
-  boidstate boid4;
-  boid4.pos={1000.,0.};
-  boid4.vel={0,0};
-  stormo set{boid1,boid2,boid3,boid4};
-  ensemble flock{set};
-  flock.update();
-
-  std::cout << "Posizione " << flock.set_()[0].pos[0] << "\n";
-}*/

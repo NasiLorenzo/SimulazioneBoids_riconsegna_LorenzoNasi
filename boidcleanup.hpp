@@ -46,13 +46,15 @@ struct boidstate {
   std::array<double, params::dim> vel;
 };
 
-inline auto generate(std::default_random_engine );
+static const std::vector<unsigned int> pixel{1010, 710};
+
+inline boidstate generate(std::default_random_engine);
 
 inline double distance(const boidstate& , const boidstate& );
 
 using stormo = std::vector<boidstate>;
 
-inline auto generator(std::default_random_engine eng);
+inline stormo generator(std::default_random_engine eng);
 
 inline auto regola1(stormo& neighbors, boidstate& boidi);//repulsion
 inline auto regola2(stormo& neighbors, boidstate& boidi);//steering
