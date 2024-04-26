@@ -10,7 +10,7 @@ double paramms::neigh_align=100000;
 
 
 
-boidstate generate(std::default_random_engine eng)
+/*inline boidstate generate(std::default_random_engine eng)
 { // genera pos e vel di un boid distribuiti secondo
   // una gauss centrata in 0
   boidstate boid{};
@@ -24,7 +24,7 @@ boidstate generate(std::default_random_engine eng)
   return boid;
 }
 
-double distance(const boidstate& a, const boidstate& b)
+inline double distance(const boidstate& a, const boidstate& b)
 { // sqrt dispendiosa
   double s{};
   for (auto it = a.pos.begin(), index = b.pos.begin(); it != a.pos.end();
@@ -34,7 +34,7 @@ double distance(const boidstate& a, const boidstate& b)
   return s;
 }
 
-stormo generator(std::default_random_engine eng)
+inline stormo generator(std::default_random_engine eng)
 {
   stormo set;
   for (unsigned int i = 0; i < params::size; i++) {
@@ -50,7 +50,7 @@ stormo generator(std::default_random_engine eng)
   }
   return set;
 }
-
+*/
 auto neighbors(stormo const& set, boidstate const& boid, const double d)
 {
   stormo neighbors{};

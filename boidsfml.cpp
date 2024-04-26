@@ -1,7 +1,6 @@
 #include "boidcleanup.hpp"
-#include "boidcleanup.hpp"
 
-namespace boids {
+/*namespace boids {
 
 double paramms::repulsione=0.7;
 double paramms::steering=0.1;
@@ -153,19 +152,13 @@ auto mod_vel(boidstate const& boid)
   }
   return sqrt(sum);
 }
-/*std::function<double(double)> cosine {[](double theta){return cos(theta);}};
-std::function<double(double)> sine {[](double theta){return sin(theta);}};
-std::vector<std::function<double(double)>> trig{sine, cosine};*/
+
 
 auto rotate(boidstate& boid, const double angle)
 {
   auto mod{mod_vel(boid)};
   auto alpha = acos(boid.vel[0] / mod);
   std::cout << "alpha " << boid.vel[0] << "\n";
-  /*auto index=trig.begin();
-  for(auto it=boid.vel.begin();it!=boid.vel.end();++it, ++index){
-    *it = mod * (*index)(alpha-angle);
-  }*/
   boid.vel[0] = mod * cos(alpha - angle);
   boid.vel[1] = mod * sin(alpha - angle);
 
@@ -204,8 +197,8 @@ void ensemble::update()
       assert(*index <= *pix * params::rate);
     }
   }
-  //std::cout << "Velocità x e y " << compx(newset) << " " << compy(newset)<< "\n";
-  set = newset;
+  //std::cout << "Velocità x e y " << compx(newset) << " " << compy(newset)<<
+"\n"; set = newset;
 }
 void ensemble::brown_update(std::random_device& r)
 {
@@ -228,30 +221,31 @@ void ensemble::brown_update(std::random_device& r)
          index != (*jt).pos.end(); ++index, ++velind, ++pix) {
       (*index) += (*velind) * params::deltaT;
       // std::cout<<"pos "<<it-set.begin()+1<<" "<<*index<<" "<<"\n";
-      (*index) = fmod(*index, *pix); // reinserire fmod con *pix
+      (*index) = fmod(*index, *pix*params::rate); // reinserire fmod con *pix
       if (*index <= 0)
-        *index += *pix;
-      assert(*index <= *pix);
+        *index += *pix*params::rate;
+      assert(*index <= *pix*params::rate);
     }
   }
   // std::cout << "Velocità media " << meanvel(newset) << "\n";
   set = newset;
 }
 } // namespace boids
+*/
+int main()
+{
+  boids::paramms::repulsione  = 0.6;
+  boids::paramms::steering    = 0.07;
+  boids::paramms::coesione    = 0.01;
+  boids::paramms::neigh_align = 70;
+  boids::paramms::neigh2      = 15;
 
-int main() {
-  boids::paramms::repulsione=0.6;
-  boids::paramms::steering=0.07;
-  boids::paramms::coesione=0.01;
-  boids::paramms::neigh_align=70;
-  boids::paramms::neigh2=15;
-
-  std::random_device r;  
+  std::random_device r;
   std::default_random_engine eng(r());
   boids::stormo flock = boids::generator(eng);
   boids::ensemble prova(flock);
   std::cout << "Dimensione generazione" << prova.size_() << "\n";
- 
+
   prova.update();
 
   sf::RenderWindow window(sf::VideoMode(boids::pixel[0], boids::pixel[1]),
@@ -266,22 +260,21 @@ int main() {
   while (window.isOpen()) {
     sf::Event event;
     while (window.pollEvent(event)) {
-      if (event.type == sf::Event::Closed) window.close();
+      if (event.type == sf::Event::Closed)
+        window.close();
     }
     // Calculate elapsed time for this frame
     sf::Time elapsedTime = clock.restart();
     accumulator += elapsedTime;
 
     // Update the simulation while we have enough time accumulated
-    int i=0;
+    int i = 0;
     while (accumulator >= frameTime) {
       i++;
       prova.update();
       accumulator -= frameTime;
-      //std::cout<<"Ce so passato "<<i<< " volte\n";
-      }
-    
-
+      // std::cout<<"Ce so passato "<<i<< " volte\n";
+    }
 
     window.clear(sf::Color::White);
 
@@ -290,9 +283,12 @@ int main() {
       sf::CircleShape circle(2);
       // std::cout<<prova.set_().size()<<"\n";
       circle.setFillColor(sf::Color::Black);
-      circle.setPosition(static_cast<float>(boid.pos[0]/boids::params::rate),
-                         static_cast<float>(boid.pos[1]/boids::params::rate));  // Assuming x and y are in pos[0]
-                                        // and pos[1] respectively
+      circle.setPosition(
+          static_cast<float>(boid.pos[0] / boids::params::rate),
+          static_cast<float>(
+              boid.pos[1]
+              / boids::params::rate)); // Assuming x and y are in pos[0]
+                                       // and pos[1] respectively
       window.draw(circle);
     }
 
@@ -302,5 +298,3 @@ int main() {
     sf::sleep(frameTime - clock.getElapsedTime());
   }
 }
-
-

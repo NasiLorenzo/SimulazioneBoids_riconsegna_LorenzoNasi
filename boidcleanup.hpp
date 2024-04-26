@@ -48,13 +48,51 @@ struct boidstate {
 
 static const std::vector<unsigned int> pixel{1010, 710};
 
-inline boidstate generate(std::default_random_engine);
+inline boidstate generate(std::default_random_engine eng)
+{ // genera pos e vel di un boid distribuiti secondo
+  // una gauss centrata in 0
+  boidstate boid{};
+  std::normal_distribution<double> dist(0.0, params::sigma);
+  for (auto it = boid.pos.begin(); it != boid.pos.end(); ++it) {
+    *it = dist(eng);
+  }
+  for (auto it = boid.vel.begin(), last = boid.vel.end(); it != last; ++it) {
+    *it = (params::vel_factor * dist(eng));
+  }
+  return boid;
+}
 
-inline double distance(const boidstate& , const boidstate& );
+inline double distance(const boidstate& a, const boidstate& b)
+{ // sqrt dispendiosa
+  double s{};
+  for (auto it = a.pos.begin(), index = b.pos.begin(); it != a.pos.end();
+       ++it, ++index) {
+    s += pow((*it) - (*index), 2);
+  }
+  return s;
+}
 
 using stormo = std::vector<boidstate>;
 
-inline stormo generator(std::default_random_engine eng);
+inline stormo generator(std::default_random_engine eng)
+{
+  stormo set;
+  for (unsigned int i = 0; i < params::size; i++) {
+    auto pix = pixel.begin();
+    boidstate boidprova{generate(eng)};
+    for (auto it = boidprova.pos.begin(); it != boidprova.pos.end();
+         ++it, ++pix) {
+      std::uniform_real_distribution<double> dis(
+          0, static_cast<double>(*pix * params::rate));
+      *it += dis(eng);
+    }
+    set.push_back(boidprova);
+  }
+  return set;
+}
+
+
+
 
 inline auto regola1(stormo& neighbors, boidstate& boidi);//repulsion
 inline auto regola2(stormo& neighbors, boidstate& boidi);//steering
