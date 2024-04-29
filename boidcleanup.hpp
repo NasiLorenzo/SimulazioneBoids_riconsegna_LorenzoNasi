@@ -26,7 +26,7 @@ struct params {
   //unsigned int vert{20};
   //unsigned int hor{20};
   static constexpr unsigned int size{500};
-  static constexpr double rate{4};//rapporto tra la dimensione dello schermo e della generazione
+  static constexpr double rate{1};//rapporto tra la dimensione dello schermo e della generazione
   static constexpr unsigned int rate2{20};
   static constexpr double vel_factor{10000};
   static constexpr double pi=3.141592;
