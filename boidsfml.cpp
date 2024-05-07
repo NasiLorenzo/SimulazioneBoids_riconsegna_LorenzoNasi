@@ -267,6 +267,13 @@ int main()
     sf::Time elapsedTime = clock.restart();
     accumulator += elapsedTime;
 
+    // Adding a background image
+    sf::FileInputStream stream;
+    stream.open("tramonto.jpg");
+
+    sf::Texture texture;
+    texture.loadFromStream(stream);
+
     // Update the simulation while we have enough time accumulated
     int i = 0;
     while (accumulator >= frameTime) {
