@@ -62,10 +62,10 @@ std::array<double, params::dim> operator+(std::array<double, params::dim> a,
 }
 
 std::array<double, params::dim> operator+=(std::array<double, params::dim> a,
-                                          std::array<double, params::dim> b)
+                                           std::array<double, params::dim> b)
 {
-  for (auto a_it = a.begin(), b_it = b.begin();
-       a_it != a.end(); ++a_it, ++b_it) {
+  for (auto a_it = a.begin(), b_it = b.begin(); a_it != a.end();
+       ++a_it, ++b_it) {
     *a_it += *a_it + *b_it;
   };
   return a;

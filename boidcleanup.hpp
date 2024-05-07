@@ -53,7 +53,8 @@ class Vector
   std::array<double, params::dim> vec;
   Vector(std::array<double, params::dim> v)
       : vec{v} {}
-  Vector() : vec{} {};
+  Vector() : vec{} {}
+  Vector(double a, double b) :vec{a,b} {}
   auto begin() {return vec.begin();};
   auto end() {return vec.end();}
   auto operator+=(Vector& a){
@@ -62,7 +63,9 @@ class Vector
       *it+=*a_it;
 
     }
-    
+  };
+  auto operator[](int i){
+    return vec[i];
   };
 };
 
