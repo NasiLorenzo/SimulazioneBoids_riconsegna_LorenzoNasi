@@ -2,13 +2,11 @@
 
 namespace boids {
 
-double paramms::repulsione=0.7;
-double paramms::steering=0.1;
-double paramms::coesione=0.1;
-double paramms::neigh2=100000;
-double paramms::neigh_align=100000;
-
-
+double paramms::repulsione  = 0.7;
+double paramms::steering    = 0.1;
+double paramms::coesione    = 0.1;
+double paramms::neigh2      = 100000;
+double paramms::neigh_align = 100000;
 
 /*inline boidstate generate(std::default_random_engine eng)
 { // genera pos e vel di un boid distribuiti secondo
@@ -60,6 +58,7 @@ auto neighbors(stormo const& set, boidstate const& boid, const double d)
   }
   return neighbors;
 }
+
 auto regola1(stormo& neighbors, boidstate& boidi)
 {
   boidstate boid{boidi};
@@ -103,6 +102,7 @@ auto regola3(stormo& neighbors, boidstate& boidi)
   }
   return boid;
 }
+
 void meiosi(stormo& set, stormo& neighborss, boidstate& boid,
             std::default_random_engine eng, double distance)
 {
@@ -118,7 +118,8 @@ void meiosi(stormo& set, stormo& neighborss, boidstate& boid,
   }
   set.push_back(child);
 }
-auto meanvel(stormo const& set)
+
+auto meanvel(stormo const& set) // Velocità quadratica media
 {
   double s{};
   for (auto it = set.begin(); it != set.end(); ++it) {
@@ -126,7 +127,8 @@ auto meanvel(stormo const& set)
   }
   return sqrt(s) / set.size();
 }
-auto compx(stormo const& set)
+
+auto compx(stormo const& set) // Media delle componenti x di vel
 {
   double s{};
   for (auto it = set.begin(); it != set.end(); ++it) {
@@ -135,7 +137,8 @@ auto compx(stormo const& set)
 
   return s / set.size();
 }
-auto compy(stormo const& set)
+
+auto compy(stormo const& set) // Media delle componenti y di vel
 {
   double s{};
   for (auto it = set.begin(); it != set.end(); ++it) {
@@ -144,7 +147,8 @@ auto compy(stormo const& set)
 
   return s / set.size();
 }
-auto mod_vel(boidstate const& boid)
+
+auto mod_vel(boidstate const& boid) // Velocità singolo boid
 {
   double sum{};
   for (auto it = boid.vel.begin(); it != boid.vel.end(); ++it) {
@@ -203,9 +207,11 @@ void ensemble::update()
       assert(*index <= *pix * params::rate);
     }
   }
-  //std::cout << "Velocità x e y " << compx(newset) << " " << compy(newset)<< "\n";
+  // std::cout << "Velocità x e y " << compx(newset) << " " << compy(newset)<<
+  // "\n";
   set = newset;
 }
+
 void ensemble::brown_update(std::random_device& r)
 {
   std::default_random_engine eng(r());

@@ -78,7 +78,7 @@ inline stormo generator(std::default_random_engine eng)
 {
   stormo set;
   for (unsigned int i = 0; i < params::size; i++) {
-    auto pix = pixel.begin();
+    auto pix = pixel.begin(); // puntatore ai pixel
     boidstate boidprova{generate(eng)};
     for (auto it = boidprova.pos.begin(); it != boidprova.pos.end();
          ++it, ++pix) {
