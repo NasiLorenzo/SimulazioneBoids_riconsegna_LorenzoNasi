@@ -61,12 +61,13 @@ std::array<double, params::dim> operator+(std::array<double, params::dim> a,
   return result;
 }
 
-std::array<double, params::dim> operator+=(std::array<double, params::dim> a,
-                                           std::array<double, params::dim> b)
+std::array<double, params::dim> operator+=(std::array<double, params::dim>& a,
+                                           std::array<double, params::dim>const& b)
 {
-  for (auto a_it = a.begin(), b_it = b.begin(); a_it != a.end();
+  auto b_it = b.begin();
+  for (auto a_it = a.begin(); a_it != a.end();
        ++a_it, ++b_it) {
-    *a_it += *a_it + *b_it;
+    *a_it += *b_it;
   };
   return a;
 }
@@ -82,6 +83,23 @@ std::array<double, params::dim> operator*(std::array<double, params::dim> a,
   return result;
 }
 
+stormo generator(std::default_random_engine eng)
+{
+  stormo set;
+  for (unsigned int i = 0; i < params::size; i++) {
+    auto pix = pixel.begin(); // puntatore ai pixel
+    boidstate boidprova{generate(eng)};
+    for (auto it = boidprova.pos.begin(); it != boidprova.pos.end();
+         ++it, ++pix) {
+      std::uniform_real_distribution<double> dis(
+          0, static_cast<double>(*pix * params::rate));
+      *it += dis(eng);
+    }
+    set.push_back(boidprova);
+  }
+  return set;
+}
+
 auto neighbors(stormo const& set, boidstate const& boid, const double d)
 {
   stormo neighbors{};
@@ -92,7 +110,7 @@ auto neighbors(stormo const& set, boidstate const& boid, const double d)
   return neighbors;
 }
 
-auto regola1(stormo& neighbors, boidstate& boidi)
+boidstate regola1(stormo& neighbors, boidstate& boidi)
 {
   boidstate boid{boidi};
   for (auto index = neighbors.begin(); index != neighbors.end(); ++index) {

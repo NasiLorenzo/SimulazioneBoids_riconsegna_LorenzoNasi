@@ -47,35 +47,11 @@ struct paramms
 
 //inline std::array<double, params::dim> operator+(std::array<double, params::dim>, std::array<double, params::dim>);
 
-class Vector
-{
- public:
-  std::array<double, params::dim> vec;
-  Vector(std::array<double, params::dim> v)
-      : vec{v} {}
-  Vector() : vec{} {}
-  Vector(double a, double b) :vec{a,b} {}
-  auto begin() {return vec.begin();};
-  auto end() {return vec.end();}
-  auto operator+=(Vector& a){
-    auto a_it=a.begin();
-    for(auto it=this->vec.begin();it!=this->vec.end();++it,++a_it){
-      *it+=*a_it;
-
-    }
-  };
-  auto operator[](int i){
-    return vec[i];
-  };
-};
-
-inline Vector operator+(Vector);
-inline Vector operator+(Vector);
 
 struct boidstate
 {
-  Vector pos{};
-  Vector vel{};
+  std::array<double, params::dim> pos;
+  std::array<double,params::dim> vel;
 };
 
 static const std::vector<unsigned int> pixel{1010, 710};
@@ -106,26 +82,13 @@ inline double distance(boidstate a, boidstate b)
 
 using stormo = std::vector<boidstate>;
 
-inline stormo generator(std::default_random_engine eng)
-{
-  stormo set;
-  for (unsigned int i = 0; i < params::size; i++) {
-    auto pix = pixel.begin(); // puntatore ai pixel
-    boidstate boidprova{generate(eng)};
-    for (auto it = boidprova.pos.begin(); it != boidprova.pos.end();
-         ++it, ++pix) {
-      std::uniform_real_distribution<double> dis(
-          0, static_cast<double>(*pix * params::rate));
-      *it += dis(eng);
-    }
-    set.push_back(boidprova);
-  }
-  return set;
-}
+stormo generator(std::default_random_engine);
 
-inline auto regola1(stormo& neighbors, boidstate& boidi); // repulsion
-inline auto regola2(stormo& neighbors, boidstate& boidi); // steering
-inline auto regola3(stormo& neighbors, boidstate& boidi); // cohesion
+boidstate regola1(stormo& neighbors, boidstate& boidi); // repulsion
+auto regola2(stormo& neighbors, boidstate& boidi); // steering
+auto regola3(stormo& neighbors, boidstate& boidi); // cohesion
+
+std::array<double, params::dim> operator+=(std::array<double, params::dim>&, std::array<double, params::dim>const&);
 
 inline void meiosi(stormo& set, stormo& neighborss, boidstate& boid,
                    std::default_random_engine eng,
