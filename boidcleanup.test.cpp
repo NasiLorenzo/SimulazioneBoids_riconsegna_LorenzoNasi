@@ -3,13 +3,13 @@
 #include "boidcleanup.hpp"
 namespace boids{
 
-TEST_CASE("Testing sum_norms_index")
+TEST_CASE("Testing rules")
 {
   paramms::repulsione=0.7;
   paramms::steering=0.1;
   paramms::coesione=0.1;
-  paramms::neigh2=100000;
-  paramms::neigh_align=100000;
+  paramms::neigh2=1000000;
+  paramms::neigh_align=1000000;
   boidstate boid1;
   boid1.pos={500.,0.};
   boid1.vel={0.,0.};
