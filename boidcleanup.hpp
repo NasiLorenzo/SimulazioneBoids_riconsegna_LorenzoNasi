@@ -4,46 +4,75 @@
 #include <algorithm>
 #include <array>
 #include <cassert>
+#include <cmath>
+#include <functional>
 #include <iostream>
 #include <iterator>
 #include <random>
 #include <string>
 #include <vector>
-#include <cmath>
-#include <functional>
 
-namespace boids{
+namespace boids {
 
-
-struct params {
-  static constexpr double sigma{0.01}; //gli esagomi vengono se c'è un parametro di steering basso e una distanza di reticolo bassa
-  static constexpr unsigned int dim{2};  // dimensione
+struct params
+{
+  static constexpr double sigma{
+      0.01}; // gli esagoni vengono se c'è un parametro di steering basso e una
+             // distanza di reticolo bassa
+  static constexpr unsigned int dim{2}; // dimensione
   static constexpr double neigh_co{90};
   static constexpr double reproduction{20};
   static constexpr unsigned int interazioni{2};
-  static constexpr float deltaT{1/20.f};
+  static constexpr float deltaT{1 / 20.f};
   static constexpr unsigned int n = 2;
-  //unsigned int vert{20};
-  //unsigned int hor{20};
+  // unsigned int vert{20};
+  // unsigned int hor{20};
   static constexpr unsigned int size{500};
-  static constexpr double rate{1};//rapporto tra la dimensione dello schermo e della generazione
+  static constexpr double rate{
+      1}; // rapporto tra la dimensione dello schermo e della generazione
   static constexpr unsigned int rate2{20};
   static constexpr double vel_factor{10000};
-  static constexpr double pi=3.141592;
-  static constexpr double theta{pi/12};
-  //static const std::vector<unsigned int> pixel;
+  static constexpr double pi = 3.141592;
+  static constexpr double theta{pi / 12};
 };
-struct paramms{
+
+struct paramms
+{
   static double repulsione;
   static double steering;
   static double coesione;
-  static double neigh_align;//raggio visivo
-  static double neigh2;//raggio di repulsione
-};  
+  static double neigh_align; // raggio visivo
+  static double neigh2;      // raggio di repulsione
+};
 
-struct boidstate {
-  std::array<double, params::dim> pos;
-  std::array<double, params::dim> vel;
+//inline std::array<double, params::dim> operator+(std::array<double, params::dim>, std::array<double, params::dim>);
+
+class Vector
+{
+ public:
+  std::array<double, params::dim> vec;
+  Vector(std::array<double, params::dim> v)
+      : vec{v} {}
+  Vector() : vec{} {};
+  auto begin() {return vec.begin();};
+  auto end() {return vec.end();}
+  auto operator+=(Vector& a){
+    auto a_it=a.begin();
+    for(auto it=this->vec.begin();it!=this->vec.end();++it,++a_it){
+      *it+=*a_it;
+
+    }
+    
+  };
+};
+
+inline Vector operator+(Vector);
+inline Vector operator+(Vector);
+
+struct boidstate
+{
+  Vector pos{};
+  Vector vel{};
 };
 
 static const std::vector<unsigned int> pixel{1010, 710};
@@ -62,7 +91,7 @@ inline boidstate generate(std::default_random_engine eng)
   return boid;
 }
 
-inline double distance(const boidstate& a, const boidstate& b)
+inline double distance(boidstate a, boidstate b)
 { // sqrt dispendiosa
   double s{};
   for (auto it = a.pos.begin(), index = b.pos.begin(); it != a.pos.end();
@@ -78,7 +107,7 @@ inline stormo generator(std::default_random_engine eng)
 {
   stormo set;
   for (unsigned int i = 0; i < params::size; i++) {
-    auto pix = pixel.begin();
+    auto pix = pixel.begin(); // puntatore ai pixel
     boidstate boidprova{generate(eng)};
     for (auto it = boidprova.pos.begin(); it != boidprova.pos.end();
          ++it, ++pix) {
@@ -91,27 +120,29 @@ inline stormo generator(std::default_random_engine eng)
   return set;
 }
 
+inline auto regola1(stormo& neighbors, boidstate& boidi); // repulsion
+inline auto regola2(stormo& neighbors, boidstate& boidi); // steering
+inline auto regola3(stormo& neighbors, boidstate& boidi); // cohesion
 
+inline void meiosi(stormo& set, stormo& neighborss, boidstate& boid,
+                   std::default_random_engine eng,
+                   double distance); // requires revision
 
-
-inline auto regola1(stormo& neighbors, boidstate& boidi);//repulsion
-inline auto regola2(stormo& neighbors, boidstate& boidi);//steering
-inline auto regola3(stormo& neighbors, boidstate& boidi);//cohesion
-
-inline void meiosi(stormo& set, stormo& neighborss, boidstate& boid, std::default_random_engine eng, double distance); //requires revision
-
-class ensemble {
+class ensemble
+{
   stormo set;
   stormo newset{set};
 
  public:
-  ensemble(stormo& old) : set{old} {}
+  ensemble(stormo& old)
+      : set{old}
+  {}
   stormo set_();
   stormo newset_();
   std::size_t size_();
   void update();
   void brown_update(std::random_device& r);
 };
-}
+} // namespace boids
 
 #endif
