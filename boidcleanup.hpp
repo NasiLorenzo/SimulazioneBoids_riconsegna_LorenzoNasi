@@ -45,22 +45,34 @@ struct paramms
   static double neigh2;      // raggio di repulsione
 };
 
+//inline std::array<double, params::dim> operator+(std::array<double, params::dim>, std::array<double, params::dim>);
+
 class Vector
 {
  public:
   std::array<double, params::dim> vec;
   Vector(std::array<double, params::dim> v)
-      : vec{v}
-  {}
+      : vec{v} {}
+  Vector() : vec{} {};
+  auto begin() {return vec.begin();};
+  auto end() {return vec.end();}
+  auto operator+=(Vector& a){
+    auto a_it=a.begin();
+    for(auto it=this->vec.begin();it!=this->vec.end();++it,++a_it){
+      *it+=*a_it;
+
+    }
+    
+  };
 };
 
 inline Vector operator+(Vector);
-inline std::array<double, params::dim> operator+(std::array<double, params::dim>);
+inline Vector operator+(Vector);
 
 struct boidstate
 {
-  Vector pos;
-  Vector vel;
+  Vector pos{};
+  Vector vel{};
 };
 
 static const std::vector<unsigned int> pixel{1010, 710};
@@ -79,7 +91,7 @@ inline boidstate generate(std::default_random_engine eng)
   return boid;
 }
 
-inline double distance(const boidstate& a, const boidstate& b)
+inline double distance(boidstate a, boidstate b)
 { // sqrt dispendiosa
   double s{};
   for (auto it = a.pos.begin(), index = b.pos.begin(); it != a.pos.end();

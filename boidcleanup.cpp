@@ -49,6 +49,39 @@ inline stormo generator(std::default_random_engine eng)
   return set;
 }
 */
+
+std::array<double, params::dim> operator+(std::array<double, params::dim> a,
+                                          std::array<double, params::dim> b)
+{
+  std::array<double, params::dim> result{};
+  for (auto a_it = a.begin(), b_it = b.begin(), r_it = result.begin();
+       a_it != a.end(); ++a_it, ++b_it, ++r_it) {
+    *r_it += *a_it + *b_it;
+  };
+  return result;
+}
+
+std::array<double, params::dim> operator+=(std::array<double, params::dim> a,
+                                          std::array<double, params::dim> b)
+{
+  for (auto a_it = a.begin(), b_it = b.begin();
+       a_it != a.end(); ++a_it, ++b_it) {
+    *a_it += *a_it + *b_it;
+  };
+  return a;
+}
+
+std::array<double, params::dim> operator*(std::array<double, params::dim> a,
+                                          std::array<double, params::dim> b)
+{
+  std::array<double, params::dim> result{1., 1.};
+  for (auto a_it = a.begin(), b_it = b.begin(), r_it = result.begin();
+       a_it != a.end(); ++a_it, ++b_it, ++r_it) {
+    *r_it += *a_it * *b_it;
+  };
+  return result;
+}
+
 auto neighbors(stormo const& set, boidstate const& boid, const double d)
 {
   stormo neighbors{};
