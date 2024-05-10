@@ -2,90 +2,75 @@
 
 namespace boids {
 
-double paramms::repulsione  = 0.7;
+double paramms::repulsione  = 0.07;
 double paramms::steering    = 0.1;
 double paramms::coesione    = 0.1;
-double paramms::neigh2      = 100000;
-double paramms::neigh_align = 100000;
+double paramms::neigh2      = 15;
+double paramms::neigh_align = 70;
 
-/*inline boidstate generate(std::default_random_engine eng)
+/*struct uniform2D{
+  std::uniform_real_distribution<double> disX(0, static_cast<double>(pixel *
+params::rate)); std::uniform_real_distribution<double> disY;
+
+};*/
+
+boidstate generate(std::default_random_engine& eng)
 { // genera pos e vel di un boid distribuiti secondo
   // una gauss centrata in 0
   boidstate boid{};
+  // std::array<double,2> Uniform2D {std::uniform_real_distribution<double>
+  // dis(0, static_cast<double>(pixe * params::rate));};
+
   std::normal_distribution<double> dist(0.0, params::sigma);
-  for (auto it = boid.pos.begin(); it != boid.pos.end(); ++it) {
-    *it = dist(eng);
-  }
-  for (auto it = boid.vel.begin(), last = boid.vel.end(); it != last; ++it) {
-    *it = (params::vel_factor * dist(eng));
-  }
+  std::for_each(boid.pos.begin(), boid.pos.end(),
+                [&](double& x) { x = dist(eng); });
+  std::for_each(boid.vel.begin(), boid.vel.end(),
+                [&](double& x) { x = params::vel_factor * dist(eng); });
   return boid;
 }
 
-inline double distance(const boidstate& a, const boidstate& b)
-{ // sqrt dispendiosa
-  double s{};
-  for (auto it = a.pos.begin(), index = b.pos.begin(); it != a.pos.end();
-       ++it, ++index) {
-    s += pow((*it) - (*index), 2);
-  }
-  return s;
+double distance(boidstate const& a, boidstate const& b)
+{
+  return std::transform_reduce(
+      a.pos.begin(), a.pos.end(), b.pos.begin(), 0, std::plus<>(),
+      [](double a, double b) { return pow(a - b, 2); });
 }
 
-inline stormo generator(std::default_random_engine eng)
+std::array<double, params::dim>
+operator+=(std::array<double, params::dim>& a,
+           std::array<double, params::dim> const& b)
 {
-  stormo set;
-  for (unsigned int i = 0; i < params::size; i++) {
-    auto pix = pixel.begin();
-    boidstate boidprova{generate(eng)};
-    for (auto it = boidprova.pos.begin(); it != boidprova.pos.end();
-         ++it, ++pix) {
-      std::uniform_real_distribution<double> dis(
-          0, static_cast<double>(*pix * params::rate));
-      *it += dis(eng);
-    }
-    set.push_back(boidprova);
-  }
-  return set;
-}
-*/
-
-std::array<double, params::dim> operator+(std::array<double, params::dim> a,
-                                          std::array<double, params::dim> b)
-{
-  std::array<double, params::dim> result{};
-  for (auto a_it = a.begin(), b_it = b.begin(), r_it = result.begin();
-       a_it != a.end(); ++a_it, ++b_it, ++r_it) {
-    *r_it += *a_it + *b_it;
-  };
-  return result;
-}
-
-std::array<double, params::dim> operator+=(std::array<double, params::dim>& a,
-                                           std::array<double, params::dim>const& b)
-{
-  auto b_it = b.begin();
-  for (auto a_it = a.begin(); a_it != a.end();
-       ++a_it, ++b_it) {
-    *a_it += *b_it;
-  };
+  std::transform(a.begin(), a.end(), b.begin(), a.begin(),
+                 [](double a, double b) { return a + b; });
   return a;
 }
 
-std::array<double, params::dim> operator*(std::array<double, params::dim> a,
-                                          std::array<double, params::dim> b)
+std::array<double, params::dim>
+operator+(const std::array<double, params::dim>& a,
+          const std::array<double, params::dim>& b)
 {
-  std::array<double, params::dim> result{1., 1.};
-  for (auto a_it = a.begin(), b_it = b.begin(), r_it = result.begin();
-       a_it != a.end(); ++a_it, ++b_it, ++r_it) {
-    *r_it += *a_it * *b_it;
-  };
+  std::array<double, params::dim> result{};
+  std::transform(a.begin(), a.end(), b.begin(), result.begin(),
+                 [&](double c, double d) { return c + d; });
   return result;
 }
 
-stormo generator(std::default_random_engine eng)
+std::array<double, params::dim> operator*(double a,
+                                          std::array<double, params::dim>& b)
 {
-  stormo set;
+  std::for_each(b.begin(), b.end(), [a](double& x) { x = a * x; });
+  return b;
+}
+
+std::array<double, params::dim> operator/(double a,
+                                          std::array<double, params::dim>& b)
+{
+  std::for_each(b.begin(), b.end(), [&a](double x) { return a / x; });
+  return b;
+}
+stormo generator(std::default_random_engine& eng)
+{
+  stormo set{};
   for (unsigned int i = 0; i < params::size; i++) {
     auto pix = pixel.begin(); // puntatore ai pixel
     boidstate boidprova{generate(eng)};
@@ -97,16 +82,17 @@ stormo generator(std::default_random_engine eng)
     }
     set.push_back(boidprova);
   }
+
   return set;
 }
 
 auto neighbors(stormo const& set, boidstate const& boid, const double d)
 {
   stormo neighbors{};
-  for (auto index = set.begin(); index != set.end(); ++index) {
-    if (distance(boid, *index) < pow(d, 2) && distance(boid, *index) != 0)
-      neighbors.push_back(*index);
-  }
+  std::for_each(set.begin(), set.end(), [&](boidstate neighbor) {
+    if (distance(boid,neighbor) < pow(d, 2) && distance(boid, neighbor) != 0)
+      neighbors.push_back(neighbor);
+  });
   return neighbors;
 }
 

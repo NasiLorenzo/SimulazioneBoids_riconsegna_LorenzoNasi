@@ -27,7 +27,7 @@ struct params
   static constexpr unsigned int n = 2;
   // unsigned int vert{20};
   // unsigned int hor{20};
-  static constexpr unsigned int size{1000};
+  static constexpr unsigned int size{200};
   static constexpr double rate{
       1}; // rapporto tra la dimensione dello schermo e della generazione
   static constexpr unsigned int rate2{20};
@@ -56,33 +56,17 @@ struct boidstate
 
 static const std::vector<unsigned int> pixel{1010, 710};
 
-inline boidstate generate(std::default_random_engine eng)
-{ // genera pos e vel di un boid distribuiti secondo
-  // una gauss centrata in 0
-  boidstate boid{};
-  std::normal_distribution<double> dist(0.0, params::sigma);
-  for (auto it = boid.pos.begin(); it != boid.pos.end(); ++it) {
-    *it = dist(eng);
-  }
-  for (auto it = boid.vel.begin(), last = boid.vel.end(); it != last; ++it) {
-    *it = (params::vel_factor * dist(eng));
-  }
-  return boid;
-}
+inline boidstate generate(std::default_random_engine& eng);
 
-inline double distance(boidstate a, boidstate b)
-{ // sqrt dispendiosa
-  double s{};
-  for (auto it = a.pos.begin(), index = b.pos.begin(); it != a.pos.end();
-       ++it, ++index) {
-    s += pow((*it) - (*index), 2);
-  }
-  return s;
-}
+inline double distance(boidstate const&, boidstate const&);
 
 using stormo = std::vector<boidstate>;
 
-stormo generator(std::default_random_engine);
+std::array<double,params::dim> operator+(std::array<double,params::dim> const&, std::array<double,params::dim> const& );
+std::array<double,params::dim> operator*(double, std::array<double,params::dim>& );
+std::array<double,params::dim> operator+=(std::array<double,params::dim>&, std::array<double,params::dim> const& );
+std::array<double, params::dim> operator/(double, const std::array<double, params::dim>&);
+stormo generator(std::default_random_engine&);
 
 boidstate regola1(stormo& neighbors, boidstate& boidi); // repulsion
 auto regola2(stormo& neighbors, boidstate& boidi); // steering
