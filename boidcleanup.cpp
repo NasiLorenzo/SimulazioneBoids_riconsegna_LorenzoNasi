@@ -124,11 +124,11 @@ void regola1(stormo& neighbors,boidstate& boid)
   });
 }
 
-void regola2(stormo& neighbors, std::array<double,params::dim>const & boid_old, boidstate& boid)
+void regola2(stormo& neighbors, boidstate& oldboid, boidstate& boid)
 {
   auto n = neighbors.size();
   std::for_each(neighbors.begin(),neighbors.end(),[&](boidstate neighbor){
-    auto x = neighbor.vel-boid_old;
+    auto x = neighbor.vel-oldboid.vel;
     boid.vel += paramms::steering / n * (x);
   });
 }
