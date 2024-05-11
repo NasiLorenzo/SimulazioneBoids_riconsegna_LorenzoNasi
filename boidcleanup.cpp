@@ -124,22 +124,44 @@ void regola1(stormo& neighbors,boidstate& boid)
   });
 }
 
-void regola2(stormo& neighbors, std::array<double,params::dim>const & boid_old, boidstate& boid)
+void _regola2(stormo& neighbors, boidstate& boid_old, boidstate& boid)
 {
   auto n = neighbors.size();
-  std::for_each(neighbors.begin(),neighbors.end(),[&](boidstate neighbor){
-    auto x = neighbor.vel-boid_old;
+  std::cout << "vicini 2 " << n << "\n";
+  for (auto index = neighbors.begin(); index != neighbors.end(); ++index) {
+    auto x = index->vel-boid_old.vel;
     boid.vel += paramms::steering / n * (x);
-  });
+    //(*it) += paramms::steering / (n) * ((*jt));
+    // std::cout<<"regola2: vel boid "<<it-boid.vel.begin()+1<<*it<<"\n";
+  }
+  //boid.vel += -paramms::steering * (boid_old.vel);
+}
+
+void regola2(stormo& neighbors, boidstate& boid_old, boidstate& boid)
+{
+  auto n = neighbors.size();
+  for (auto index = neighbors.begin(); index != neighbors.end(); ++index) {
+    for (auto it = boid.vel.begin(), jt = (*index).vel.begin(),
+              i = boid_old.vel.begin();
+         it != boid.vel.end(); ++it, ++jt, ++i) {
+      (*it) += paramms::steering / (n) * ((*jt) - *i);
+      //(*it) += paramms::steering / (n) * ((*jt));
+      // std::cout<<"regola2: vel boid "<<it-boid.vel.begin()+1<<*it<<"\n";
+    }
+  }
+  // boid.vel+=-paramms::steering*(boid_old.vel);
 }
 
 void regola3(stormo& neighbors, boidstate& boid)
 {
   auto n = neighbors.size();
-  std::for_each(neighbors.begin(),neighbors.end(),[&](boidstate neighbor){
-    auto x = neighbor.pos-boid.pos;
-    boid.vel += paramms::steering / n * (x);
-  });
+  for (auto index = neighbors.begin(); index != neighbors.end(); ++index) {
+    for (auto it = boid.vel.begin(), jt = (*index).pos.begin(),
+              i = boid.pos.begin();
+         it != boid.vel.end(); ++it, ++jt, ++i) {
+      (*it) += paramms::coesione / (n) * ((*jt) - (*i));
+    }
+  }
 }
 
 auto regola4(stormo& neighbors, boidstate& boid)
@@ -220,53 +242,43 @@ stormo ensemble::set_()
 {
   return set;
 }
-/*stormo ensemble::newset_()
+stormo ensemble::newset_()
 {
   return newset;
-}*/
+}
 std::size_t ensemble::size_()
 {
   return set.size();
 }
 
-double angle(boidstate const& boid){
-  return atan(boid.vel[1]/boid.vel[0]);
-}
-void velvec(stormo const& set, std::vector<std::array<double, params::dim>>& old_velvec){
-  auto jt=old_velvec.begin();
-  for(auto it=set.begin();it!=set.end();++it,++jt){
-    *jt=(*it).vel;
-  }
-}
 void ensemble::update()
 {
-  velvec(set,oldvel);
-  auto jt = oldvel.begin();
-  for (auto it = set.begin(); it != set.end();
+  for (auto it = set.begin(), jt = newset.begin(); it != set.end();
        ++it, ++jt) {
     stormo neighbor{neighbors(set, *it, paramms::neigh_align)};
     stormo close_neighbor{neighbors(neighbor, *it, paramms::neigh2)};
-    //regola2(neighbor, *jt, *it);
-    regola1(close_neighbor, *it);
-    regola3(neighbor, *it);
-    //*jt      = regola4(neighbor, *jt); dd
+    regola2(neighbor, *it, *jt);
+    regola1(close_neighbor, *jt);
+    regola3(neighbor, *jt);
+    //*jt      = regola4(neighbor, *jt);
     auto pix = pixel.begin();
-    for (auto index = (*it).pos.begin(), velind = (*it).vel.begin();
-         index != (*it).pos.end(); ++index, ++velind, ++pix) {
+    for (auto index = (*jt).pos.begin(), velind = (*jt).vel.begin();
+         index != (*jt).pos.end(); ++index, ++velind, ++pix) {
       (*index) += (*velind) * params::deltaT;
-      (*index) = fmod(*index, *pix * params::rate);
-      if (*index <= 0)
-       *index += *pix * params::rate;
+      //(*index) = fmod(*index, *pix * params::rate);
+      /*if (*index <= 0)
+       *index += *pix * params::rate;*/
       // assert(*index <= *pix * params::rate);
     }
   }
-  std::cout << "Velocità x e y " << compx(set) << " " << compy(set)
+  std::cout << "Velocità x e y " << compx(newset) << " " << compy(newset)
             << "\n";
-  std::cout << "velocità media " << meanvel(set) << "\n";
+  std::cout << "velocità media " << meanvel(newset) << "\n";
   // "\n";
+  set = newset;
 }
 
-/*void ensemble::brown_update(std::random_device& r)
+void ensemble::brown_update(std::random_device& r)
 {
   std::default_random_engine eng(r());
   for (auto it = set.begin(), jt = newset.begin(); it != set.end();
@@ -295,5 +307,5 @@ void ensemble::update()
   }
   std::cout << "Velocità media " << meanvel(newset) << "\n";
   set = newset;
-}*/
+}
 } // namespace boids
