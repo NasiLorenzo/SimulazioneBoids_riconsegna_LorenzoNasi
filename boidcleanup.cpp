@@ -116,7 +116,7 @@ auto neighbors(stormo const& set, boidstate const& boid, const double d)
   return neighbors;
 }
 
-void regola1(stormo& neighbors, boidstate const& boid_old,boidstate& boid)
+void regola1(stormo& neighbors,boidstate& boid)
 {
   std::for_each(neighbors.begin(), neighbors.end(), [&](boidstate neighbor) {
     auto x = neighbor.pos - boid.pos;
@@ -152,9 +152,8 @@ void regola2(stormo& neighbors, boidstate& boid_old, boidstate& boid)
   // boid.vel+=-paramms::steering*(boid_old.vel);
 }
 
-auto regola3(stormo& neighbors, boidstate& boidi)
+void regola3(stormo& neighbors, boidstate& boid)
 {
-  boidstate boid{boidi};
   auto n = neighbors.size();
   for (auto index = neighbors.begin(); index != neighbors.end(); ++index) {
     for (auto it = boid.vel.begin(), jt = (*index).pos.begin(),
@@ -163,7 +162,6 @@ auto regola3(stormo& neighbors, boidstate& boidi)
       (*it) += paramms::coesione / (n) * ((*jt) - (*i));
     }
   }
-  return boid;
 }
 
 auto regola4(stormo& neighbors, boidstate& boid)
@@ -259,9 +257,9 @@ void ensemble::update()
        ++it, ++jt) {
     stormo neighbor{neighbors(set, *it, paramms::neigh_align)};
     stormo close_neighbor{neighbors(neighbor, *it, paramms::neigh2)};
-    regola1(close_neighbor, *it, *jt);
     regola2(neighbor, *it, *jt);
-    *jt      = regola3(neighbor, *jt);
+    regola1(close_neighbor, *jt);
+    regola3(neighbor, *jt);
     //*jt      = regola4(neighbor, *jt);
     auto pix = pixel.begin();
     for (auto index = (*jt).pos.begin(), velind = (*jt).vel.begin();

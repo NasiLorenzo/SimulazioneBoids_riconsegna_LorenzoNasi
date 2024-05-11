@@ -71,9 +71,9 @@ std::array<double,params::dim> operator-(std::array<double,params::dim> const&, 
 
 stormo generator(std::default_random_engine&);
 
-void regola1(stormo& neighbors, boidstate const& boidi, boidstate& boid_old); // repulsion
+void regola1(stormo& neighbors, boidstate& boid_old); // repulsion
 void regola2(stormo& neighbors, boidstate& boidi, boidstate& boid); // steering
-auto regola3(stormo& neighbors, boidstate& boidi); // cohesion
+void regola3(stormo& neighbors, boidstate& boidi); // cohesion
 auto regola4(stormo& neighbors, boidstate& boid);
 std::array<double, params::dim> operator+=(std::array<double, params::dim>&, std::array<double, params::dim>const&);
 
