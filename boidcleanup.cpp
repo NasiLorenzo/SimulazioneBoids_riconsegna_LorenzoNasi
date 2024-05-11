@@ -124,45 +124,24 @@ void regola1(stormo& neighbors,boidstate& boid)
   });
 }
 
-void _regola2(stormo& neighbors, boidstate& boid_old, boidstate& boid)
+void regola2(stormo& neighbors, std::array<double,params::dim>const & boid_old, boidstate& boid)
 {
   auto n = neighbors.size();
-  std::cout << "vicini 2 " << n << "\n";
-  for (auto index = neighbors.begin(); index != neighbors.end(); ++index) {
-    auto x = index->vel-boid_old.vel;
+  std::for_each(neighbors.begin(),neighbors.end(),[&](boidstate neighbor){
+    auto x = neighbor.vel-boid_old;
     boid.vel += paramms::steering / n * (x);
-    //(*it) += paramms::steering / (n) * ((*jt));
-    // std::cout<<"regola2: vel boid "<<it-boid.vel.begin()+1<<*it<<"\n";
-  }
-  //boid.vel += -paramms::steering * (boid_old.vel);
-}
-
-void regola2(stormo& neighbors, boidstate& boid_old, boidstate& boid)
-{
-  auto n = neighbors.size();
-  for (auto index = neighbors.begin(); index != neighbors.end(); ++index) {
-    for (auto it = boid.vel.begin(), jt = (*index).vel.begin(),
-              i = boid_old.vel.begin();
-         it != boid.vel.end(); ++it, ++jt, ++i) {
-      (*it) += paramms::steering / (n) * ((*jt) - *i);
-      //(*it) += paramms::steering / (n) * ((*jt));
-      // std::cout<<"regola2: vel boid "<<it-boid.vel.begin()+1<<*it<<"\n";
-    }
-  }
-  // boid.vel+=-paramms::steering*(boid_old.vel);
+  });
 }
 
 void regola3(stormo& neighbors, boidstate& boid)
 {
   auto n = neighbors.size();
-  for (auto index = neighbors.begin(); index != neighbors.end(); ++index) {
-    for (auto it = boid.vel.begin(), jt = (*index).pos.begin(),
-              i = boid.pos.begin();
-         it != boid.vel.end(); ++it, ++jt, ++i) {
-      (*it) += paramms::coesione / (n) * ((*jt) - (*i));
-    }
-  }
+  std::for_each(neighbors.begin(),neighbors.end(),[&](boidstate neighbor){
+    auto x = neighbor.pos-boid.pos;
+    boid.vel += paramms::steering / n * (x);
+  });
 }
+
 
 auto regola4(stormo& neighbors, boidstate& boid)
 {
