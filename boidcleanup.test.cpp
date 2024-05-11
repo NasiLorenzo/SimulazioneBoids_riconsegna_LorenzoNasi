@@ -27,7 +27,13 @@ TEST_CASE("Testing rules")
   flock.update();
   REQUIRE(flock.size_() == 4);
 
-  CHECK(flock.set_()[0].pos[0] == doctest::Approx(471.33));
+  CHECK(flock.set_()[0].vel[0] == doctest::Approx(471.33));
+  CHECK(flock.set_()[1].vel[0] == doctest::Approx(471.33));
+  CHECK(flock.set_()[2].vel[0] == doctest::Approx(471.33));
+  CHECK(flock.set_()[3].vel[0] == doctest::Approx(471.33));
+
+
+
 }
 
 }

@@ -2,12 +2,12 @@
 
 int main()
 {
-  boids::paramms::repulsione  = 0.06;
+  boids::paramms::repulsione  = 0.2;
   boids::paramms::steering    = 0.07;
   boids::paramms::coesione    = 0.01;
   boids::paramms::neigh_align = 70;
   boids::paramms::neigh2      = 15;
-
+  boids::paramms::mod_align=0.000003;
   std::random_device r;
   std::default_random_engine eng(r());
   boids::stormo flock = boids::generator(eng);

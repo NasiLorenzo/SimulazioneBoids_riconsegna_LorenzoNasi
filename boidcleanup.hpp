@@ -42,7 +42,8 @@ struct paramms
   static double steering;
   static double coesione;
   static double neigh_align; // raggio visivo
-  static double neigh2;      // raggio di repulsione
+  static double neigh2; 
+  static double mod_align;     // raggio di repulsione
 };
 
 //inline std::array<double, params::dim> operator+(std::array<double, params::dim>, std::array<double, params::dim>);
@@ -50,7 +51,7 @@ struct paramms
 
 struct boidstate
 {
-  std::array<double, params::dim> pos;
+  std::array<double,params::dim> pos;
   std::array<double,params::dim> vel;
 };
 
@@ -63,15 +64,17 @@ inline double distance(boidstate const&, boidstate const&);
 using stormo = std::vector<boidstate>;
 
 std::array<double,params::dim> operator+(std::array<double,params::dim> const&, std::array<double,params::dim> const& );
-std::array<double,params::dim> operator*(double, std::array<double,params::dim>& );
+std::array<double,params::dim> operator*(const double, std::array<double,params::dim>& );
 std::array<double,params::dim> operator+=(std::array<double,params::dim>&, std::array<double,params::dim> const& );
-std::array<double, params::dim> operator/(double, const std::array<double, params::dim>&);
+std::array<double, params::dim> operator/(double, std::array<double, params::dim>&);
+std::array<double,params::dim> operator-(std::array<double,params::dim> const&, std::array<double,params::dim> const& );
+
 stormo generator(std::default_random_engine&);
 
 boidstate regola1(stormo& neighbors, boidstate& boidi); // repulsion
-auto regola2(stormo& neighbors, boidstate& boidi); // steering
+void regola2(stormo& neighbors, boidstate& boidi, boidstate& boid); // steering
 auto regola3(stormo& neighbors, boidstate& boidi); // cohesion
-
+auto regola4(stormo& neighbors, boidstate& boid);
 std::array<double, params::dim> operator+=(std::array<double, params::dim>&, std::array<double, params::dim>const&);
 
 inline void meiosi(stormo& set, stormo& neighborss, boidstate& boid,
