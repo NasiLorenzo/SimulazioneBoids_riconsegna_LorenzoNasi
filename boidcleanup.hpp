@@ -61,6 +61,8 @@ inline boidstate generate(std::default_random_engine& eng);
 
 inline double distance(boidstate const&, boidstate const&);
 
+double angle(boidstate const&);
+
 using stormo = std::vector<boidstate>;
 
 std::array<double,params::dim> operator+(std::array<double,params::dim> const&, std::array<double,params::dim> const& );
@@ -72,7 +74,7 @@ std::array<double,params::dim> operator-(std::array<double,params::dim> const&, 
 stormo generator(std::default_random_engine&);
 
 void regola1(stormo& neighbors, boidstate& boid_old); // repulsion
-void regola2(stormo& neighbors, boidstate& boidi, boidstate& boid); // steering
+void regola2(stormo& neighbors, std::array<double, params::dim>const& boidi, boidstate& boid); // steering
 void regola3(stormo& neighbors, boidstate& boidi); // cohesion
 auto regola4(stormo& neighbors, boidstate& boid);
 std::array<double, params::dim> operator+=(std::array<double, params::dim>&, std::array<double, params::dim>const&);
@@ -84,11 +86,11 @@ inline void meiosi(stormo& set, stormo& neighborss, boidstate& boid,
 class ensemble
 {
   stormo set;
-  stormo newset{set};
+  std::vector<std::array<double, params::dim>> oldvel;
 
  public:
   ensemble(stormo& old)
-      : set{old}
+      : set{old}, oldvel(old.size())
   {}
   stormo set_();
   stormo newset_();

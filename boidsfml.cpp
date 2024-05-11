@@ -2,11 +2,11 @@
 
 int main()
 {
-  boids::paramms::repulsione  = 0.2;
-  boids::paramms::steering    = 0.07;
+  boids::paramms::repulsione  = 0.06;
+  boids::paramms::steering    = 0.02;
   boids::paramms::coesione    = 0.01;
   boids::paramms::neigh_align = 70;
-  boids::paramms::neigh2      = 15;
+  boids::paramms::neigh2      = 20;
   boids::paramms::mod_align=0.000003;
   std::random_device r;
   std::default_random_engine eng(r());
@@ -51,7 +51,7 @@ int main()
       // std::cout<<"Ce so passato "<<i<< " volte\n";
     }
 
-    window.clear(sf::Color::White);
+    //window.clear(sf::Color::White);
     //window.draw(backgroundSprite);
     // Draw boids
     for (auto& boid : prova.set_()) {
@@ -64,7 +64,27 @@ int main()
               boid.pos[1]
               / boids::params::rate)); // Assuming x and y are in pos[0]
                                        // and pos[1] respectively
-      window.draw(circle);
+      //window.draw(circle);
+      float angle = boids::angle(boid); // Assuming you have the angle in degrees
+
+      // Arrow length and width
+      float arrowLength = 30;
+      float arrowWidth = 10;
+
+            // Calculate arrow positiion            
+      sf::Vector2f arrowPos = circle.getPosition();
+      sf::Vector2f arrowEndPos(arrowPos.x + arrowLength * cos(angle),
+      arrowPos.y + arrowLength * sin(angle));
+
+      // Draw arrow
+      sf::ConvexShape arrow(3);
+      arrow.setPoint(0, sf::Vector2f(0, 0));
+      arrow.setPoint(1, sf::Vector2f(-arrowWidth, arrowWidth / 2));
+      arrow.setPoint(2, sf::Vector2f(-arrowWidth, -arrowWidth / 2));
+      arrow.setFillColor(sf::Color::Red);
+      arrow.setPosition(arrowEndPos);
+      arrow.setRotation(angle);
+      window.draw(arrow);
     }
 
     window.display();
