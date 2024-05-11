@@ -116,30 +116,12 @@ auto neighbors(stormo const& set, boidstate const& boid, const double d)
   return neighbors;
 }
 
-boidstate regola1(stormo& neighbors, boidstate& boid_old)
+void regola1(stormo& neighbors, boidstate const& boid_old,boidstate& boid)
 {
-  boidstate boid{boid_old};
-  /*for (auto index = neighbors.begin(); index != neighbors.end(); ++index) {
-    for (auto it = boid.vel.begin(), jt = (*index).pos.begin(),
-              i = boid.pos.begin();
-         it != boid.vel.end(); ++it, ++jt, ++i) {
-      *it += -paramms::repulsione * ((*jt) - *i);
-      // std::cout<<"regola1: vel boid "<<it-boid.vel.begin()+1<<*it<<"\n";
-    }
-  }*/
-  // for (auto& index: neighbors) {
-  // auto x=index.pos-boid.pos;
-  // boid.vel += -paramms::repulsione * x;
-  //  std::cout<<"regola1: vel boid "<<it-boid.vel.begin()+1<<*it<<"\n";
-  // boid.vel += -paramms::repulsione * index.pos + paramms::repulsione *
-  // boid.pos;
-
-  //}
   std::for_each(neighbors.begin(), neighbors.end(), [&](boidstate neighbor) {
     auto x = neighbor.pos - boid.pos;
     boid.vel += -paramms::repulsione * (x);
   });
-  return boid;
 }
 
 void _regola2(stormo& neighbors, boidstate& boid_old, boidstate& boid)
@@ -277,7 +259,7 @@ void ensemble::update()
        ++it, ++jt) {
     stormo neighbor{neighbors(set, *it, paramms::neigh_align)};
     stormo close_neighbor{neighbors(neighbor, *it, paramms::neigh2)};
-    *jt = regola1(close_neighbor, *it);
+    regola1(close_neighbor, *it, *jt);
     regola2(neighbor, *it, *jt);
     *jt      = regola3(neighbor, *jt);
     //*jt      = regola4(neighbor, *jt);
