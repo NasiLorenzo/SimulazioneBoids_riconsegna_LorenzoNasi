@@ -23,7 +23,7 @@ struct params
   static constexpr double neigh_co{90};
   static constexpr double reproduction{20};
   static constexpr unsigned int interazioni{2};
-  static constexpr float deltaT{1 / 20.f};
+  static constexpr float deltaT{1 / 60.f};
   static constexpr unsigned int n = 2;
   // unsigned int vert{20};
   // unsigned int hor{20};
@@ -81,6 +81,7 @@ inline void meiosi(stormo& set, stormo& neighborss, boidstate& boid,
                    std::default_random_engine eng,
                    double distance); // requires revision
 
+double angle(boidstate const& boid);
 class ensemble
 {
   stormo set;
@@ -93,6 +94,7 @@ class ensemble
   stormo set_();
   stormo newset_();
   std::size_t size_();
+  boidstate delta();
   void update();
   void brown_update(std::random_device& r);
 };

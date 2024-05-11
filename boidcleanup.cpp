@@ -230,8 +230,13 @@ std::size_t ensemble::size_()
   return set.size();
 }
 
+double angle(boidstate const& boid){
+  return atan2(boid.vel[1],boid.vel[0]);
+}
+
 void ensemble::update()
 {
+  std::cout<<"Angolo "<<angle(set[0])<<"\n";
   for (auto it = set.begin(), jt = newset.begin(); it != set.end();
        ++it, ++jt) {
     stormo neighbor{neighbors(set, *it, paramms::neigh_align)};
@@ -244,16 +249,12 @@ void ensemble::update()
     for (auto index = (*jt).pos.begin(), velind = (*jt).vel.begin();
          index != (*jt).pos.end(); ++index, ++velind, ++pix) {
       (*index) += (*velind) * params::deltaT;
-      //(*index) = fmod(*index, *pix * params::rate);
-      /*if (*index <= 0)
-       *index += *pix * params::rate;*/
+      (*index) = fmod(*index, *pix * params::rate);
+      if (*index <= 0)
+       *index += *pix * params::rate;
       // assert(*index <= *pix * params::rate);
     }
   }
-  std::cout << "Velocità x e y " << compx(newset) << " " << compy(newset)
-            << "\n";
-  std::cout << "velocità media " << meanvel(newset) << "\n";
-  // "\n";
   set = newset;
 }
 
@@ -278,7 +279,7 @@ void ensemble::brown_update(std::random_device& r)
          index != (*jt).pos.end(); ++index, ++velind, ++pix) {
       (*index) += (*velind) * params::deltaT;
       // std::cout<<"pos "<<it-set.begin()+1<<" "<<*index<<" "<<"\n";
-      (*index) = fmod(*index, *pix); // reinserire fmod con *pix
+      //(*index) = fmod(*index, *pix); // reinserire fmod con *pix
       if (*index <= 0)
         *index += *pix;
       assert(*index <= *pix);
