@@ -43,7 +43,8 @@ struct paramms
   static double coesione;
   static double neigh_align; // raggio visivo
   static double neigh2; 
-  static double mod_align;     // raggio di repulsione
+  static double mod_align; 
+  static double attraction;    // raggio di repulsione
 };
 
 //inline std::array<double, params::dim> operator+(std::array<double, params::dim>, std::array<double, params::dim>);

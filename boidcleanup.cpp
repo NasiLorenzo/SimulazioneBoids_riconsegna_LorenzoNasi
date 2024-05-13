@@ -8,6 +8,7 @@ double paramms::coesione    = 0.1;
 double paramms::neigh2      = 20;
 double paramms::neigh_align = 70;
 double paramms::mod_align   = 0.000003;
+double paramms::attraction=0.02;
 
 /*struct uniform2D{
   std::uniform_real_distribution<double> disX(0, static_cast<double>(pixel *
@@ -249,11 +250,24 @@ void ensemble::update()
     for (auto index = (*jt).pos.begin(), velind = (*jt).vel.begin();
          index != (*jt).pos.end(); ++index, ++velind, ++pix) {
       (*index) += (*velind) * params::deltaT;
-      (*index) = fmod(*index, *pix * params::rate);
+      /*(*index) = fmod(*index, *pix * params::rate);
       if (*index <= 0)
        *index += *pix * params::rate;
-      // assert(*index <= *pix * params::rate);
+      // assert(*index <= *pix * params::rate);*/
     }
+    for(auto it=newset.begin();it!=newset.end();++it){
+      auto pix=pixel.begin();
+      for(auto index=it->pos.begin(), velind=it->vel.begin();index!=it->pos.end();++index,++velind,++pix){
+        if(*index>*pix-100){
+          *velind-=paramms::attraction;
+        }else{
+          if(*index<100){
+            *velind+=paramms::attraction;
+          }
+        }
+      }
+    }
+
   }
   set = newset;
 }
