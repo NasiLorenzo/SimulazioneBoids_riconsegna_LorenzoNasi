@@ -55,7 +55,7 @@ int main()
     }
 
     window.clear(sf::Color::White);
-    //window.draw(backgroundSprite);
+    window.draw(backgroundSprite);
     // Draw boids
     for (auto& boid : prova.set_()) {
       /*sf::CircleShape circle(2);
