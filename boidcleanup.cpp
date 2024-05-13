@@ -8,8 +8,8 @@ double paramms::coesione    = 0.1;
 double paramms::neigh2      = 20;
 double paramms::neigh_align = 70;
 double paramms::mod_align   = 0.000003;
-double paramms::attraction=0.02;
-
+double paramms::attraction  = 0.02;
+double paramms::alpha       = params::pi / 6;
 /*struct uniform2D{
   std::uniform_real_distribution<double> disX(0, static_cast<double>(pixel *
 params::rate)); std::uniform_real_distribution<double> disY;
@@ -38,6 +38,20 @@ auto mod_vel(boidstate const& boid) // Velocità singolo boid
     sum += pow(*it, 2);
   }
   return sum;
+}
+double mod(std::array<double, params::dim> const& vec)
+{
+  /*return sqrt(
+      std::accumulate(vec.begin(), vec.end(), 0,
+                      [](double sum, double x) { return sum = sum + x * x;
+     }));*/
+  return sqrt(vec[0] * vec[0] + vec[1] * vec[1]);
+}
+
+std::array<double, params::dim> normalize(std::array<double, params::dim>& vec)
+{
+  // assert(mod(vec)!=0);
+  return vec / boids::mod(vec);
 }
 
 double distance(boidstate const& a, boidstate const& b)
@@ -89,6 +103,14 @@ std::array<double, params::dim> operator/(double a,
   std::for_each(b.begin(), b.end(), [&a](double x) { return a / x; });
   return b;
 }
+
+std::array<double, params::dim> operator/(std::array<double, params::dim>& b,
+                                          double a)
+{
+  std::for_each(b.begin(), b.end(), [&a](double& x) { x = x / a; });
+  return b;
+}
+
 stormo generator(std::default_random_engine& eng)
 {
   stormo set{};
@@ -111,13 +133,25 @@ auto neighbors(stormo const& set, boidstate const& boid, const double d)
 {
   stormo neighbors{};
   std::for_each(set.begin(), set.end(), [&](boidstate neighbor) {
-    if (distance(boid, neighbor) < pow(d, 2) && distance(boid, neighbor) != 0)
-      neighbors.push_back(neighbor);
+    if (distance(boid, neighbor) < pow(d, 2)&&distance(boid, neighbor)!=0) {
+      std::array<double, params::dim> deltax = neighbor.pos - boid.pos;
+      std::array<double, params::dim> y      = boid.vel;
+      if (boids::mod(boid.vel) != 0)
+        deltax = normalize(deltax);
+      y = normalize(y);
+      //std::cout<<"deltax"<<deltax[0]<<" "<<deltax[1]<<", v norm "<<y[0]<<y[1]<<"\n";
+      double prodscalare =
+          std::inner_product(deltax.begin(), deltax.end(), y.begin(), 0.);
+         // std::cout<<"prodotto scalare "<<prodscalare<<"\n";
+      if ((prodscalare) > cos(paramms::alpha)) {
+        neighbors.push_back(neighbor);
+      }
+    }
   });
   return neighbors;
 }
 
-void regola1(stormo& neighbors,boidstate& boid)
+void regola1(stormo& neighbors, boidstate& boid)
 {
   std::for_each(neighbors.begin(), neighbors.end(), [&](boidstate neighbor) {
     auto x = neighbor.pos - boid.pos;
@@ -128,8 +162,8 @@ void regola1(stormo& neighbors,boidstate& boid)
 void regola2(stormo& neighbors, boidstate& oldboid, boidstate& boid)
 {
   auto n = neighbors.size();
-  std::for_each(neighbors.begin(),neighbors.end(),[&](boidstate neighbor){
-    auto x = neighbor.vel-oldboid.vel;
+  std::for_each(neighbors.begin(), neighbors.end(), [&](boidstate neighbor) {
+    auto x = neighbor.vel - oldboid.vel;
     boid.vel += paramms::steering / n * (x);
   });
 }
@@ -137,12 +171,11 @@ void regola2(stormo& neighbors, boidstate& oldboid, boidstate& boid)
 void regola3(stormo& neighbors, boidstate& boid)
 {
   auto n = neighbors.size();
-  std::for_each(neighbors.begin(),neighbors.end(),[&](boidstate neighbor){
-    auto x = neighbor.pos-boid.pos;
+  std::for_each(neighbors.begin(), neighbors.end(), [&](boidstate neighbor) {
+    auto x = neighbor.pos - boid.pos;
     boid.vel += paramms::steering / n * (x);
   });
 }
-
 
 auto regola4(stormo& neighbors, boidstate& boid)
 {
@@ -231,13 +264,14 @@ std::size_t ensemble::size_()
   return set.size();
 }
 
-double angle(boidstate const& boid){
-  return atan2(boid.vel[1],boid.vel[0]);
+double angle(boidstate const& boid)
+{
+  return atan2(boid.vel[1], boid.vel[0]);
 }
 
 void ensemble::update()
 {
-  std::cout<<"Angolo "<<angle(set[0])<<"\n";
+  std::cout << "Angolo " << angle(set[0]) << "\n";
   for (auto it = set.begin(), jt = newset.begin(); it != set.end();
        ++it, ++jt) {
     stormo neighbor{neighbors(set, *it, paramms::neigh_align)};
@@ -255,19 +289,19 @@ void ensemble::update()
        *index += *pix * params::rate;
       // assert(*index <= *pix * params::rate);*/
     }
-    for(auto it=newset.begin();it!=newset.end();++it){
-      auto pix=pixel.begin();
-      for(auto index=it->pos.begin(), velind=it->vel.begin();index!=it->pos.end();++index,++velind,++pix){
-        if(*index>*pix-100){
-          *velind-=paramms::attraction;
-        }else{
-          if(*index<100){
-            *velind+=paramms::attraction;
+    for (auto it = newset.begin(); it != newset.end(); ++it) {
+      auto pix = pixel.begin();
+      for (auto index = it->pos.begin(), velind = it->vel.begin();
+           index != it->pos.end(); ++index, ++velind, ++pix) {
+        if (*index > *pix - 100) {
+          *velind -= paramms::attraction;
+        } else {
+          if (*index < 100) {
+            *velind += paramms::attraction;
           }
         }
       }
     }
-
   }
   set = newset;
 }

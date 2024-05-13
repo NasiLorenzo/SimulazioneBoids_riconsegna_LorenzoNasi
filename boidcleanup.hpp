@@ -27,7 +27,7 @@ struct params
   static constexpr unsigned int n = 2;
   // unsigned int vert{20};
   // unsigned int hor{20};
-  static constexpr unsigned int size{200};
+  static constexpr unsigned int size{100};
   static constexpr double rate{
       1}; // rapporto tra la dimensione dello schermo e della generazione
   static constexpr unsigned int rate2{20};
@@ -44,7 +44,8 @@ struct paramms
   static double neigh_align; // raggio visivo
   static double neigh2; 
   static double mod_align; 
-  static double attraction;    // raggio di repulsione
+  static double attraction; 
+  static double alpha;   // raggio di repulsione
 };
 
 //inline std::array<double, params::dim> operator+(std::array<double, params::dim>, std::array<double, params::dim>);
@@ -69,7 +70,9 @@ std::array<double,params::dim> operator*(const double, std::array<double,params:
 std::array<double,params::dim> operator+=(std::array<double,params::dim>&, std::array<double,params::dim> const& );
 std::array<double, params::dim> operator/(double, std::array<double, params::dim>&);
 std::array<double,params::dim> operator-(std::array<double,params::dim> const&, std::array<double,params::dim> const& );
-
+std::array<double, params::dim> operator/(std::array<double, params::dim>&, double);
+double mod(std::array<double,params::dim> const& vec);
+std::array<double,params::dim> normalize(std::array<double,params::dim>& vec);
 stormo generator(std::default_random_engine&);
 
 void regola1(stormo& neighbors, boidstate& boid_old); // repulsion
