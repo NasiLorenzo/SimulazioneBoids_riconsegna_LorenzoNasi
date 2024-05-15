@@ -2,14 +2,14 @@
 
 int main()
 {
-  boids::paramms::repulsione  = 0.01;
-  boids::paramms::steering    = 0.01;
+  boids::paramms::repulsione  = 0.02;
+  boids::paramms::steering    = 0.02;
   boids::paramms::coesione    = 0.01;
   boids::paramms::neigh_align = 100;
   boids::paramms::neigh2      = 20;
   boids::paramms::mod_align=0.000003;
-  boids::paramms::attraction=0.009;
-  boids::paramms::alpha       = (1./3.)*boids::params::pi;
+  boids::paramms::attraction=1.5;
+  boids::paramms::alpha       = (1./3.)*M_PI;
 
   std::random_device r;
   std::default_random_engine eng(r());
@@ -26,7 +26,7 @@ int main()
   const sf::Time frameTime = sf::seconds(boids::params::deltaT);
 
   sf::Clock clock;
-  sf::Time accumulator = sf::Time::Zero;
+  //sf::Time accumulator = sf::Time::Zero;
 
   sf::Texture texture;
   texture.loadFromFile("tramonto.jpg");
@@ -38,24 +38,22 @@ int main()
         window.close();
     }
     // Calculate elapsed time for this frame
-    sf::Time elapsedTime = clock.restart();
-    accumulator += elapsedTime;
+    clock.restart();
+    //accumulator += elapsedTime;
 
     // Adding a background image
     /*sf::FileInputStream stream;
     stream.open("tramonto.jpg");*/
-
+    prova.update();
     // Update the simulation while we have enough time accumulated
-    int i = 0;
-    while (accumulator >= frameTime) {
-      i++;
+    /*while (accumulator >= frameTime) {
       prova.update();
       accumulator -= frameTime;
       // std::cout<<"Ce so passato "<<i<< " volte\n";
-    }
+    }*/
 
     window.clear(sf::Color::White);
-    window.draw(backgroundSprite);
+    //window.draw(backgroundSprite);
     // Draw boids
     for (auto& boid : prova.set_()) {
       /*sf::CircleShape circle(2);
@@ -68,7 +66,7 @@ int main()
               / boids::params::rate)); // Assuming x and y are in pos[0]
                                        // and pos[1] respectively
       window.draw(circle);*/
-      float angle = boids::angle(boid); // Assuming you have the angle in degrees
+      float angle = static_cast<float>(boids::angle(boid)); // Assuming you have the angle in degrees
 
       // Arrow length and width
       float arrowLength = 10;
@@ -86,13 +84,15 @@ int main()
       arrow.setPoint(2, sf::Vector2f(0,arrowWidth/2));
       arrow.setFillColor(sf::Color::Red);
       arrow.setPosition(arrowPos);
-      arrow.setRotation(angle*180/boids::params::pi);
+      arrow.setRotation(angle*180/static_cast<float>(M_PI));
       window.draw(arrow);
     }
 
     window.display();
 
     // Delay to achieve desired frame rate
+    if(frameTime < clock.getElapsedTime())
+    std::cout<<"Lag"<<"\n";
     sf::sleep(frameTime - clock.getElapsedTime());
   }
 }

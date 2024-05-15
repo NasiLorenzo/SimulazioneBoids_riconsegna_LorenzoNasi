@@ -11,7 +11,7 @@
 #include <random>
 #include <string>
 #include <vector>
-
+#include <chrono>
 namespace boids {
 
 struct params
@@ -23,11 +23,11 @@ struct params
   static constexpr double neigh_co{90};
   static constexpr double reproduction{20};
   static constexpr unsigned int interazioni{2};
-  static constexpr float deltaT{1 / 60.f};
+  static constexpr float deltaT{1 / 30.f};
   static constexpr unsigned int n = 2;
   // unsigned int vert{20};
   // unsigned int hor{20};
-  static constexpr unsigned int size{100};
+  static constexpr unsigned int size{200};
   static constexpr double rate{
       1}; // rapporto tra la dimensione dello schermo e della generazione
   static constexpr unsigned int rate2{20};

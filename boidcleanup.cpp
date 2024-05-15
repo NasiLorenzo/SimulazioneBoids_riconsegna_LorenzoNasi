@@ -130,7 +130,8 @@ stormo generator(std::default_random_engine& eng)
 }
 
 auto neighbors(stormo const& set, boidstate const& boid, const double d)
-{
+{  
+  auto t1=std::chrono::high_resolution_clock::now();
   stormo neighbors{};
   std::for_each(set.begin(), set.end(), [&](boidstate neighbor) {
     if (distance(boid, neighbor) < pow(d, 2)&&distance(boid, neighbor)!=0) {
@@ -139,15 +140,18 @@ auto neighbors(stormo const& set, boidstate const& boid, const double d)
       if (boids::mod(boid.vel) != 0)
         deltax = normalize(deltax);
       y = normalize(y);
-      //std::cout<<"deltax"<<deltax[0]<<" "<<deltax[1]<<", v norm "<<y[0]<<y[1]<<"\n";
       double prodscalare =
           std::inner_product(deltax.begin(), deltax.end(), y.begin(), 0.);
-         // std::cout<<"prodotto scalare "<<prodscalare<<"\n";
-      if ((prodscalare) > cos(paramms::alpha)) {
+      if ((prodscalare) >= std::cos(paramms::alpha)/*||prodscalare==-1||prodscalare==1*/) {
         neighbors.push_back(neighbor);
+
       }
     }
   });
+  //std::cout<<"Numero vicini "<<neighbors.size()<<"\n";
+  //auto t2=std::chrono::high_resolution_clock::now();
+  //std::chrono::duration<double, std::milli> ms_double = t2 - t1;
+  //std::cout<<"Tempo passato "<<ms_double.count()<<" ms\n";
   return neighbors;
 }
 
@@ -271,7 +275,7 @@ double angle(boidstate const& boid)
 
 void ensemble::update()
 {
-  std::cout << "Angolo " << angle(set[0]) << "\n";
+ // std::cout << "Angolo " << angle(set[0]) << "\n";
   for (auto it = set.begin(), jt = newset.begin(); it != set.end();
        ++it, ++jt) {
     stormo neighbor{neighbors(set, *it, paramms::neigh_align)};
@@ -288,20 +292,27 @@ void ensemble::update()
       if (*index <= 0)
        *index += *pix * params::rate;
       // assert(*index <= *pix * params::rate);*/
+      if (*index > *pix-200) {
+          *velind -= paramms::attraction;
+        } else {
+          if (*index < 200) {
+            *velind += paramms::attraction;
+          }
+        }
     }
-    for (auto it = newset.begin(); it != newset.end(); ++it) {
+    /*for (auto it = newset.begin(); it != newset.end(); ++it) {
       auto pix = pixel.begin();
       for (auto index = it->pos.begin(), velind = it->vel.begin();
            index != it->pos.end(); ++index, ++velind, ++pix) {
-        if (*index > *pix - 100) {
+        if (*index > *pix-200) {
           *velind -= paramms::attraction;
         } else {
-          if (*index < 100) {
+          if (*index < 200) {
             *velind += paramms::attraction;
           }
         }
       }
-    }
+    }*/
   }
   set = newset;
 }
