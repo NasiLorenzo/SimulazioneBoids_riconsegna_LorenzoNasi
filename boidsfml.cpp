@@ -2,20 +2,25 @@
 
 int main()
 {
-  boids::paramms::repulsione  = 0.02;
-  boids::paramms::steering    = 0.02;
-  boids::paramms::coesione    = 0.01;
+  boids::paramms::repulsione  = 0.2;
+  boids::paramms::steering    = 0.05;
+  boids::paramms::coesione    = 0.08;
   boids::paramms::neigh_align = 100;
-  boids::paramms::neigh2      = 20;
+  boids::paramms::neigh2      = 15;
   boids::paramms::mod_align=0.000003;
-  boids::paramms::attraction=1.5;
+  boids::paramms::attraction=25;
   boids::paramms::alpha       = (1./3.)*M_PI;
+  boids::paramms::speedlimit =200;
+  boids::paramms::speedminimum=80;
 
   std::random_device r;
   std::default_random_engine eng(r());
   boids::stormo flock = boids::generator(eng);
   boids::ensemble prova(flock);
   std::cout << "Dimensione generazione" << prova.size_() << "\n";
+  std::cout << "Coesione" << boids::paramms::coesione << "\n";
+  std::cout << "Distanta max" << boids::paramms::neigh_align << "\n";
+  std::cout << "Repulsione" << boids::paramms::repulsione << "\n";
 
   prova.update();
 

@@ -27,7 +27,7 @@ struct params
   static constexpr unsigned int n = 2;
   // unsigned int vert{20};
   // unsigned int hor{20};
-  static constexpr unsigned int size{200};
+  static constexpr unsigned int size{150};
   static constexpr double rate{
       1}; // rapporto tra la dimensione dello schermo e della generazione
   static constexpr unsigned int rate2{20};
@@ -45,7 +45,9 @@ struct paramms
   static double neigh2; 
   static double mod_align; 
   static double attraction; 
-  static double alpha;   // raggio di repulsione
+  static double alpha; 
+  static double speedlimit;
+  static double speedminimum;  // raggio di repulsione
 };
 
 //inline std::array<double, params::dim> operator+(std::array<double, params::dim>, std::array<double, params::dim>);
@@ -80,6 +82,8 @@ void regola2(stormo& neighbors, boidstate& boidi, boidstate& boid); // steering
 void regola3(stormo& neighbors, boidstate& boidi); // cohesion
 auto regola4(stormo& neighbors, boidstate& boid);
 std::array<double, params::dim> operator+=(std::array<double, params::dim>&, std::array<double, params::dim>const&);
+
+void speedadjust(boidstate& boid);
 
 inline void meiosi(stormo& set, stormo& neighborss, boidstate& boid,
                    std::default_random_engine eng,

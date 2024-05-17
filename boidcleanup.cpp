@@ -4,12 +4,14 @@ namespace boids {
 
 double paramms::repulsione  = 0.7;
 double paramms::steering    = 0.1;
-double paramms::coesione    = 0.1;
+double paramms::coesione    = 100;
 double paramms::neigh2      = 20;
 double paramms::neigh_align = 70;
 double paramms::mod_align   = 0.000003;
 double paramms::attraction  = 0.02;
-double paramms::alpha       = params::pi / 6;
+double paramms::alpha       = M_PI;
+double paramms::speedlimit =80;
+double paramms::speedminimum=2;
 /*struct uniform2D{
   std::uniform_real_distribution<double> disX(0, static_cast<double>(pixel *
 params::rate)); std::uniform_real_distribution<double> disY;
@@ -127,6 +129,18 @@ stormo generator(std::default_random_engine& eng)
   }
 
   return set;
+}
+
+void speedadjust(boidstate& boid){
+  auto vnorm=boids::mod(boid.vel);
+  if(vnorm>paramms::speedlimit){
+    normalize(boid.vel);
+    boid.vel=paramms::speedlimit * boid.vel;
+  }
+  if(vnorm<paramms::speedminimum){
+    normalize(boid.vel);
+    boid.vel=paramms::speedminimum*boid.vel;
+  }
 }
 
 auto neighbors(stormo const& set, boidstate const& boid, const double d)
@@ -283,6 +297,7 @@ void ensemble::update()
     regola2(neighbor, *it, *jt);
     regola1(close_neighbor, *jt);
     regola3(neighbor, *jt);
+    speedadjust(*jt);
     //*jt      = regola4(neighbor, *jt);
     auto pix = pixel.begin();
     for (auto index = (*jt).pos.begin(), velind = (*jt).vel.begin();
@@ -292,10 +307,10 @@ void ensemble::update()
       if (*index <= 0)
        *index += *pix * params::rate;
       // assert(*index <= *pix * params::rate);*/
-      if (*index > *pix-200) {
+      if (*index > *pix-40) {
           *velind -= paramms::attraction;
         } else {
-          if (*index < 200) {
+          if (*index < 40) {
             *velind += paramms::attraction;
           }
         }
