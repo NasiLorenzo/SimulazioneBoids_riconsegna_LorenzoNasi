@@ -23,6 +23,9 @@ int main()
   std::cout << "Repulsione" << boids::paramms::repulsione << "\n";
 
   prova.update();
+  std::cout<<"dimesione dopo update "<<prova.size_()<<"\n";
+  prova.update();
+  std::cout<<"dimesione dopo update "<<prova.size_()<<"\n";
 
   sf::RenderWindow window(sf::VideoMode(boids::pixel[0], boids::pixel[1]),
                           "Boids Simulation");
