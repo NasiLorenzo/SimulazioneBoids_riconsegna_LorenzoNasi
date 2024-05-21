@@ -3,7 +3,7 @@
 int main()
 {
   boids::paramms::repulsione  = 0.2;
-  boids::paramms::steering    = 0.02;
+  boids::paramms::steering    = 0.04;
   boids::paramms::coesione    = 0.08;
   boids::paramms::neigh_align = 100;
   boids::paramms::neigh2      = 15;
