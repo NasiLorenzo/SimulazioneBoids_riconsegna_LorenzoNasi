@@ -216,7 +216,7 @@ void regola3(std::vector<boidstate*>& neighbors, boidstate& boid)
   auto n = neighbors.size();
   std::for_each(neighbors.begin(), neighbors.end(), [&](boidstate* neighbor) {
     auto x = neighbor->pos - boid.pos;
-    boid.vel += paramms::steering / n * (x);
+    boid.vel += paramms::steering / n * x;
   });
 }
 
