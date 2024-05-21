@@ -305,8 +305,8 @@ void ensemble::update()
       (*index) += (*velind) * params::deltaT;
       /*(*index) = fmod(*index, *pix * params::rate);
       if (*index <= 0)
-       *index += *pix * params::rate;
-      // assert(*index <= *pix * params::rate);*/
+       *index += *pix * params::rate;*/
+      // assert(*index <= *pix * params::rate);
       if (*index > *pix-40) {
           *velind -= paramms::attraction;
         } else {
