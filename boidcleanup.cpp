@@ -155,22 +155,25 @@ auto neighbors(stormo const& set, boidstate const& boid, const double d)
       y = normalize(y);
       double prodscalare =
           std::inner_product(deltax.begin(), deltax.end(), y.begin(), 0.);
-      if ((prodscalare) >= std::cos(paramms::alpha)) {
-        auto prova=&neighbor;
-        std::cout<<"proca "<<prova->pos[0]<<std::endl;
-        neighbors.emplace_back(prova);
+      if ((prodscalare) >= std::cos(paramms::alpha)/*||prodscalare==-1||prodscalare==1*/) {
+        std::cout<<"valore vicino"<<neighbor.pos[0]<<"\n";
+        neighbors.push_back(&neighbor);
 
       }
     }
-  });
-  for(auto& it: neighbors){
-    auto prova=it->pos[0];
-    std::cout<<"roba a caso dentro"<<(double)it->pos[0]<<std::endl;
-  } 
+  }
+  );
+  //std::cout<<"Numero vicini "<<neighbors.size()<<"\n";
+  //auto t2=std::chrono::high_resolution_clock::now();
+  //std::chrono::duration<double, std::milli> ms_double = t2 - t1;
+  //std::cout<<"Tempo passato "<<ms_double.count()<<" ms\n";
+  for(auto& i:neighbors){
+    std::cout<<"valore boid dopo "<<i->pos[0]<<"\n";
+  }
   return neighbors;
 }
 
-auto neighbors(std::vector<boidstate*>const& set, boidstate const& boid, const double d)
+auto neighbors(std::vector<boidstate*> const& set, boidstate const& boid, const double d)
 {  
   std::vector<boidstate*> neighbors{};
   std::for_each(set.begin(), set.end(), [&](boidstate* neighbor) {
@@ -182,14 +185,16 @@ auto neighbors(std::vector<boidstate*>const& set, boidstate const& boid, const d
       y = normalize(y);
       double prodscalare =
           std::inner_product(deltax.begin(), deltax.end(), y.begin(), 0.);
-      if ((prodscalare) >= std::cos(paramms::alpha)) {
-        neighbors.emplace_back(neighbor);
+      if ((prodscalare) >= std::cos(paramms::alpha)/*||prodscalare==-1||prodscalare==1*/) {
+        neighbors.push_back(neighbor);
+
       }
     }
   });
-  for(auto& it: neighbors){
-    //std::cout<<"roba a caso dentro"<<it->pos[0]<<std::endl;
-  }
+  //std::cout<<"Numero vicini "<<neighbors.size()<<"\n";
+  //auto t2=std::chrono::high_resolution_clock::now();
+  //std::chrono::duration<double, std::milli> ms_double = t2 - t1;
+  //std::cout<<"Tempo passato "<<ms_double.count()<<" ms\n";
   return neighbors;
 }
 
@@ -197,12 +202,11 @@ void regola1(std::vector<boidstate*>& neighbors, boidstate& boid)
 {
   std::for_each(neighbors.begin(), neighbors.end(), [&](boidstate* neighbor) {
     auto x = neighbor->pos - boid.pos;
-    std::cout<<"roba a caso "<<neighbor->pos[0]<<"\n";
     boid.vel += -paramms::repulsione * (x);
   });
 }
 
-void regola2(std::vector<boidstate*>& neighbors, boidstate& oldboid, boidstate& boid)
+void regola2(std::vector<boidstate*> & neighbors, boidstate& oldboid, boidstate& boid)
 {
   auto n = neighbors.size();
   std::for_each(neighbors.begin(), neighbors.end(), [&](boidstate* neighbor) {
@@ -216,7 +220,7 @@ void regola3(std::vector<boidstate*>& neighbors, boidstate& boid)
   auto n = neighbors.size();
   std::for_each(neighbors.begin(), neighbors.end(), [&](boidstate* neighbor) {
     auto x = neighbor->pos - boid.pos;
-    boid.vel += paramms::steering / n * x;
+    boid.vel += paramms::steering / n * (x);
   });
 }
 
@@ -317,13 +321,13 @@ void ensemble::update()
  // std::cout << "Angolo " << angle(set[0]) << "\n";
   for (auto it = set.begin(), jt = newset.begin(); it != set.end();
        ++it, ++jt) {
-    std::vector<boidstate*> neighbor{neighbors(set, *it, paramms::neigh_align)};
+    auto neighbor{neighbors(set, *it, paramms::neigh_align)};
     std::vector<boidstate*> close_neighbor{neighbors(neighbor, *it, paramms::neigh2)};
-    //regola2(neighbor, *it, *jt);
-    //regola1(close_neighbor, *jt);
-    //regola3(neighbor, *jt);
-    //speedadjust(*jt);
-    std::cout<<"numero vicini"<< close_neighbor.size() <<"\n";
+    regola2(neighbor, *it, *jt);
+    regola1(close_neighbor, *jt);
+    regola3(neighbor, *jt);
+    speedadjust(*jt);
+    //*jt      = regola4(neighbor, *jt);
     auto pix = pixel.begin();
     for (auto index = (*jt).pos.begin(), velind = (*jt).vel.begin();
          index != (*jt).pos.end(); ++index, ++velind, ++pix) {
@@ -332,14 +336,27 @@ void ensemble::update()
       if (*index <= 0)
        *index += *pix * params::rate;
       // assert(*index <= *pix * params::rate);*/
-     /* if (*index > *pix-40) {
+      if (*index > *pix-40) {
           *velind -= paramms::attraction;
         } else {
           if (*index < 40) {
             *velind += paramms::attraction;
           }
-        }*/
+        }
     }
+    /*for (auto it = newset.begin(); it != newset.end(); ++it) {
+      auto pix = pixel.begin();
+      for (auto index = it->pos.begin(), velind = it->vel.begin();
+           index != it->pos.end(); ++index, ++velind, ++pix) {
+        if (*index > *pix-200) {
+          *velind -= paramms::attraction;
+        } else {
+          if (*index < 200) {
+            *velind += paramms::attraction;
+          }
+        }
+      }
+    }*/
   }
   set = newset;
 }
