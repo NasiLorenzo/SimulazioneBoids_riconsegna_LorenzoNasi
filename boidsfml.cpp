@@ -9,10 +9,10 @@ int main()
   boids::paramms::neigh2      = 15;
   boids::paramms::mod_align=0.000003;
   boids::paramms::attraction=25;
-  boids::paramms::alpha       = (1./2.)*M_PI;
-  boids::paramms::speedlimit =200;
-  boids::paramms::speedminimum=80;
 
+  boids::paramms::alpha       = (1./6.)*M_PI;
+  boids::paramms::speedlimit =100;
+  boids::paramms::speedminimum=40;
   std::random_device r;
   std::default_random_engine eng(r());
   boids::stormo flock = boids::generator(eng);
@@ -23,6 +23,9 @@ int main()
   std::cout << "Repulsione" << boids::paramms::repulsione << "\n";
 
   prova.update();
+  std::cout<<"dimesione dopo update "<<prova.size_()<<"\n";
+  prova.update();
+  std::cout<<"dimesione dopo update "<<prova.size_()<<"\n";
 
   sf::RenderWindow window(sf::VideoMode(boids::pixel[0], boids::pixel[1]),
                           "Boids Simulation");

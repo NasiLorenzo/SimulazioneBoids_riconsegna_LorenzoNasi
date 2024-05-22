@@ -2,16 +2,16 @@
 
 namespace boids {
 
-double paramms::repulsione  = 0.7;
-double paramms::steering    = 0.1;
-double paramms::coesione    = 100;
-double paramms::neigh2      = 20;
-double paramms::neigh_align = 70;
-double paramms::mod_align   = 0.000003;
-double paramms::attraction  = 0.02;
-double paramms::alpha       = M_PI;
-double paramms::speedlimit =80;
-double paramms::speedminimum=2;
+double paramms::repulsione   = 0.7;
+double paramms::steering     = 0.1;
+double paramms::coesione     = 100;
+double paramms::neigh2       = 20;
+double paramms::neigh_align  = 70;
+double paramms::mod_align    = 0.000003;
+double paramms::attraction   = 0.02;
+double paramms::alpha        = M_PI;
+double paramms::speedlimit   = 80;
+double paramms::speedminimum = 2;
 /*struct uniform2D{
   std::uniform_real_distribution<double> disX(0, static_cast<double>(pixel *
 params::rate)); std::uniform_real_distribution<double> disY;
@@ -131,24 +131,24 @@ stormo generator(std::default_random_engine& eng)
   return set;
 }
 
-void speedadjust(boidstate& boid){
-  auto vnorm=boids::mod(boid.vel);
-  if(vnorm>paramms::speedlimit){
+void speedadjust(boidstate& boid)
+{
+  auto vnorm = boids::mod(boid.vel);
+  if (vnorm > paramms::speedlimit) {
     normalize(boid.vel);
-    boid.vel=paramms::speedlimit * boid.vel;
+    boid.vel = paramms::speedlimit * boid.vel;
   }
-  if(vnorm<paramms::speedminimum){
+  if (vnorm < paramms::speedminimum) {
     normalize(boid.vel);
-    boid.vel=paramms::speedminimum*boid.vel;
+    boid.vel = paramms::speedminimum * boid.vel;
   }
 }
 
 auto neighbors(stormo const& set, boidstate const& boid, const double d)
-{  
-  auto t1=std::chrono::high_resolution_clock::now();
-  stormo neighbors{};
-  std::for_each(set.begin(), set.end(), [&](boidstate neighbor) {
-    if (distance(boid, neighbor) < pow(d, 2)&&distance(boid, neighbor)!=0) {
+{
+  std::vector<boidstate const*> neighbors{};
+  std::for_each(set.begin(), set.end(), [&](auto& neighbor) {
+    if (distance(boid, neighbor) < pow(d, 2) && distance(boid, neighbor) != 0) {
       std::array<double, params::dim> deltax = neighbor.pos - boid.pos;
       std::array<double, params::dim> y      = boid.vel;
       if (boids::mod(boid.vel) != 0)
@@ -156,41 +156,70 @@ auto neighbors(stormo const& set, boidstate const& boid, const double d)
       y = normalize(y);
       double prodscalare =
           std::inner_product(deltax.begin(), deltax.end(), y.begin(), 0.);
-      if ((prodscalare) >= std::cos(paramms::alpha)/*||prodscalare==-1||prodscalare==1*/) {
-        neighbors.push_back(neighbor);
-
+      if ((prodscalare) >= std::cos(paramms::alpha)) {
+        auto prova = &neighbor;
+        //std::cout << "prova " << prova->pos[0] << std::endl;
+        neighbors.emplace_back(prova);
       }
     }
   });
-  //std::cout<<"Numero vicini "<<neighbors.size()<<"\n";
-  //auto t2=std::chrono::high_resolution_clock::now();
-  //std::chrono::duration<double, std::milli> ms_double = t2 - t1;
-  //std::cout<<"Tempo passato "<<ms_double.count()<<" ms\n";
+  for (auto& it : neighbors) {
+    auto prova = it->pos[0];
+    //std::cout << "roba a caso dentro" << (double)it->pos[0] << std::endl;
+  }
   return neighbors;
 }
 
-void regola1(stormo& neighbors, boidstate& boid)
+auto neighbors(std::vector<boidstate const*> const& set, boidstate const& boid,
+               const double d)
 {
-  std::for_each(neighbors.begin(), neighbors.end(), [&](boidstate neighbor) {
-    auto x = neighbor.pos - boid.pos;
+  std::vector<boidstate const*> neighbors{};
+  std::for_each(set.begin(), set.end(), [&](auto& neighbor) {
+    if (distance(boid, *neighbor) < pow(d, 2)
+        && distance(boid, *neighbor) != 0) {
+      std::array<double, params::dim> deltax = neighbor->pos - boid.pos;
+      std::array<double, params::dim> y      = boid.vel;
+      if (boids::mod(boid.vel) != 0)
+        deltax = normalize(deltax);
+      y = normalize(y);
+      double prodscalare =
+          std::inner_product(deltax.begin(), deltax.end(), y.begin(), 0.);
+      if ((prodscalare) >= std::cos(paramms::alpha)) {
+        // std::cout<<"valore prima"<<neighbor->pos[0]<<"\n";
+        neighbors.emplace_back(neighbor);
+      }
+    }
+  });
+  for (auto& it : neighbors) {
+    // std::cout<<"roba a caso dentro"<<it->pos[0]<<std::endl;
+  }
+  return neighbors;
+}
+
+void regola1(std::vector<boidstate const*>& neighbors, boidstate& boid)
+{
+  std::for_each(neighbors.begin(), neighbors.end(), [&](auto& neighbor) {
+    auto x = neighbor->pos - boid.pos;
+   // std::cout << "roba a caso " << neighbor->pos[0] << "\n";
     boid.vel += -paramms::repulsione * (x);
   });
 }
 
-void regola2(stormo& neighbors, boidstate& oldboid, boidstate& boid)
+void regola2(std::vector<boidstate const*>& neighbors, boidstate& oldboid,
+             boidstate& boid)
 {
   auto n = neighbors.size();
-  std::for_each(neighbors.begin(), neighbors.end(), [&](boidstate neighbor) {
-    auto x = neighbor.vel - oldboid.vel;
+  std::for_each(neighbors.begin(), neighbors.end(), [&](auto& neighbor) {
+    auto x = neighbor->vel - oldboid.vel;
     boid.vel += paramms::steering / n * (x);
   });
 }
 
-void regola3(stormo& neighbors, boidstate& boid)
+void regola3(std::vector<boidstate const*>& neighbors, boidstate& boid)
 {
   auto n = neighbors.size();
-  std::for_each(neighbors.begin(), neighbors.end(), [&](boidstate neighbor) {
-    auto x = neighbor.pos - boid.pos;
+  std::for_each(neighbors.begin(), neighbors.end(), [&](auto& neighbor) {
+    auto x = neighbor->pos - boid.pos;
     boid.vel += paramms::steering / n * (x);
   });
 }
@@ -206,7 +235,7 @@ auto regola4(stormo& neighbors, boidstate& boid)
   return boid;
 }
 
-void meiosi(stormo& set, stormo& neighborss, boidstate& boid,
+/*void meiosi(stormo& set, stormo& neighborss, boidstate& boid,
             std::default_random_engine eng, double distance)
 {
   stormo neighbor{neighbors(neighborss, boid, distance)};
@@ -220,7 +249,7 @@ void meiosi(stormo& set, stormo& neighborss, boidstate& boid,
     }
   }
   set.push_back(child);
-}
+}*/
 
 auto meanvel(stormo const& set) // Velocità quadratica media
 {
@@ -289,16 +318,16 @@ double angle(boidstate const& boid)
 
 void ensemble::update()
 {
- // std::cout << "Angolo " << angle(set[0]) << "\n";
+  // std::cout << "Angolo " << angle(set[0]) << "\n";
   for (auto it = set.begin(), jt = newset.begin(); it != set.end();
        ++it, ++jt) {
-    stormo neighbor{neighbors(set, *it, paramms::neigh_align)};
-    stormo close_neighbor{neighbors(neighbor, *it, paramms::neigh2)};
+    auto neighbor{neighbors(set, *it, paramms::neigh_align)};
+    auto close_neighbor{neighbors(neighbor, *it, paramms::neigh2)};
     regola2(neighbor, *it, *jt);
     regola1(close_neighbor, *jt);
     regola3(neighbor, *jt);
     speedadjust(*jt);
-    //*jt      = regola4(neighbor, *jt);
+    //std::cout << "numero vicini" << close_neighbor.size() << "\n";
     auto pix = pixel.begin();
     for (auto index = (*jt).pos.begin(), velind = (*jt).vel.begin();
          index != (*jt).pos.end(); ++index, ++velind, ++pix) {
@@ -315,24 +344,11 @@ void ensemble::update()
           }
         }
     }
-    /*for (auto it = newset.begin(); it != newset.end(); ++it) {
-      auto pix = pixel.begin();
-      for (auto index = it->pos.begin(), velind = it->vel.begin();
-           index != it->pos.end(); ++index, ++velind, ++pix) {
-        if (*index > *pix-200) {
-          *velind -= paramms::attraction;
-        } else {
-          if (*index < 200) {
-            *velind += paramms::attraction;
-          }
-        }
-      }
-    }*/
   }
   set = newset;
 }
 
-void ensemble::brown_update(std::random_device& r)
+/*void ensemble::brown_update(std::random_device& r)
 {
   std::default_random_engine eng(r());
   for (auto it = set.begin(), jt = newset.begin(); it != set.end();
@@ -361,5 +377,5 @@ void ensemble::brown_update(std::random_device& r)
   }
   std::cout << "Velocità media " << meanvel(newset) << "\n";
   set = newset;
-}
+}*/
 } // namespace boids
