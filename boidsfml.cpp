@@ -3,15 +3,15 @@
 int main()
 {
   boids::paramms::repulsione  = 0.2;
-  boids::paramms::steering    = 0.05;
+  boids::paramms::steering    = 0.04;
   boids::paramms::coesione    = 0.08;
   boids::paramms::neigh_align = 100;
   boids::paramms::neigh2      = 15;
   boids::paramms::mod_align=0.000003;
   boids::paramms::attraction=25;
-  boids::paramms::alpha       = (1./3.)*M_PI;
-  boids::paramms::speedlimit =200;
-  boids::paramms::speedminimum=80;
+  boids::paramms::alpha       = (1./6.)*M_PI;
+  boids::paramms::speedlimit =100;
+  boids::paramms::speedminimum=40;
 
   std::random_device r;
   std::default_random_engine eng(r());
