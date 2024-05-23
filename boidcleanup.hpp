@@ -27,7 +27,7 @@ struct params
   static constexpr unsigned int n = 2;
   // unsigned int vert{20};
   // unsigned int hor{20};
-  static constexpr unsigned int size{200};
+  static constexpr unsigned int size{20};
   static constexpr double rate{
       1}; // rapporto tra la dimensione dello schermo e della generazione
   static constexpr unsigned int rate2{20};

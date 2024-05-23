@@ -326,7 +326,7 @@ void ensemble::update()
     regola2(neighbor, *it, *jt);
     regola1(close_neighbor, *jt);
     regola3(neighbor, *jt);
-    speedadjust(*jt);
+    //speedadjust(*jt);
     //std::cout << "numero vicini" << close_neighbor.size() << "\n";
     auto pix = pixel.begin();
     for (auto index = (*jt).pos.begin(), velind = (*jt).vel.begin();
@@ -336,13 +336,13 @@ void ensemble::update()
       if (*index <= 0)
        *index += *pix * params::rate;*/
       // assert(*index <= *pix * params::rate);
-      if (*index > *pix-40) {
+      /*if (*index > *pix-150) {
           *velind -= paramms::attraction;
         } else {
-          if (*index < 40) {
+          if (*index < 150) {
             *velind += paramms::attraction;
           }
-        }
+        }*/
     }
   }
   set = newset;
