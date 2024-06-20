@@ -158,14 +158,14 @@ auto neighbors(stormo const& set, boidstate const& boid, const double d)
           std::inner_product(deltax.begin(), deltax.end(), y.begin(), 0.);
       if ((prodscalare) >= std::cos(paramms::alpha)) {
         auto prova = &neighbor;
-        //std::cout << "prova " << prova->pos[0] << std::endl;
+        // std::cout << "prova " << prova->pos[0] << std::endl;
         neighbors.emplace_back(prova);
       }
     }
   });
   for (auto& it : neighbors) {
     auto prova = it->pos[0];
-    //std::cout << "roba a caso dentro" << (double)it->pos[0] << std::endl;
+    // std::cout << "roba a caso dentro" << (double)it->pos[0] << std::endl;
   }
   return neighbors;
 }
@@ -200,7 +200,7 @@ void regola1(std::vector<boidstate const*>& neighbors, boidstate& boid)
 {
   std::for_each(neighbors.begin(), neighbors.end(), [&](auto& neighbor) {
     auto x = neighbor->pos - boid.pos;
-   // std::cout << "roba a caso " << neighbor->pos[0] << "\n";
+    // std::cout << "roba a caso " << neighbor->pos[0] << "\n";
     boid.vel += -paramms::repulsione * (x);
   });
 }
@@ -229,7 +229,8 @@ auto regola4(stormo& neighbors, boidstate& boid)
   double a{1};
   auto n = neighbors.size();
   for (auto index = neighbors.begin(); index != neighbors.end(); ++index) {
-    a += paramms::mod_align / static_cast<double>(n) * (mod_vel(*index) - mod_vel(boid));
+    a += paramms::mod_align / static_cast<double>(n)
+       * (mod_vel(*index) - mod_vel(boid));
   }
   boid.vel = a * boid.vel;
   return boid;
@@ -326,8 +327,8 @@ void ensemble::update()
     regola2(neighbor, *it, *jt);
     regola1(close_neighbor, *jt);
     regola3(neighbor, *jt);
-    //speedadjust(*jt);
-    //std::cout << "numero vicini" << close_neighbor.size() << "\n";
+    // speedadjust(*jt);
+    // std::cout << "numero vicini" << close_neighbor.size() << "\n";
     auto pix = pixel.begin();
     for (auto index = (*jt).pos.begin(), velind = (*jt).vel.begin();
          index != (*jt).pos.end(); ++index, ++velind, ++pix) {
