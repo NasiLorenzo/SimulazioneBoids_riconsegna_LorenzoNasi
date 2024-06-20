@@ -211,7 +211,7 @@ void regola2(std::vector<boidstate const*>& neighbors, boidstate& oldboid,
   auto n = neighbors.size();
   std::for_each(neighbors.begin(), neighbors.end(), [&](auto& neighbor) {
     auto x = neighbor->vel - oldboid.vel;
-    boid.vel += paramms::steering / n * (x);
+    boid.vel += paramms::steering / static_cast<double>(n) * (x);
   });
 }
 
@@ -220,7 +220,7 @@ void regola3(std::vector<boidstate const*>& neighbors, boidstate& boid)
   auto n = neighbors.size();
   std::for_each(neighbors.begin(), neighbors.end(), [&](auto& neighbor) {
     auto x = neighbor->pos - boid.pos;
-    boid.vel += paramms::steering / n * (x);
+    boid.vel += paramms::steering / static_cast<double>(n) * (x);
   });
 }
 
@@ -229,7 +229,7 @@ auto regola4(stormo& neighbors, boidstate& boid)
   double a{1};
   auto n = neighbors.size();
   for (auto index = neighbors.begin(); index != neighbors.end(); ++index) {
-    a += paramms::mod_align / n * (mod_vel(*index) - mod_vel(boid));
+    a += paramms::mod_align / static_cast<double>(n) * (mod_vel(*index) - mod_vel(boid));
   }
   boid.vel = a * boid.vel;
   return boid;
@@ -257,7 +257,7 @@ auto meanvel(stormo const& set) // Velocità quadratica media
   for (auto it = set.begin(); it != set.end(); ++it) {
     s += pow((*it).vel[0], 2) + pow((*it).vel[1], 2);
   }
-  return sqrt(s) / set.size();
+  return sqrt(s) / static_cast<double>(set.size());
 }
 
 auto compx(stormo const& set) // Media delle componenti x di vel
@@ -267,7 +267,7 @@ auto compx(stormo const& set) // Media delle componenti x di vel
     s += (*it).vel[0];
   }
 
-  return s / set.size();
+  return s / static_cast<double>(set.size());
 }
 
 auto compy(stormo const& set) // Media delle componenti y di vel
@@ -277,7 +277,7 @@ auto compy(stormo const& set) // Media delle componenti y di vel
     s += (*it).vel[1];
   }
 
-  return s / set.size();
+  return s / static_cast<double>(set.size());
 }
 
 /*std::function<double(double)> cosine {[](double theta){return cos(theta);}};
