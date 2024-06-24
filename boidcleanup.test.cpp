@@ -4,16 +4,16 @@
 using namespace boids;
 TEST_CASE("Testing rules")
 {
-
-  paramms::repulsione  = 0.7;
-  paramms::steering    = 0.1;
-  paramms::coesione    = 0.1;
-  paramms::neigh2      = 1000000;
-  paramms::neigh_align = 1000000;
-  paramms::alpha=M_PI;
-  paramms::attraction=0;
-  paramms::speedlimit   = 80;
-  paramms::speedminimum = 2; 
+  boids::paramlist params{};
+  params.repulsione     = 0.7;
+  params.steering     = 0.1;
+  params.coesione     = 0.1;
+  params.neigh2       = 1000000;
+  params.neigh_align  = 1000000;
+  params.alpha        = M_PI;
+  params.attraction   = 0;
+  params.speedlimit   = 80;
+  params.speedminimum = 2;
   boidstate boid1;
   boid1.pos = {700., 0.};
   boid1.vel = {300., 0.};
@@ -45,12 +45,13 @@ TEST_CASE("Testing rules")
   boid10.pos = {910., 0.};
   boid10.vel = {-300., 0.};
 
-  stormo set{boid1, boid2, boid3, boid4, boid5, boid6, boid7, boid8, boid9, boid10};
+  stormo set{boid1, boid2, boid3, boid4, boid5,
+             boid6, boid7, boid8, boid9, boid10};
   std::random_device r;
   std::default_random_engine eng(r());
   ensemble flock{set};
 
-  flock.update();
+  flock.update(params);
   REQUIRE(flock.size_() == 10);
 
   CHECK(flock.set_()[0].vel[0] == doctest::Approx(1636.744444));

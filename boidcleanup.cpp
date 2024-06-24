@@ -2,21 +2,7 @@
 
 namespace boids {
 
-double paramms::repulsione   = 0.7;
-double paramms::steering     = 0.1;
-double paramms::coesione     = 100;
-double paramms::neigh2       = 20;
-double paramms::neigh_align  = 70;
-double paramms::mod_align    = 0.000003;
-double paramms::attraction   = 0.02;
-double paramms::alpha        = M_PI;
-double paramms::speedlimit   = 80;
-double paramms::speedminimum = 2;
-/*struct uniform2D{
-  std::uniform_real_distribution<double> disX(0, static_cast<double>(pixel *
-params::rate)); std::uniform_real_distribution<double> disY;
-
-};*/
+std::bitset<8> FlagOpt;
 
 boidstate generate(std::default_random_engine& eng)
 { // genera pos e vel di un boid distribuiti secondo
@@ -131,7 +117,8 @@ stormo generator(std::default_random_engine& eng)
   return set;
 }
 
-void speedadjust(boidstate& boid, const double speedlimit, const double speedminimum)
+void speedadjust(boidstate& boid, const double speedlimit,
+                 const double speedminimum)
 {
   auto vnorm = boids::mod(boid.vel);
   if (vnorm > speedlimit) {
@@ -144,7 +131,8 @@ void speedadjust(boidstate& boid, const double speedlimit, const double speedmin
   }
 }
 
-auto neighbors(stormo const& set, boidstate const& boid, const double d, const double alpha)
+auto neighbors(stormo const& set, boidstate const& boid, const double d,
+               const double alpha)
 {
   std::vector<boidstate const*> neighbors{};
   std::for_each(set.begin(), set.end(), [&](auto& neighbor) {
@@ -158,15 +146,11 @@ auto neighbors(stormo const& set, boidstate const& boid, const double d, const d
           std::inner_product(deltax.begin(), deltax.end(), y.begin(), 0.);
       if ((prodscalare) >= std::cos(alpha)) {
         auto prova = &neighbor;
-        //std::cout << "prova " << prova->pos[0] << std::endl;
+        // std::cout << "prova " << prova->pos[0] << std::endl;
         neighbors.emplace_back(prova);
       }
     }
   });
-  for (auto& it : neighbors) {
-    auto prova = it->pos[0];
-    //std::cout << "roba a caso dentro" << (double)it->pos[0] << std::endl;
-  }
   return neighbors;
 }
 
@@ -185,22 +169,18 @@ auto neighbors(std::vector<boidstate const*> const& set, boidstate const& boid,
       double prodscalare =
           std::inner_product(deltax.begin(), deltax.end(), y.begin(), 0.);
       if ((prodscalare) >= std::cos(alpha)) {
-        // std::cout<<"valore prima"<<neighbor->pos[0]<<"\n";
         neighbors.emplace_back(neighbor);
       }
     }
   });
-  for (auto& it : neighbors) {
-    // std::cout<<"roba a caso dentro"<<it->pos[0]<<std::endl;
-  }
   return neighbors;
 }
 
-void regola1(std::vector<boidstate const*>& neighbors, boidstate& boid,const double repulsione)
+void regola1(std::vector<boidstate const*>& neighbors, boidstate& boid,
+             const double repulsione)
 {
   std::for_each(neighbors.begin(), neighbors.end(), [&](auto& neighbor) {
     auto x = neighbor->pos - boid.pos;
-   // std::cout << "roba a caso " << neighbor->pos[0] << "\n";
     boid.vel += -repulsione * (x);
   });
 }
@@ -211,11 +191,12 @@ void regola2(std::vector<boidstate const*>& neighbors, boidstate& oldboid,
   auto n = neighbors.size();
   std::for_each(neighbors.begin(), neighbors.end(), [&](auto& neighbor) {
     auto x = neighbor->vel - oldboid.vel;
-    boid.vel +=steering / n * (x);
+    boid.vel += steering / n * (x);
   });
 }
 
-void regola3(std::vector<boidstate const*>& neighbors, boidstate& boid, const double cohesion)
+void regola3(std::vector<boidstate const*>& neighbors, boidstate& boid,
+             const double cohesion)
 {
   auto n = neighbors.size();
   std::for_each(neighbors.begin(), neighbors.end(), [&](auto& neighbor) {
@@ -253,10 +234,6 @@ auto compy(stormo const& set) // Media delle componenti y di vel
   return s / set.size();
 }
 
-/*std::function<double(double)> cosine {[](double theta){return cos(theta);}};
-std::function<double(double)> sine {[](double theta){return sin(theta);}};
-std::vector<std::function<double(double)>> trig{sine, cosine};*/
-
 auto rotate(boidstate& boid, const double angle)
 {
   auto mod{mod_vel(boid)};
@@ -289,27 +266,27 @@ double angle(boidstate const& boid)
   return atan2(boid.vel[1], boid.vel[0]);
 }
 
-void ensemble::update()
+void ensemble::update(paramlist const& params)
 {
   for (auto it = set.begin(), jt = newset.begin(); it != set.end();
        ++it, ++jt) {
-    auto neighbor{neighbors(set, *it, paramms::neigh_align,paramms::alpha)};
-    auto close_neighbor{neighbors(neighbor, *it, paramms::neigh2,paramms::alpha)};
-    regola2(neighbor, *it, *jt,paramms::steering);
-    regola1(close_neighbor, *jt,paramms::repulsione);
-    regola3(neighbor, *jt, paramms::coesione);
-    speedadjust(*jt,paramms::speedlimit,paramms::speedminimum);
+    auto neighbor{neighbors(set, *it, params.neigh_align, params.alpha)};
+    auto close_neighbor{neighbors(neighbor, *it, params.neigh2, params.alpha)};
+    regola2(neighbor, *it, *jt, params.steering);
+    regola1(close_neighbor, *jt, params.repulsione);
+    regola3(neighbor, *jt, params.coesione);
+    speedadjust(*jt, params.speedlimit, params.speedminimum);
     auto pix = pixel.begin();
     for (auto index = (*jt).pos.begin(), velind = (*jt).vel.begin();
          index != (*jt).pos.end(); ++index, ++velind, ++pix) {
       (*index) += (*velind) * params::deltaT;
-      if (*index > *pix-150) {
-          *velind -= paramms::attraction;
-        } else {
-          if (*index < 150) {
-            *velind += paramms::attraction;
-          }
+      if (*index > *pix - 150) {
+        *velind -= params.attraction;
+      } else {
+        if (*index < 150) {
+          *velind += params.attraction;
         }
+      }
     }
   }
   set = newset;
