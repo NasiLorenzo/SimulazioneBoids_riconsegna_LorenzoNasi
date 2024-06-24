@@ -41,6 +41,7 @@ auto mod_vel(boidstate const& boid) // Velocità singolo boid
   }
   return sum;
 }
+
 double mod(std::array<double, params::dim> const& vec)
 {
   /*return sqrt(
@@ -299,14 +300,17 @@ auto rotate(boidstate& boid, const double angle)
 
   return boid;
 }
+
 stormo ensemble::set_()
 {
   return set;
 }
+
 stormo ensemble::newset_()
 {
   return newset;
 }
+
 std::size_t ensemble::size_()
 {
   return set.size();
