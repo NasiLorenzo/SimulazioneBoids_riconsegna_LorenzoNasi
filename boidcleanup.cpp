@@ -164,13 +164,6 @@ auto neighbors(stormo const& set, boidstate const& boid, const double d)
       }
     }
   });
-<<<<<<< HEAD
-  for (auto& it : neighbors) {
-    auto prova = it->pos[0];
-    // std::cout << "roba a caso dentro" << (double)it->pos[0] << std::endl;
-  }
-=======
->>>>>>> a2ad43b4f021049f72a7ae44a0d08521a988313c
   return neighbors;
 }
 
@@ -341,13 +334,13 @@ void ensemble::update()
       if (*index <= 0)
        *index += *pix * params::rate;*/
       // assert(*index <= *pix * params::rate);
-     /* if (*index > *pix-150) {
-          *velind -= paramms::attraction;
-        } else {
-          if (*index < 150) {
-            *velind += paramms::attraction;
-          }
-        }*/
+      /* if (*index > *pix-150) {
+           *velind -= paramms::attraction;
+         } else {
+           if (*index < 150) {
+             *velind += paramms::attraction;
+           }
+         }*/
     }
   }
   set = newset;
