@@ -43,7 +43,6 @@ struct paramlist{
   double coesione;    
   double neigh_align;
   double neigh2;
-  double mod_align;
   double attraction;
   double alpha;
   double speedlimit;

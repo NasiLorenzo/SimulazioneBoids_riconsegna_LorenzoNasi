@@ -8,7 +8,6 @@ int main()
   params.coesione     = 0.08;
   params.neigh_align  = 200;
   params.neigh2       = 15;
-  params.mod_align    = 0.000003;
   params.attraction   = 1.0;
   params.alpha        = (1. / 3.) * M_PI;
   params.speedlimit   = 100;
