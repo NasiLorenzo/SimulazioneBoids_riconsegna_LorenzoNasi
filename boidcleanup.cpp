@@ -164,10 +164,13 @@ auto neighbors(stormo const& set, boidstate const& boid, const double d)
       }
     }
   });
+<<<<<<< HEAD
   for (auto& it : neighbors) {
     auto prova = it->pos[0];
     // std::cout << "roba a caso dentro" << (double)it->pos[0] << std::endl;
   }
+=======
+>>>>>>> a2ad43b4f021049f72a7ae44a0d08521a988313c
   return neighbors;
 }
 
@@ -191,9 +194,6 @@ auto neighbors(std::vector<boidstate const*> const& set, boidstate const& boid,
       }
     }
   });
-  for (auto& it : neighbors) {
-    // std::cout<<"roba a caso dentro"<<it->pos[0]<<std::endl;
-  }
   return neighbors;
 }
 
@@ -341,7 +341,7 @@ void ensemble::update()
       if (*index <= 0)
        *index += *pix * params::rate;*/
       // assert(*index <= *pix * params::rate);
-      /*if (*index > *pix-150) {
+     /* if (*index > *pix-150) {
           *velind -= paramms::attraction;
         } else {
           if (*index < 150) {
@@ -353,34 +353,4 @@ void ensemble::update()
   set = newset;
 }
 
-/*void ensemble::brown_update(std::random_device& r)
-{
-  std::default_random_engine eng(r());
-  for (auto it = set.begin(), jt = newset.begin(); it != set.end();
-       ++it, ++jt) {
-    stormo neighbor{neighbors(set, *it, params::neigh_co)};
-    stormo close_neighbor{neighbors(set, *it, paramms::neigh2)};
-    //*jt = regola1(close_neighbor, *jt);
-    //*jt = regola2(neighbor, *jt);
-    //*jt = regola3(neighbor, *jt);
-    std::uniform_int_distribution<int> dist(0, params::rate2);
-    std::uniform_real_distribution<double> dist2(-params::pi / 2,
-                                                 params::pi / 2);
-    std::cout << "dist " << dist(eng) << "\n";
-    if (dist(eng) % params::rate2 == 0)
-      *jt = rotate(*jt, dist2(eng));
-    auto pix = pixel.begin();
-    for (auto index = (*jt).pos.begin(), velind = (*jt).vel.begin();
-         index != (*jt).pos.end(); ++index, ++velind, ++pix) {
-      (*index) += (*velind) * params::deltaT;
-      // std::cout<<"pos "<<it-set.begin()+1<<" "<<*index<<" "<<"\n";
-      //(*index) = fmod(*index, *pix); // reinserire fmod con *pix
-      if (*index <= 0)
-        *index += *pix;
-      assert(*index <= *pix);
-    }
-  }
-  std::cout << "Velocità media " << meanvel(newset) << "\n";
-  set = newset;
-}*/
 } // namespace boids

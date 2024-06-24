@@ -36,9 +36,9 @@ int main()
   sf::Clock clock;
   //sf::Time accumulator = sf::Time::Zero;
 
-  sf::Texture texture;
+  /*sf::Texture texture;
   texture.loadFromFile("tramonto.jpg");
-  sf::Sprite backgroundSprite(texture);
+  sf::Sprite backgroundSprite(texture);*/
   while (window.isOpen()) {
     sf::Event event;
     while (window.pollEvent(event)) {
