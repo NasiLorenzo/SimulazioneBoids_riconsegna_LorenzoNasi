@@ -27,7 +27,7 @@ struct params
   static constexpr unsigned int n = 2;
   // unsigned int vert{20};
   // unsigned int hor{20};
-  static constexpr unsigned int size{20};
+  static constexpr unsigned int size{100};
   static constexpr double rate{
       1}; // rapporto tra la dimensione dello schermo e della generazione
   static constexpr unsigned int rate2{20};
@@ -77,13 +77,12 @@ double mod(std::array<double,params::dim> const& vec);
 std::array<double,params::dim> normalize(std::array<double,params::dim>& vec);
 stormo generator(std::default_random_engine&);
 
-void regola1(stormo& neighbors, boidstate& boid_old); // repulsion
-void regola2(stormo& neighbors, boidstate& boidi, boidstate& boid); // steering
-void regola3(stormo& neighbors, boidstate& boidi); // cohesion
-auto regola4(stormo& neighbors, boidstate& boid);
+void regola1(stormo& neighbors, boidstate& boid_old,const double repulsione); // repulsion
+void regola2(stormo& neighbors, boidstate& boidi, boidstate& boid,const double steering); // steering
+void regola3(stormo& neighbors, boidstate& boidi,const double cohesion); // cohesion
 std::array<double, params::dim> operator+=(std::array<double, params::dim>&, std::array<double, params::dim>const&);
 
-void speedadjust(boidstate& boid);
+void speedadjust(boidstate& boid, const double speedadjust, const double speedminimum);
 
 inline void meiosi(stormo& set, stormo& neighborss, boidstate& boid,
                    std::default_random_engine eng,

@@ -8,9 +8,9 @@ int main()
   boids::paramms::neigh_align = 200;
   boids::paramms::neigh2      = 15;
   boids::paramms::mod_align=0.000003;
-  boids::paramms::attraction=1.5;
+  boids::paramms::attraction=1.0;
 
-  boids::paramms::alpha       = (1./1.)*M_PI;
+  boids::paramms::alpha       = (1./3.)*M_PI;
   boids::paramms::speedlimit =100;
   boids::paramms::speedminimum=40;
   std::random_device r;
