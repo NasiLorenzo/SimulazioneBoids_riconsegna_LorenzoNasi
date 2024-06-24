@@ -4,8 +4,8 @@
 using namespace boids;
 TEST_CASE("Testing rules")
 {
-  boids::paramlist params{};
-  params.repulsione     = 0.7;
+  paramlist params{};
+  params.repulsione   = 0.7;
   params.steering     = 0.1;
   params.coesione     = 0.1;
   params.neigh2       = 1000000;
