@@ -2,30 +2,26 @@
 
 int main()
 {
-  boids::paramms::repulsione  = 0.2;
-  boids::paramms::steering    = 0.04;
-  boids::paramms::coesione    = 0.08;
-  boids::paramms::neigh_align = 200;
-  boids::paramms::neigh2      = 15;
-  boids::paramms::mod_align=0.000003;
-  boids::paramms::attraction=1.5;
-
-  boids::paramms::alpha       = (1./1.)*M_PI;
-  boids::paramms::speedlimit =100;
-  boids::paramms::speedminimum=40;
+  boids::paramlist params{};
+  params.repulsione   = 0.2;
+  params.steering     = 0.04;
+  params.coesione     = 0.08;
+  params.neigh_align  = 200;
+  params.neigh2       = 15;
+  params.mod_align    = 0.000003;
+  params.attraction   = 1.0;
+  params.alpha        = (1. / 3.) * M_PI;
+  params.speedlimit   = 100;
+  params.speedminimum = 40;
   std::random_device r;
   std::default_random_engine eng(r());
   boids::stormo flock = boids::generator(eng);
   boids::ensemble prova(flock);
-  std::cout << "Dimensione generazione" << prova.size_() << "\n";
-  std::cout << "Coesione" << boids::paramms::coesione << "\n";
-  std::cout << "Distanta max" << boids::paramms::neigh_align << "\n";
-  std::cout << "Repulsione" << boids::paramms::repulsione << "\n";
 
-  prova.update();
-  std::cout<<"dimesione dopo update "<<prova.size_()<<"\n";
-  prova.update();
-  std::cout<<"dimesione dopo update "<<prova.size_()<<"\n";
+  prova.update(params);
+  std::cout << "dimesione dopo update " << prova.size_() << "\n";
+  prova.update(params);
+  std::cout << "dimesione dopo update " << prova.size_() << "\n";
 
   sf::RenderWindow window(sf::VideoMode(boids::pixel[0], boids::pixel[1]),
                           "Boids Simulation");
@@ -34,7 +30,7 @@ int main()
   const sf::Time frameTime = sf::seconds(boids::params::deltaT);
 
   sf::Clock clock;
-  //sf::Time accumulator = sf::Time::Zero;
+  // sf::Time accumulator = sf::Time::Zero;
 
   /*sf::Texture texture;
   texture.loadFromFile("tramonto.jpg");
@@ -47,12 +43,12 @@ int main()
     }
     // Calculate elapsed time for this frame
     clock.restart();
-    //accumulator += elapsedTime;
+    // accumulator += elapsedTime;
 
     // Adding a background image
     /*sf::FileInputStream stream;
     stream.open("tramonto.jpg");*/
-    prova.update();
+    prova.update(params);
     // Update the simulation while we have enough time accumulated
     /*while (accumulator >= frameTime) {
       prova.update();
@@ -61,8 +57,8 @@ int main()
     }*/
 
     window.clear(sf::Color::White);
-    //window.draw(backgroundSprite);
-    // Draw boids
+    // window.draw(backgroundSprite);
+    //  Draw boids
     for (auto& boid : prova.set_()) {
       /*sf::CircleShape circle(2);
       // std::cout<<prova.set_().size()<<"\n";
@@ -74,33 +70,34 @@ int main()
               / boids::params::rate)); // Assuming x and y are in pos[0]
                                        // and pos[1] respectively
       window.draw(circle);*/
-      float angle = static_cast<float>(boids::angle(boid)); // Assuming you have the angle in degrees
+      float angle = static_cast<float>(
+          boids::angle(boid)); // Assuming you have the angle in degrees
 
       // Arrow length and width
       float arrowLength = 10;
-      float arrowWidth = 5;
+      float arrowWidth  = 5;
 
-            // Calculate arrow positiion            
-      sf::Vector2<float> arrowPos(static_cast<float>(boid.pos[0] / boids::params::rate),
-          static_cast<float>(boid.pos[1]/ boids::params::rate));
-    
+      // Calculate arrow positiion
+      sf::Vector2<float> arrowPos(
+          static_cast<float>(boid.pos[0] / boids::params::rate),
+          static_cast<float>(boid.pos[1] / boids::params::rate));
 
       // Draw arrow
       sf::ConvexShape arrow(3);
-      arrow.setPoint(0, sf::Vector2f(arrowLength,0));
-      arrow.setPoint(1, sf::Vector2f(0,-arrowWidth/2));
-      arrow.setPoint(2, sf::Vector2f(0,arrowWidth/2));
+      arrow.setPoint(0, sf::Vector2f(arrowLength, 0));
+      arrow.setPoint(1, sf::Vector2f(0, -arrowWidth / 2));
+      arrow.setPoint(2, sf::Vector2f(0, arrowWidth / 2));
       arrow.setFillColor(sf::Color::Red);
       arrow.setPosition(arrowPos);
-      arrow.setRotation(angle*180/static_cast<float>(M_PI));
+      arrow.setRotation(angle * 180 / static_cast<float>(M_PI));
       window.draw(arrow);
     }
 
     window.display();
 
     // Delay to achieve desired frame rate
-    if(frameTime < clock.getElapsedTime())
-    std::cout<<"Lag"<<"\n";
+    if (frameTime < clock.getElapsedTime())
+      std::cout << "Lag" << "\n";
     sf::sleep(frameTime - clock.getElapsedTime());
   }
 }

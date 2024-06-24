@@ -3,7 +3,9 @@
 #include <SFML/Graphics.hpp>
 #include <algorithm>
 #include <array>
+#include <bitset>
 #include <cassert>
+#include <chrono>
 #include <cmath>
 #include <functional>
 #include <iostream>
@@ -11,7 +13,6 @@
 #include <random>
 #include <string>
 #include <vector>
-#include <chrono>
 namespace boids {
 
 struct params
@@ -27,7 +28,7 @@ struct params
   static constexpr unsigned int n = 2;
   // unsigned int vert{20};
   // unsigned int hor{20};
-  static constexpr unsigned int size{20};
+  static constexpr unsigned int size{100};
   static constexpr double rate{
       1}; // rapporto tra la dimensione dello schermo e della generazione
   static constexpr unsigned int rate2{20};
@@ -36,27 +37,22 @@ struct params
   static constexpr double theta{pi / 12};
 };
 
-struct paramms
-{
-  static double repulsione;
-  static double steering;
-  static double coesione;
-  static double neigh_align; // raggio visivo
-  static double neigh2; 
-  static double mod_align; 
-  static double attraction; 
-  static double alpha; 
-  static double speedlimit;
-  static double speedminimum;  // raggio di repulsione
+struct paramlist{
+  double repulsione;   
+  double steering;     
+  double coesione;    
+  double neigh_align;
+  double neigh2;
+  double mod_align;
+  double attraction;
+  double alpha;
+  double speedlimit;
+  double speedminimum;
 };
-
-//inline std::array<double, params::dim> operator+(std::array<double, params::dim>, std::array<double, params::dim>);
-
-
 struct boidstate
 {
-  std::array<double,params::dim> pos;
-  std::array<double,params::dim> vel;
+  std::array<double, params::dim> pos;
+  std::array<double, params::dim> vel;
 };
 
 static const std::vector<unsigned int> pixel{1010, 710};
@@ -67,23 +63,37 @@ inline double distance(boidstate const&, boidstate const&);
 
 using stormo = std::vector<boidstate>;
 
-std::array<double,params::dim> operator+(std::array<double,params::dim> const&, std::array<double,params::dim> const& );
-std::array<double,params::dim> operator*(const double, std::array<double,params::dim>& );
-std::array<double,params::dim> operator+=(std::array<double,params::dim>&, std::array<double,params::dim> const& );
-std::array<double, params::dim> operator/(double, std::array<double, params::dim>&);
-std::array<double,params::dim> operator-(std::array<double,params::dim> const&, std::array<double,params::dim> const& );
-std::array<double, params::dim> operator/(std::array<double, params::dim>&, double);
-double mod(std::array<double,params::dim> const& vec);
-std::array<double,params::dim> normalize(std::array<double,params::dim>& vec);
+std::array<double, params::dim>
+operator+(std::array<double, params::dim> const&,
+          std::array<double, params::dim> const&);
+std::array<double, params::dim> operator*(const double,
+                                          std::array<double, params::dim>&);
+std::array<double, params::dim>
+operator+=(std::array<double, params::dim>&,
+           std::array<double, params::dim> const&);
+std::array<double, params::dim> operator/(double,
+                                          std::array<double, params::dim>&);
+std::array<double, params::dim>
+operator-(std::array<double, params::dim> const&,
+          std::array<double, params::dim> const&);
+std::array<double, params::dim> operator/(std::array<double, params::dim>&,
+                                          double);
+double mod(std::array<double, params::dim> const& vec);
+std::array<double, params::dim> normalize(std::array<double, params::dim>& vec);
 stormo generator(std::default_random_engine&);
 
-void regola1(stormo& neighbors, boidstate& boid_old); // repulsion
-void regola2(stormo& neighbors, boidstate& boidi, boidstate& boid); // steering
-void regola3(stormo& neighbors, boidstate& boidi); // cohesion
-auto regola4(stormo& neighbors, boidstate& boid);
-std::array<double, params::dim> operator+=(std::array<double, params::dim>&, std::array<double, params::dim>const&);
+void regola1(stormo& neighbors, boidstate& boid_old,
+             const double repulsione); // repulsion
+void regola2(stormo& neighbors, boidstate& boidi, boidstate& boid,
+             const double steering); // steering
+void regola3(stormo& neighbors, boidstate& boidi,
+             const double cohesion); // cohesion
+std::array<double, params::dim>
+operator+=(std::array<double, params::dim>&,
+           std::array<double, params::dim> const&);
 
-void speedadjust(boidstate& boid);
+void speedadjust(boidstate& boid, const double speedadjust,
+                 const double speedminimum);
 
 inline void meiosi(stormo& set, stormo& neighborss, boidstate& boid,
                    std::default_random_engine eng,
@@ -103,8 +113,7 @@ class ensemble
   stormo newset_();
   std::size_t size_();
   boidstate delta();
-  void update();
-  void brown_update(std::random_device& r);
+  void update(paramlist const&);
 };
 } // namespace boids
 
