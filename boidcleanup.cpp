@@ -3,7 +3,6 @@
 namespace boids {
 
 std::bitset<8> FlagOpt;
-
 boidstate generate(std::default_random_engine& eng)
 { // genera pos e vel di un boid distribuiti secondo
   // una gauss centrata in 0
@@ -18,6 +17,21 @@ boidstate generate(std::default_random_engine& eng)
                 [&](double& x) { x = params::vel_factor * dist(eng); });
   return boid;
 }
+
+std::vector<RGB> generatecolors(std::default_random_engine& eng,
+                                paramlist const& params)
+{
+  std::vector<RGB> colorvec{};
+  for (int i = 0; i < params.size / params.flocknumber + 1; i++) {
+    RGB color{};
+    std::uniform_int_distribution dist(0, 255);
+    color.red   = dist(eng);
+    color.blue  = dist(eng);
+    color.green = dist(eng);
+    colorvec.push_back(color);
+  }
+  return colorvec;
+};
 
 auto mod_vel(boidstate const& boid) // Velocità singolo boid
 {
@@ -107,23 +121,14 @@ std::array<double, params::dim> operator/(std::array<double, params::dim>& b,
 stormo generator(std::default_random_engine& eng, paramlist const& params)
 {
   stormo set{};
+  auto colorvec = generatecolors(eng, params);
   for (unsigned int i = 0; i < params.size; i++) {
     auto pix = pixel.begin(); // puntatore ai pixel
     boidstate boidprova{generate(eng)};
     boidprova.flockID = i / params.flocknumber;
-    boidprova.arrow.setFillColor(
-        sf::Color(floor(255.*pow(static_cast<double>(boidprova.flockID)
-                                * static_cast<double>(params.flocknumber)
-                                / static_cast<double>(params.size),
-                            1)),
-                  floor(255.*pow(static_cast<double>(boidprova.flockID)
-                                * static_cast<double>(params.flocknumber)
-                                / static_cast<double>(params.size),
-                            2)),
-                  floor(255.*pow(static_cast<double>(boidprova.flockID)
-                                * static_cast<double>(params.flocknumber)
-                                / static_cast<double>(params.size),
-                            3))));
+    boidprova.arrow.setFillColor(sf::Color(colorvec[boidprova.flockID].red,
+                                           colorvec[boidprova.flockID].green,
+                                           colorvec[boidprova.flockID].blue));
     for (auto it = boidprova.pos.begin(); it != boidprova.pos.end();
          ++it, ++pix) {
       std::uniform_real_distribution<double> dis(
@@ -154,18 +159,23 @@ auto neighbors(stormo const& set, boidstate const& boid, const double d,
                const double alpha)
 {
   std::vector<boidstate const*> neighbors{};
+  int i = 0;
   std::for_each(set.begin(), set.end(), [&](auto& neighbor) {
-    if (distance2(boid, neighbor) < pow(d, 2) && distance2(boid, neighbor) != 0
-        && (val == 1 || (val == 0 && boid.flockID == neighbor.flockID))) {
-      std::array<double, params::dim> deltax = neighbor.pos - boid.pos;
-      std::array<double, params::dim> y      = boid.vel;
-      if (boids::mod(boid.vel) != 0)
-        deltax = normalize(deltax);
-      y = normalize(y);
-      double prodscalare =
-          std::inner_product(deltax.begin(), deltax.end(), y.begin(), 0.);
-      if ((prodscalare) >= std::cos(alpha)) {
-        neighbors.emplace_back(&neighbor);
+    if (i < 10) {
+      if (distance2(boid, neighbor) < pow(d, 2)
+          && distance2(boid, neighbor) != 0
+          && (val == 1 || (val == 0 && boid.flockID == neighbor.flockID))) {
+        std::array<double, params::dim> deltax = neighbor.pos - boid.pos;
+        std::array<double, params::dim> y      = boid.vel;
+        if (boids::mod(boid.vel) != 0)
+          deltax = normalize(deltax);
+        y = normalize(y);
+        double prodscalare =
+            std::inner_product(deltax.begin(), deltax.end(), y.begin(), 0.);
+        if ((prodscalare) >= std::cos(alpha)) {
+          neighbors.emplace_back(&neighbor);
+          i++;
+        }
       }
     }
   });
@@ -176,18 +186,22 @@ auto neighbors(std::vector<boidstate const*> const& set, boidstate const& boid,
                const double d, const double alpha)
 {
   std::vector<boidstate const*> neighbors{};
+  int i = 0;
   std::for_each(set.begin(), set.end(), [&](auto& neighbor) {
-    if (distance2(boid, *neighbor) < pow(d, 2)
-        && distance2(boid, *neighbor) != 0) {
-      std::array<double, params::dim> deltax = neighbor->pos - boid.pos;
-      std::array<double, params::dim> y      = boid.vel;
-      if (boids::mod(boid.vel) != 0)
-        deltax = normalize(deltax);
-      y = normalize(y);
-      double prodscalare =
-          std::inner_product(deltax.begin(), deltax.end(), y.begin(), 0.);
-      if ((prodscalare) >= std::cos(alpha)) {
-        neighbors.emplace_back(neighbor);
+    if (i < 10) {
+      if (distance2(boid, *neighbor) < pow(d, 2)
+          && distance2(boid, *neighbor) != 0) {
+        std::array<double, params::dim> deltax = neighbor->pos - boid.pos;
+        std::array<double, params::dim> y      = boid.vel;
+        if (boids::mod(boid.vel) != 0)
+          deltax = normalize(deltax);
+        y = normalize(y);
+        double prodscalare =
+            std::inner_product(deltax.begin(), deltax.end(), y.begin(), 0.);
+        if ((prodscalare) >= std::cos(alpha)) {
+          neighbors.emplace_back(neighbor);
+          i++;
+        }
       }
     }
   });

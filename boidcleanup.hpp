@@ -60,6 +60,12 @@ struct boidstate
   }
 };
 
+struct RGB{
+  int red;
+  int blue;
+  int green;
+};
+
 static const std::vector<unsigned int> pixel{1010, 710};
 
 inline boidstate generate(std::default_random_engine& eng);
