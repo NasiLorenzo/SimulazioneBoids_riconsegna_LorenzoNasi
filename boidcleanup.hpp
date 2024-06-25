@@ -7,15 +7,14 @@
 #include <cassert>
 #include <chrono>
 #include <cmath>
+#include <fstream>
 #include <functional>
 #include <iostream>
 #include <iterator>
 #include <random>
+#include <sstream>
 #include <string>
 #include <vector>
-#include <fstream>
-#include <sstream>
-#include <chrono>
 
 namespace boids {
 
@@ -24,14 +23,16 @@ struct params
   static constexpr double sigma{0.01};
   static constexpr unsigned int dim{2}; // dimensione
   static constexpr unsigned int n = 2;
-  static constexpr double rate{1}; // rapporto tra la dimensione dello schermo e della generazione
+  static constexpr double rate{
+      1}; // rapporto tra la dimensione dello schermo e della generazione
   static constexpr double vel_factor{10000};
 };
 
-struct paramlist{
-  double repulsione;   
-  double steering;     
-  double coesione;    
+struct paramlist
+{
+  double repulsione;
+  double steering;
+  double coesione;
   double neigh_align;
   double neigh_repulsion;
   double attraction;
@@ -40,11 +41,23 @@ struct paramlist{
   double speedminimum;
   float deltaT;
   unsigned int size;
+  unsigned int flocknumber;
 };
 struct boidstate
 {
   std::array<double, params::dim> pos;
   std::array<double, params::dim> vel;
+  unsigned int flockID{0};
+  sf::ConvexShape arrow;
+  boidstate()
+  {
+    float arrowLength = 10;
+    float arrowWidth  = 5;
+    arrow.setPointCount(3);
+    arrow.setPoint(0, sf::Vector2f(arrowLength, 0));
+    arrow.setPoint(1, sf::Vector2f(0, -arrowWidth / 2));
+    arrow.setPoint(2, sf::Vector2f(0, arrowWidth / 2));
+  }
 };
 
 static const std::vector<unsigned int> pixel{1010, 710};

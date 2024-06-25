@@ -20,44 +20,60 @@ int main()
     return 1;
   }
   std::string line{};
-  while(std::getline(input,line)){
+  while (std::getline(input, line)) {
     std::istringstream inputline(line);
     double value{};
     std::string name{};
-    if(inputline>>name>>value){
-      if(name=="repulsione") params.repulsione=value;
-      else if(name=="steering") params.steering=value;
-      else if(name=="coesione") params.coesione=value;
-      else if(name=="neigh_align") params.neigh_align=value;
-      else if(name=="neigh_repulsion") params.neigh_repulsion=value;
-      else if(name=="attraction") params.attraction=value;
-      else if(name=="alpha") params.alpha=value*M_PI;
-      else if(name=="speedlimit") params.speedlimit=value;
-      else if(name=="speedminimum") params.speedminimum=value;
-      else if(name=="deltaT") params.deltaT=static_cast<float>(value);
-      else if(name=="size") params.size=value;
+    if (inputline >> name >> value) {
+      if (name == "repulsione")
+        params.repulsione = value;
+      else if (name == "steering")
+        params.steering = value;
+      else if (name == "coesione")
+        params.coesione = value;
+      else if (name == "neigh_align")
+        params.neigh_align = value;
+      else if (name == "neigh_repulsion")
+        params.neigh_repulsion = value;
+      else if (name == "attraction")
+        params.attraction = value;
+      else if (name == "alpha")
+        params.alpha = value * M_PI;
+      else if (name == "speedlimit")
+        params.speedlimit = value;
+      else if (name == "speedminimum")
+        params.speedminimum = value;
+      else if (name == "deltaT")
+        params.deltaT = static_cast<float>(value);
+      else if (name == "size")
+        params.size = value;
+      else if (name == "flocknumber")
+        params.flocknumber = static_cast<unsigned int>(value);
     }
   }
   std::cout << "repulsione: " << params.repulsione << std::endl;
-    std::cout << "steering: " << params.steering << std::endl;
-    std::cout << "coesione: " << params.coesione << std::endl;
-    std::cout << "neigh_align: " << params.neigh_align << std::endl;
-    std::cout << "neigh_repulsion: " << params.neigh_repulsion << std::endl;
-    std::cout << "attraction: " << params.attraction << std::endl;
-    std::cout << "alpha: " << params.alpha << std::endl;
-    std::cout << "speedlimit: " << params.speedlimit << std::endl;
-    std::cout << "speedminimum: " << params.speedminimum << std::endl;
-    std::cout << "deltaT: " << params.deltaT << std::endl;
+  std::cout << "steering: " << params.steering << std::endl;
+  std::cout << "coesione: " << params.coesione << std::endl;
+  std::cout << "neigh_align: " << params.neigh_align << std::endl;
+  std::cout << "neigh_repulsion: " << params.neigh_repulsion << std::endl;
+  std::cout << "attraction: " << params.attraction << std::endl;
+  std::cout << "alpha: " << params.alpha << std::endl;
+  std::cout << "speedlimit: " << params.speedlimit << std::endl;
+  std::cout << "speedminimum: " << params.speedminimum << std::endl;
+  std::cout << "deltaT: " << params.deltaT << std::endl;
+  std::cout << "size" << params.size <<std::endl;
   std::random_device r;
   std::default_random_engine eng(r());
-  boids::stormo flock = boids::generator(eng,params);
+  boids::stormo flock = boids::generator(eng, params);
   boids::ensemble prova(flock);
-
+  
   prova.update(params);
   std::cout << "dimesione dopo update " << prova.size_() << "\n";
   prova.update(params);
   std::cout << "dimesione dopo update " << prova.size_() << "\n";
-
+  for (auto& it: prova.set_()){
+    std::cout<<"L'ID è "<<it.flockID<<"\n";
+  }
   sf::RenderWindow window(sf::VideoMode(boids::pixel[0], boids::pixel[1]),
                           "Boids Simulation");
 
@@ -92,8 +108,8 @@ int main()
           boids::angle(boid)); // Assuming you have the angle in degrees
 
       // Arrow length and width
-      float arrowLength = 10;
-      float arrowWidth  = 5;
+     /* float arrowLength = 10;
+      float arrowWidth  = 5;*/
 
       // Calculate arrow positiion
       sf::Vector2<float> arrowPos(
@@ -101,14 +117,14 @@ int main()
           static_cast<float>(boid.pos[1] / boids::params::rate));
 
       // Draw arrow
-      sf::ConvexShape arrow(3);
+      /*sf::ConvexShape arrow(3);
       arrow.setPoint(0, sf::Vector2f(arrowLength, 0));
       arrow.setPoint(1, sf::Vector2f(0, -arrowWidth / 2));
       arrow.setPoint(2, sf::Vector2f(0, arrowWidth / 2));
-      arrow.setFillColor(sf::Color::Red);
-      arrow.setPosition(arrowPos);
-      arrow.setRotation(angle * 180 / static_cast<float>(M_PI));
-      window.draw(arrow);
+      arrow.setFillColor(sf::Color::Red);*/
+      boid.arrow.setPosition(arrowPos);
+      boid.arrow.setRotation(angle * 180 / static_cast<float>(M_PI));
+      window.draw(boid.arrow);
     }
 
     window.display();

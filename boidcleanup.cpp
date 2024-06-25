@@ -110,6 +110,20 @@ stormo generator(std::default_random_engine& eng, paramlist const& params)
   for (unsigned int i = 0; i < params.size; i++) {
     auto pix = pixel.begin(); // puntatore ai pixel
     boidstate boidprova{generate(eng)};
+    boidprova.flockID = i / params.flocknumber;
+    boidprova.arrow.setFillColor(
+        sf::Color(floor(255.*pow(static_cast<double>(boidprova.flockID)
+                                * static_cast<double>(params.flocknumber)
+                                / static_cast<double>(params.size),
+                            1)),
+                  floor(255.*pow(static_cast<double>(boidprova.flockID)
+                                * static_cast<double>(params.flocknumber)
+                                / static_cast<double>(params.size),
+                            2)),
+                  floor(255.*pow(static_cast<double>(boidprova.flockID)
+                                * static_cast<double>(params.flocknumber)
+                                / static_cast<double>(params.size),
+                            3))));
     for (auto it = boidprova.pos.begin(); it != boidprova.pos.end();
          ++it, ++pix) {
       std::uniform_real_distribution<double> dis(
@@ -135,14 +149,14 @@ void speedadjust(boidstate& boid, const double speedlimit,
     boid.vel = speedminimum * boid.vel;
   }
 }
-
+template<bool val>
 auto neighbors(stormo const& set, boidstate const& boid, const double d,
                const double alpha)
 {
   std::vector<boidstate const*> neighbors{};
   std::for_each(set.begin(), set.end(), [&](auto& neighbor) {
-    if (distance2(boid, neighbor) < pow(d, 2)
-        && distance2(boid, neighbor) != 0) {
+    if (distance2(boid, neighbor) < pow(d, 2) && distance2(boid, neighbor) != 0
+        && (val == 1 || (val == 0 && boid.flockID == neighbor.flockID))) {
       std::array<double, params::dim> deltax = neighbor.pos - boid.pos;
       std::array<double, params::dim> y      = boid.vel;
       if (boids::mod(boid.vel) != 0)
@@ -277,11 +291,11 @@ void ensemble::update(paramlist const& params)
 {
   for (auto it = set.begin(), jt = newset.begin(); it != set.end();
        ++it, ++jt) {
-    auto neighbor{neighbors(set, *it, params.neigh_align, params.alpha)};
+    auto neighbor{neighbors<0>(set, *it, params.neigh_align, params.alpha)};
     auto close_neighbor{
-        neighbors(neighbor, *it, params.neigh_repulsion, params.alpha)};
-    regola2(neighbor, *it, *jt, params.steering);
+        neighbors<1>(set, *it, params.neigh_repulsion, params.alpha)};
     regola1(close_neighbor, *jt, params.repulsione);
+    regola2(neighbor, *it, *jt, params.steering);
     regola3(neighbor, *jt, params.coesione);
     speedadjust(*jt, params.speedlimit, params.speedminimum);
     auto pix = pixel.begin();
@@ -303,28 +317,29 @@ void ensemble::update2(paramlist const& params)
 {
   std::vector<double> vicini(set.size(), 0);
   std::vector<std::array<double, params::dim>> deltavec(set.size(), {0., 0.});
-  std::vector<std::array<double, params::dim>> deltaveclose(set.size(), {0., 0.});
-  auto neighcountit = vicini.begin();
-  auto neighcountjt = vicini.begin()+1;
-  auto deltavecit = deltavec.begin();
-  auto deltavecjt =deltavec.begin()+1;
-  auto deltavecloseit=deltaveclose.begin();
-  auto deltaveclosejt=deltaveclose.begin()+1;
-  for (auto it = set.begin(); it != set.end()-1; ++it) {
+  std::vector<std::array<double, params::dim>> deltaveclose(set.size(),
+                                                            {0., 0.});
+  auto neighcountit   = vicini.begin();
+  auto neighcountjt   = vicini.begin() + 1;
+  auto deltavecit     = deltavec.begin();
+  auto deltavecjt     = deltavec.begin() + 1;
+  auto deltavecloseit = deltaveclose.begin();
+  auto deltaveclosejt = deltaveclose.begin() + 1;
+  for (auto it = set.begin(); it != set.end() - 1; ++it) {
     for (auto jt = it + 1; jt != set.end(); ++jt) {
-      auto distanza=distance(*it, *jt);
+      auto distanza = distance(*it, *jt);
       if (distanza <= params.neigh_align) {
         *neighcountit++;
         *neighcountjt++;
-        auto x=jt->vel -it->vel;
-        *deltavecit+=params.steering*x;//regola 2
-        *deltavecjt+=-params.steering*x;
-        auto y=jt->pos-it->pos;
-        *deltavecit+=params.coesione*x;//regola3
-        *deltavecjt+=-params.coesione*x;
-        if(distanza<=params.neigh_repulsion){
-        *deltavecit+=-params.repulsione*y;//regola1, da non riscalare
-        *deltavecjt+=params.repulsione*y;
+        auto x = jt->vel - it->vel;
+        *deltavecit += params.steering * x; // regola 2
+        *deltavecjt += -params.steering * x;
+        auto y = jt->pos - it->pos;
+        *deltavecit += params.coesione * x; // regola3
+        *deltavecjt += -params.coesione * x;
+        if (distanza <= params.neigh_repulsion) {
+          *deltavecit += -params.repulsione * y; // regola1, da non riscalare
+          *deltavecjt += params.repulsione * y;
         }
       }
       ++neighcountjt;
@@ -335,15 +350,15 @@ void ensemble::update2(paramlist const& params)
     ++deltavecloseit;
     ++neighcountit;
   }
-  neighcountit = vicini.begin();
-  deltavecit = deltavec.begin();
-  deltavecloseit=deltaveclose.begin();
-  for(auto it=set.begin();it!=set.end();++it){
-   it->vel+=*deltavecit/(*neighcountit) + *deltavecloseit;
-   it->pos+=params.deltaT * it->vel;
-   ++neighcountit;
-   ++deltavecit;
-   ++deltavecloseit;
+  neighcountit   = vicini.begin();
+  deltavecit     = deltavec.begin();
+  deltavecloseit = deltaveclose.begin();
+  for (auto it = set.begin(); it != set.end(); ++it) {
+    it->vel += *deltavecit / (*neighcountit) + *deltavecloseit;
+    it->pos += params.deltaT * it->vel;
+    ++neighcountit;
+    ++deltavecit;
+    ++deltavecloseit;
   }
 }
 } // namespace boids
