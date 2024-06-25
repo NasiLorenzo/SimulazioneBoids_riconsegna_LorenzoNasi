@@ -161,7 +161,7 @@ auto neighbors(stormo const& set, boidstate const& boid, const double d,
   std::vector<boidstate const*> neighbors{};
   int i = 0;
   std::for_each(set.begin(), set.end(), [&](auto& neighbor) {
-    if (i < 10) {
+    //if (i < 10) {
       if (distance2(boid, neighbor) < pow(d, 2)
           && distance2(boid, neighbor) != 0
           && (val == 1 || (val == 0 && boid.flockID == neighbor.flockID))) {
@@ -177,7 +177,7 @@ auto neighbors(stormo const& set, boidstate const& boid, const double d,
           i++;
         }
       }
-    }
+   // }
   });
   return neighbors;
 }
@@ -188,7 +188,7 @@ auto neighbors(std::vector<boidstate const*> const& set, boidstate const& boid,
   std::vector<boidstate const*> neighbors{};
   int i = 0;
   std::for_each(set.begin(), set.end(), [&](auto& neighbor) {
-    if (i < 10) {
+    //if (i < 10) {
       if (distance2(boid, *neighbor) < pow(d, 2)
           && distance2(boid, *neighbor) != 0) {
         std::array<double, params::dim> deltax = neighbor->pos - boid.pos;
@@ -203,7 +203,7 @@ auto neighbors(std::vector<boidstate const*> const& set, boidstate const& boid,
           i++;
         }
       }
-    }
+    //}
   });
   return neighbors;
 }
@@ -316,10 +316,10 @@ void ensemble::update(paramlist const& params)
     for (auto index = (*jt).pos.begin(), velind = (*jt).vel.begin();
          index != (*jt).pos.end(); ++index, ++velind, ++pix) {
       (*index) += (*velind) * params.deltaT;
-      if (*index > *pix - 150) {
+      if (*index > *pix - 100) {
         *velind -= params.attraction;
       } else {
-        if (*index < 150) {
+        if (*index < 100) {
           *velind += params.attraction;
         }
       }

@@ -9,4 +9,4 @@ speedlimit       100
 speedminimum     40
 deltaT           0.0333
 size             300
-flocknumber      300
+flocknumber      20
