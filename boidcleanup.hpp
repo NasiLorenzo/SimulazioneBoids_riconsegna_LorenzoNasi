@@ -20,24 +20,12 @@ namespace boids {
 
 struct params
 {
-  static constexpr double sigma{
-      0.01}; // gli esagoni vengono se c'è un parametro di steering basso e una
-             // distanza di reticolo bassa
+  static constexpr double sigma{0.01};
   static constexpr unsigned int dim{2}; // dimensione
-  static constexpr double neigh_co{90};
-  static constexpr double reproduction{20};
-  static constexpr unsigned int interazioni{2};
-  static constexpr float deltaT{1 / 30.f};
   static constexpr unsigned int n = 2;
-  // unsigned int vert{20};
-  // unsigned int hor{20};
   static constexpr unsigned int size{100};
-  static constexpr double rate{
-      1}; // rapporto tra la dimensione dello schermo e della generazione
-  static constexpr unsigned int rate2{20};
+  static constexpr double rate{1}; // rapporto tra la dimensione dello schermo e della generazione
   static constexpr double vel_factor{10000};
-  static constexpr double pi = 3.141592;
-  static constexpr double theta{pi / 12};
 };
 
 struct paramlist{

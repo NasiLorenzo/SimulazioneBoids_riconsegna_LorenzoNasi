@@ -31,7 +31,7 @@ int main()
       else if(name=="neigh_align") params.neigh_align=value;
       else if(name=="neigh_repulsion") params.neigh_repulsion=value;
       else if(name=="attraction") params.attraction=value;
-      else if(name=="alpha") params.alpha=value;
+      else if(name=="alpha") params.alpha=value*M_PI;
       else if(name=="speedlimit") params.speedlimit=value;
       else if(name=="speedminimum") params.speedminimum=value;
       else if(name=="deltaT") params.deltaT=static_cast<float>(value);

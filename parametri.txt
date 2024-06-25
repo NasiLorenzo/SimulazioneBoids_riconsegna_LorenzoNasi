@@ -4,7 +4,7 @@ coesione         0.08
 neigh_align      200
 neigh_repulsion  15
 attraction       2.0
-alpha            1.047
+alpha            0.33
 speedlimit       100
-speedminimum     10
+speedminimum     40
 deltaT           0.0333
