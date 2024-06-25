@@ -146,9 +146,7 @@ auto neighbors(stormo const& set, boidstate const& boid, const double d,
       double prodscalare =
           std::inner_product(deltax.begin(), deltax.end(), y.begin(), 0.);
       if ((prodscalare) >= std::cos(alpha)) {
-        auto prova = &neighbor;
-        // std::cout << "prova " << prova->pos[0] << std::endl;
-        neighbors.emplace_back(prova);
+        neighbors.emplace_back(&neighbor);
       }
     }
   });
@@ -250,12 +248,12 @@ auto rotate(boidstate& boid, const double angle)
   return boid;
 }
 
-stormo ensemble::set_()
+stormo& ensemble::set_()
 {
   return set;
 }
 
-stormo ensemble::newset_()
+stormo& ensemble::newset_()
 {
   return newset;
 }
@@ -283,7 +281,7 @@ void ensemble::update(paramlist const& params)
     auto pix = pixel.begin();
     for (auto index = (*jt).pos.begin(), velind = (*jt).vel.begin();
          index != (*jt).pos.end(); ++index, ++velind, ++pix) {
-      (*index) += (*velind) * params::deltaT;
+      (*index) += (*velind) * params.deltaT;
       if (*index > *pix - 150) {
         *velind -= params.attraction;
       } else {

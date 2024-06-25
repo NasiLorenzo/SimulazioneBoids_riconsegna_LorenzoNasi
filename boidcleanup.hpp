@@ -47,6 +47,7 @@ struct paramlist{
   double alpha;
   double speedlimit;
   double speedminimum;
+  float deltaT;
 };
 struct boidstate
 {
@@ -108,8 +109,8 @@ class ensemble
   ensemble(stormo& old)
       : set{old}
   {}
-  stormo set_();
-  stormo newset_();
+  stormo& set_();
+  stormo& newset_();
   std::size_t size_();
   boidstate delta();
   void update(paramlist const&);

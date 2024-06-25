@@ -12,6 +12,8 @@ int main()
   params.alpha        = (1. / 3.) * M_PI;
   params.speedlimit   = 100;
   params.speedminimum = 40;
+  params.deltaT=1/30.;
+  
   std::random_device r;
   std::default_random_engine eng(r());
   boids::stormo flock = boids::generator(eng);
@@ -26,7 +28,7 @@ int main()
                           "Boids Simulation");
 
   // Desired frame rate
-  const sf::Time frameTime = sf::seconds(boids::params::deltaT);
+  const sf::Time frameTime = sf::seconds(params.deltaT);
 
   sf::Clock clock;
   // sf::Time accumulator = sf::Time::Zero;
@@ -48,27 +50,10 @@ int main()
     /*sf::FileInputStream stream;
     stream.open("tramonto.jpg");*/
     prova.update(params);
-    // Update the simulation while we have enough time accumulated
-    /*while (accumulator >= frameTime) {
-      prova.update();
-      accumulator -= frameTime;
-      // std::cout<<"Ce so passato "<<i<< " volte\n";
-    }*/
-
     window.clear(sf::Color::White);
     // window.draw(backgroundSprite);
     //  Draw boids
     for (auto& boid : prova.set_()) {
-      /*sf::CircleShape circle(2);
-      // std::cout<<prova.set_().size()<<"\n";
-      circle.setFillColor(sf::Color::Black);
-      circle.setPosition(
-          static_cast<float>(boid.pos[0] / boids::params::rate),
-          static_cast<float>(
-              boid.pos[1]
-              / boids::params::rate)); // Assuming x and y are in pos[0]
-                                       // and pos[1] respectively
-      window.draw(circle);*/
       float angle = static_cast<float>(
           boids::angle(boid)); // Assuming you have the angle in degrees
 
