@@ -15,6 +15,7 @@
 #include <vector>
 #include <fstream>
 #include <sstream>
+#include <chrono>
 
 namespace boids {
 
@@ -23,7 +24,6 @@ struct params
   static constexpr double sigma{0.01};
   static constexpr unsigned int dim{2}; // dimensione
   static constexpr unsigned int n = 2;
-  static constexpr unsigned int size{100};
   static constexpr double rate{1}; // rapporto tra la dimensione dello schermo e della generazione
   static constexpr double vel_factor{10000};
 };
@@ -39,6 +39,7 @@ struct paramlist{
   double speedlimit;
   double speedminimum;
   float deltaT;
+  unsigned int size;
 };
 struct boidstate
 {
@@ -71,7 +72,7 @@ std::array<double, params::dim> operator/(std::array<double, params::dim>&,
                                           double);
 double mod(std::array<double, params::dim> const& vec);
 std::array<double, params::dim> normalize(std::array<double, params::dim>& vec);
-stormo generator(std::default_random_engine&);
+stormo generator(std::default_random_engine&, paramlist const&);
 
 void regola1(stormo& neighbors, boidstate& boid_old,
              const double repulsione); // repulsion
@@ -105,6 +106,7 @@ class ensemble
   std::size_t size_();
   boidstate delta();
   void update(paramlist const&);
+  void update2(paramlist const&);
 };
 } // namespace boids
 

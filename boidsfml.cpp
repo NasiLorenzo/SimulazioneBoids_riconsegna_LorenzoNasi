@@ -35,6 +35,7 @@ int main()
       else if(name=="speedlimit") params.speedlimit=value;
       else if(name=="speedminimum") params.speedminimum=value;
       else if(name=="deltaT") params.deltaT=static_cast<float>(value);
+      else if(name=="size") params.size=value;
     }
   }
   std::cout << "repulsione: " << params.repulsione << std::endl;
@@ -49,7 +50,7 @@ int main()
     std::cout << "deltaT: " << params.deltaT << std::endl;
   std::random_device r;
   std::default_random_engine eng(r());
-  boids::stormo flock = boids::generator(eng);
+  boids::stormo flock = boids::generator(eng,params);
   boids::ensemble prova(flock);
 
   prova.update(params);
