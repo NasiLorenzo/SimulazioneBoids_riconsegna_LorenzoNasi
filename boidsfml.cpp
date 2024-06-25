@@ -3,17 +3,50 @@
 int main()
 {
   boids::paramlist params{};
-  params.repulsione   = 0.2;
-  params.steering     = 0.04;
-  params.coesione     = 0.08;
-  params.neigh_align  = 200;
-  params.neigh2       = 15;
-  params.attraction   = 1.0;
-  params.alpha        = (1. / 3.) * M_PI;
-  params.speedlimit   = 100;
-  params.speedminimum = 40;
-  params.deltaT=1/30.;
-  
+  /*params.repulsione      = 0.2;
+  params.steering        = 0.04;
+  params.coesione        = 0.08;
+  params.neigh_align     = 200;
+  params.neigh_repulsion = 15;
+  params.attraction      = 1.0;
+  params.alpha           = (1. / 3.) * M_PI;
+  params.speedlimit      = 100;
+  params.speedminimum    = 40;
+  params.deltaT          = 1 / 30.;*/
+
+  std::ifstream input{"parametri.txt"};
+  if (!input) {
+    std::cerr << "File di input non trovato!\n";
+    return 1;
+  }
+  std::string line{};
+  while(std::getline(input,line)){
+    std::istringstream inputline(line);
+    double value{};
+    std::string name{};
+    if(inputline>>name>>value){
+      if(name=="repulsione") params.repulsione=value;
+      else if(name=="steering") params.steering=value;
+      else if(name=="coesione") params.coesione=value;
+      else if(name=="neigh_align") params.neigh_align=value;
+      else if(name=="neigh_repulsion") params.neigh_repulsion=value;
+      else if(name=="attraction") params.attraction=value;
+      else if(name=="alpha") params.alpha=value;
+      else if(name=="speedlimit") params.speedlimit=value;
+      else if(name=="speedminimum") params.speedminimum=value;
+      else if(name=="deltaT") params.deltaT=static_cast<float>(value);
+    }
+  }
+  std::cout << "repulsione: " << params.repulsione << std::endl;
+    std::cout << "steering: " << params.steering << std::endl;
+    std::cout << "coesione: " << params.coesione << std::endl;
+    std::cout << "neigh_align: " << params.neigh_align << std::endl;
+    std::cout << "neigh_repulsion: " << params.neigh_repulsion << std::endl;
+    std::cout << "attraction: " << params.attraction << std::endl;
+    std::cout << "alpha: " << params.alpha << std::endl;
+    std::cout << "speedlimit: " << params.speedlimit << std::endl;
+    std::cout << "speedminimum: " << params.speedminimum << std::endl;
+    std::cout << "deltaT: " << params.deltaT << std::endl;
   std::random_device r;
   std::default_random_engine eng(r());
   boids::stormo flock = boids::generator(eng);

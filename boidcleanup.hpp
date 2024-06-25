@@ -13,6 +13,9 @@
 #include <random>
 #include <string>
 #include <vector>
+#include <fstream>
+#include <sstream>
+
 namespace boids {
 
 struct params
@@ -42,7 +45,7 @@ struct paramlist{
   double steering;     
   double coesione;    
   double neigh_align;
-  double neigh2;
+  double neigh_repulsion;
   double attraction;
   double alpha;
   double speedlimit;

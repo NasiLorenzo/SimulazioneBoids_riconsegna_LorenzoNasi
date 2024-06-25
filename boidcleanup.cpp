@@ -273,7 +273,7 @@ void ensemble::update(paramlist const& params)
   for (auto it = set.begin(), jt = newset.begin(); it != set.end();
        ++it, ++jt) {
     auto neighbor{neighbors(set, *it, params.neigh_align, params.alpha)};
-    auto close_neighbor{neighbors(neighbor, *it, params.neigh2, params.alpha)};
+    auto close_neighbor{neighbors(neighbor, *it, params.neigh_repulsion, params.alpha)};
     regola2(neighbor, *it, *jt, params.steering);
     regola1(close_neighbor, *jt, params.repulsione);
     regola3(neighbor, *jt, params.coesione);

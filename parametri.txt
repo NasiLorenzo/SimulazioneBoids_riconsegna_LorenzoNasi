@@ -3,8 +3,8 @@ steering         0.04
 coesione         0.08
 neigh_align      200
 neigh_repulsion  15
-attraction       1.0
+attraction       2.0
 alpha            1.047
 speedlimit       100
-speedminimum     40
-deltaT           0.0167
+speedminimum     10
+deltaT           0.0333
