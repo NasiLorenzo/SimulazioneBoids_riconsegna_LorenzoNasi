@@ -7,52 +7,63 @@
 #include <cassert>
 #include <chrono>
 #include <cmath>
+#include <fstream>
 #include <functional>
 #include <iostream>
 #include <iterator>
 #include <random>
+#include <sstream>
 #include <string>
 #include <vector>
+
 namespace boids {
 
 struct params
 {
-  static constexpr double sigma{
-      0.01}; // gli esagoni vengono se c'è un parametro di steering basso e una
-             // distanza di reticolo bassa
+  static constexpr double sigma{0.01};
   static constexpr unsigned int dim{2}; // dimensione
-  static constexpr double neigh_co{90};
-  static constexpr double reproduction{20};
-  static constexpr unsigned int interazioni{2};
-  static constexpr float deltaT{1 / 30.f};
   static constexpr unsigned int n = 2;
-  // unsigned int vert{20};
-  // unsigned int hor{20};
-  static constexpr unsigned int size{100};
   static constexpr double rate{
       1}; // rapporto tra la dimensione dello schermo e della generazione
-  static constexpr unsigned int rate2{20};
   static constexpr double vel_factor{10000};
-  static constexpr double pi = 3.141592;
-  static constexpr double theta{pi / 12};
 };
 
-struct paramlist{
-  double repulsione;   
-  double steering;     
-  double coesione;    
+struct paramlist
+{
+  double repulsione;
+  double steering;
+  double coesione;
   double neigh_align;
-  double neigh2;
-  double mod_align;
+  double neigh_repulsion;
   double attraction;
   double alpha;
   double speedlimit;
   double speedminimum;
+  float deltaT;
+  unsigned int size;
+  unsigned int flocknumber;
 };
 struct boidstate
 {
   std::array<double, params::dim> pos;
   std::array<double, params::dim> vel;
+  unsigned int flockID{0};
+  sf::ConvexShape arrow;
+  boidstate()
+  {
+    float arrowLength = 10;
+    float arrowWidth  = 5;
+    arrow.setPointCount(3);
+    arrow.setPoint(0, sf::Vector2f(arrowLength, 0));
+    arrow.setPoint(1, sf::Vector2f(0, -arrowWidth / 2));
+    arrow.setPoint(2, sf::Vector2f(0, arrowWidth / 2));
+  }
+};
+
+struct RGB{
+  int red;
+  int blue;
+  int green;
 };
 
 static const std::vector<unsigned int> pixel{1010, 710};
@@ -80,7 +91,7 @@ std::array<double, params::dim> operator/(std::array<double, params::dim>&,
                                           double);
 double mod(std::array<double, params::dim> const& vec);
 std::array<double, params::dim> normalize(std::array<double, params::dim>& vec);
-stormo generator(std::default_random_engine&);
+stormo generator(std::default_random_engine&, paramlist const&);
 
 void regola1(stormo& neighbors, boidstate& boid_old,
              const double repulsione); // repulsion
@@ -109,11 +120,12 @@ class ensemble
   ensemble(stormo& old)
       : set{old}
   {}
-  stormo set_();
-  stormo newset_();
+  stormo& set_();
+  stormo& newset_();
   std::size_t size_();
   boidstate delta();
   void update(paramlist const&);
+  void update2(paramlist const&);
 };
 } // namespace boids
 

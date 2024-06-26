@@ -1,0 +1,12 @@
+repulsione       0.2
+steering         0.04
+coesione         0.08
+neigh_align      200
+neigh_repulsion  15
+attraction       2.0
+alpha            0.55
+speedlimit       100
+speedminimum     40
+deltaT           0.0333
+size             300
+flocknumber      20

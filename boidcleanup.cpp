@@ -3,7 +3,6 @@
 namespace boids {
 
 std::bitset<8> FlagOpt;
-
 boidstate generate(std::default_random_engine& eng)
 { // genera pos e vel di un boid distribuiti secondo
   // una gauss centrata in 0
@@ -19,6 +18,21 @@ boidstate generate(std::default_random_engine& eng)
   return boid;
 }
 
+std::vector<RGB> generatecolors(std::default_random_engine& eng,
+                                paramlist const& params)
+{
+  std::vector<RGB> colorvec{};
+  for (int i = 0; i < params.size / params.flocknumber + 1; i++) {
+    RGB color{};
+    std::uniform_int_distribution dist(0, 255);
+    color.red   = dist(eng);
+    color.blue  = dist(eng);
+    color.green = dist(eng);
+    colorvec.push_back(color);
+  }
+  return colorvec;
+};
+
 auto mod_vel(boidstate const& boid) // Velocità singolo boid
 {
   double sum{};
@@ -28,21 +42,25 @@ auto mod_vel(boidstate const& boid) // Velocità singolo boid
   return sum;
 }
 
+double distance2(boidstate const& a, boidstate const& b)
+{
+  return pow(a.pos[0] - b.pos[0], 2) + pow(a.pos[1] - b.pos[1], 2);
+}
+
 double mod(std::array<double, params::dim> const& vec)
 {
-  /*return sqrt(
+  return sqrt(
       std::accumulate(vec.begin(), vec.end(), 0,
-                      [](double sum, double x) { return sum = sum + x * x;
-     }));*/
-  return sqrt(vec[0] * vec[0] + vec[1] * vec[1]);
+                      [](double sum, double x) { return sum = sum + x * x; }));
 }
 
 std::array<double, params::dim> normalize(std::array<double, params::dim>& vec)
 {
-  // assert(mod(vec)!=0);
-  return vec / boids::mod(vec);
+  auto modulo = boids::mod(vec);
+  if (modulo == 0)
+    modulo = 1.;
+  return vec / modulo;
 }
-
 double distance(boidstate const& a, boidstate const& b)
 {
   return std::transform_reduce(
@@ -100,12 +118,17 @@ std::array<double, params::dim> operator/(std::array<double, params::dim>& b,
   return b;
 }
 
-stormo generator(std::default_random_engine& eng)
+stormo generator(std::default_random_engine& eng, paramlist const& params)
 {
   stormo set{};
-  for (unsigned int i = 0; i < params::size; i++) {
+  auto colorvec = generatecolors(eng, params);
+  for (unsigned int i = 0; i < params.size; i++) {
     auto pix = pixel.begin(); // puntatore ai pixel
     boidstate boidprova{generate(eng)};
+    boidprova.flockID = i / params.flocknumber;
+    boidprova.arrow.setFillColor(sf::Color(colorvec[boidprova.flockID].red,
+                                           colorvec[boidprova.flockID].green,
+                                           colorvec[boidprova.flockID].blue));
     for (auto it = boidprova.pos.begin(); it != boidprova.pos.end();
          ++it, ++pix) {
       std::uniform_real_distribution<double> dis(
@@ -131,26 +154,30 @@ void speedadjust(boidstate& boid, const double speedlimit,
     boid.vel = speedminimum * boid.vel;
   }
 }
-
+template<bool val>
 auto neighbors(stormo const& set, boidstate const& boid, const double d,
                const double alpha)
 {
   std::vector<boidstate const*> neighbors{};
+  int i = 0;
   std::for_each(set.begin(), set.end(), [&](auto& neighbor) {
-    if (distance(boid, neighbor) < pow(d, 2) && distance(boid, neighbor) != 0) {
-      std::array<double, params::dim> deltax = neighbor.pos - boid.pos;
-      std::array<double, params::dim> y      = boid.vel;
-      if (boids::mod(boid.vel) != 0)
-        deltax = normalize(deltax);
-      y = normalize(y);
-      double prodscalare =
-          std::inner_product(deltax.begin(), deltax.end(), y.begin(), 0.);
-      if ((prodscalare) >= std::cos(alpha)) {
-        auto prova = &neighbor;
-        // std::cout << "prova " << prova->pos[0] << std::endl;
-        neighbors.emplace_back(prova);
+    //if (i < 10) {
+      if (distance2(boid, neighbor) < pow(d, 2)
+          && distance2(boid, neighbor) != 0
+          && (val == 1 || (val == 0 && boid.flockID == neighbor.flockID))) {
+        std::array<double, params::dim> deltax = neighbor.pos - boid.pos;
+        std::array<double, params::dim> y      = boid.vel;
+        if (boids::mod(boid.vel) != 0)
+          deltax = normalize(deltax);
+        y = normalize(y);
+        double prodscalare =
+            std::inner_product(deltax.begin(), deltax.end(), y.begin(), 0.);
+        if ((prodscalare) >= std::cos(alpha)) {
+          neighbors.emplace_back(&neighbor);
+          i++;
+        }
       }
-    }
+   // }
   });
   return neighbors;
 }
@@ -159,20 +186,24 @@ auto neighbors(std::vector<boidstate const*> const& set, boidstate const& boid,
                const double d, const double alpha)
 {
   std::vector<boidstate const*> neighbors{};
+  int i = 0;
   std::for_each(set.begin(), set.end(), [&](auto& neighbor) {
-    if (distance(boid, *neighbor) < pow(d, 2)
-        && distance(boid, *neighbor) != 0) {
-      std::array<double, params::dim> deltax = neighbor->pos - boid.pos;
-      std::array<double, params::dim> y      = boid.vel;
-      if (boids::mod(boid.vel) != 0)
-        deltax = normalize(deltax);
-      y = normalize(y);
-      double prodscalare =
-          std::inner_product(deltax.begin(), deltax.end(), y.begin(), 0.);
-      if ((prodscalare) >= std::cos(alpha)) {
-        neighbors.emplace_back(neighbor);
+    //if (i < 10) {
+      if (distance2(boid, *neighbor) < pow(d, 2)
+          && distance2(boid, *neighbor) != 0) {
+        std::array<double, params::dim> deltax = neighbor->pos - boid.pos;
+        std::array<double, params::dim> y      = boid.vel;
+        if (boids::mod(boid.vel) != 0)
+          deltax = normalize(deltax);
+        y = normalize(y);
+        double prodscalare =
+            std::inner_product(deltax.begin(), deltax.end(), y.begin(), 0.);
+        if ((prodscalare) >= std::cos(alpha)) {
+          neighbors.emplace_back(neighbor);
+          i++;
+        }
       }
-    }
+    //}
   });
   return neighbors;
 }
@@ -250,12 +281,12 @@ auto rotate(boidstate& boid, const double angle)
   return boid;
 }
 
-stormo ensemble::set_()
+stormo& ensemble::set_()
 {
   return set;
 }
 
-stormo ensemble::newset_()
+stormo& ensemble::newset_()
 {
   return newset;
 }
@@ -274,25 +305,74 @@ void ensemble::update(paramlist const& params)
 {
   for (auto it = set.begin(), jt = newset.begin(); it != set.end();
        ++it, ++jt) {
-    auto neighbor{neighbors(set, *it, params.neigh_align, params.alpha)};
-    auto close_neighbor{neighbors(neighbor, *it, params.neigh2, params.alpha)};
-    regola2(neighbor, *it, *jt, params.steering);
+    auto neighbor{neighbors<0>(set, *it, params.neigh_align, params.alpha)};
+    auto close_neighbor{
+        neighbors<1>(set, *it, params.neigh_repulsion, params.alpha)};
     regola1(close_neighbor, *jt, params.repulsione);
+    regola2(neighbor, *it, *jt, params.steering);
     regola3(neighbor, *jt, params.coesione);
     speedadjust(*jt, params.speedlimit, params.speedminimum);
     auto pix = pixel.begin();
     for (auto index = (*jt).pos.begin(), velind = (*jt).vel.begin();
          index != (*jt).pos.end(); ++index, ++velind, ++pix) {
-      (*index) += (*velind) * params::deltaT;
-      if (*index > *pix - 150) {
+      (*index) += (*velind) * params.deltaT;
+      if (*index > *pix - 100) {
         *velind -= params.attraction;
       } else {
-        if (*index < 150) {
+        if (*index < 100) {
           *velind += params.attraction;
         }
       }
     }
   }
   set = newset;
+}
+void ensemble::update2(paramlist const& params)
+{
+  std::vector<double> vicini(set.size(), 0);
+  std::vector<std::array<double, params::dim>> deltavec(set.size(), {0., 0.});
+  std::vector<std::array<double, params::dim>> deltaveclose(set.size(),
+                                                            {0., 0.});
+  auto neighcountit   = vicini.begin();
+  auto neighcountjt   = vicini.begin() + 1;
+  auto deltavecit     = deltavec.begin();
+  auto deltavecjt     = deltavec.begin() + 1;
+  auto deltavecloseit = deltaveclose.begin();
+  auto deltaveclosejt = deltaveclose.begin() + 1;
+  for (auto it = set.begin(); it != set.end() - 1; ++it) {
+    for (auto jt = it + 1; jt != set.end(); ++jt) {
+      auto distanza = distance(*it, *jt);
+      if (distanza <= params.neigh_align) {
+        *neighcountit++;
+        *neighcountjt++;
+        auto x = jt->vel - it->vel;
+        *deltavecit += params.steering * x; // regola 2
+        *deltavecjt += -params.steering * x;
+        auto y = jt->pos - it->pos;
+        *deltavecit += params.coesione * x; // regola3
+        *deltavecjt += -params.coesione * x;
+        if (distanza <= params.neigh_repulsion) {
+          *deltavecit += -params.repulsione * y; // regola1, da non riscalare
+          *deltavecjt += params.repulsione * y;
+        }
+      }
+      ++neighcountjt;
+      ++deltavecjt;
+      ++deltaveclosejt;
+    }
+    ++deltavecit;
+    ++deltavecloseit;
+    ++neighcountit;
+  }
+  neighcountit   = vicini.begin();
+  deltavecit     = deltavec.begin();
+  deltavecloseit = deltaveclose.begin();
+  for (auto it = set.begin(); it != set.end(); ++it) {
+    it->vel += *deltavecit / (*neighcountit) + *deltavecloseit;
+    it->pos += params.deltaT * it->vel;
+    ++neighcountit;
+    ++deltavecit;
+    ++deltavecloseit;
+  }
 }
 } // namespace boids

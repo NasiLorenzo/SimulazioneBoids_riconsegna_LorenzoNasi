@@ -5,15 +5,15 @@ using namespace boids;
 TEST_CASE("Testing rules")
 {
   paramlist params{};
-  params.repulsione   = 0.7;
-  params.steering     = 0.1;
-  params.coesione     = 0.1;
-  params.neigh2       = 1000000;
-  params.neigh_align  = 1000000;
-  params.alpha        = M_PI;
-  params.attraction   = 0;
-  params.speedlimit   = 10000.;
-  params.speedminimum = 0.;
+  params.repulsione      = 0.7;
+  params.steering        = 0.1;
+  params.coesione        = 0.1;
+  params.neigh_repulsion = 1000000;
+  params.neigh_align     = 1000000;
+  params.alpha           = M_PI;
+  params.attraction      = 0;
+  params.speedlimit      = 80;
+  params.speedminimum    = 2;
   boidstate boid1;
   boid1.pos = {700., 200.};
   boid1.vel = {300., -10.};
