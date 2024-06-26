@@ -49,6 +49,10 @@ int main()
         params.size = value;
       else if (name == "flocknumber")
         params.flocknumber = static_cast<unsigned int>(value);
+      else if (name == "pixel.x")
+        params.pixel[0] = static_cast<unsigned int>(value);
+      else if (name == "pixel.y")
+        params.pixel[1] = static_cast<unsigned int>(value);
     }
   }
   std::cout << "repulsione: " << params.repulsione << std::endl;
@@ -74,7 +78,7 @@ int main()
   for (auto& it: prova.set_()){
     std::cout<<"L'ID è "<<it.flockID<<"\n";
   }
-  sf::RenderWindow window(sf::VideoMode(boids::pixel[0], boids::pixel[1]),
+  sf::RenderWindow window(sf::VideoMode(params.pixel[0], params.pixel[1]),
                           "Boids Simulation");
 
   // Desired frame rate

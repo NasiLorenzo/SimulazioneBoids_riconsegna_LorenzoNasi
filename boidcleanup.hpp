@@ -42,6 +42,8 @@ struct paramlist
   float deltaT;
   unsigned int size;
   unsigned int flocknumber;
+  std::vector<unsigned int> pixel{1010, 710};
+
 };
 struct boidstate
 {
@@ -55,8 +57,6 @@ struct RGB{
   int blue;
   int green;
 };
-
-static const std::vector<unsigned int> pixel{1010, 710};
 
 inline boidstate generate(std::default_random_engine& eng);
 

@@ -31,7 +31,7 @@ std::vector<RGB> generatecolors(std::default_random_engine& eng,
     colorvec.push_back(color);
   }
   return colorvec;
-};
+}
 
 auto mod_vel(boidstate const& boid) // Velocità singolo boid
 {
@@ -122,7 +122,7 @@ stormo generator(std::default_random_engine& eng, paramlist const& params)
 {
   stormo set{};
   for (unsigned int i = 0; i < params.size; i++) {
-    auto pix = pixel.begin(); // puntatore ai pixel
+    auto pix = params.pixel.begin(); // puntatore ai pixel
     boidstate boidprova{generate(eng)};
     boidprova.flockID = i / params.flocknumber;
     for (auto it = boidprova.pos.begin(); it != boidprova.pos.end();
@@ -308,7 +308,7 @@ void ensemble::update(paramlist const& params)
     regola2(neighbor, *it, *jt, params.steering);
     regola3(neighbor, *jt, params.coesione);
     speedadjust(*jt, params.speedlimit, params.speedminimum);
-    auto pix = pixel.begin();
+    auto pix = params.pixel.begin();
     for (auto index = (*jt).pos.begin(), velind = (*jt).vel.begin();
          index != (*jt).pos.end(); ++index, ++velind, ++pix) {
       (*index) += (*velind) * params.deltaT;
