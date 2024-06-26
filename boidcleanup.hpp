@@ -48,16 +48,6 @@ struct boidstate
   std::array<double, params::dim> pos;
   std::array<double, params::dim> vel;
   unsigned int flockID{0};
-  sf::ConvexShape arrow;
-  boidstate()
-  {
-    float arrowLength = 10;
-    float arrowWidth  = 5;
-    arrow.setPointCount(3);
-    arrow.setPoint(0, sf::Vector2f(arrowLength, 0));
-    arrow.setPoint(1, sf::Vector2f(0, -arrowWidth / 2));
-    arrow.setPoint(2, sf::Vector2f(0, arrowWidth / 2));
-  }
 };
 
 struct RGB{
@@ -111,6 +101,9 @@ inline void meiosi(stormo& set, stormo& neighborss, boidstate& boid,
                    double distance); // requires revision
 
 double angle(boidstate const& boid);
+
+std::vector<RGB> generatecolors(std::default_random_engine& eng,
+                                paramlist const& params);
 class ensemble
 {
   stormo set;

@@ -121,14 +121,10 @@ std::array<double, params::dim> operator/(std::array<double, params::dim>& b,
 stormo generator(std::default_random_engine& eng, paramlist const& params)
 {
   stormo set{};
-  auto colorvec = generatecolors(eng, params);
   for (unsigned int i = 0; i < params.size; i++) {
     auto pix = pixel.begin(); // puntatore ai pixel
     boidstate boidprova{generate(eng)};
     boidprova.flockID = i / params.flocknumber;
-    boidprova.arrow.setFillColor(sf::Color(colorvec[boidprova.flockID].red,
-                                           colorvec[boidprova.flockID].green,
-                                           colorvec[boidprova.flockID].blue));
     for (auto it = boidprova.pos.begin(); it != boidprova.pos.end();
          ++it, ++pix) {
       std::uniform_real_distribution<double> dis(

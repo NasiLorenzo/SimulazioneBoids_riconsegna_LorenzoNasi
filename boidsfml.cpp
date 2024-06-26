@@ -66,7 +66,7 @@ int main()
   std::default_random_engine eng(r());
   boids::stormo flock = boids::generator(eng, params);
   boids::ensemble prova(flock);
-  
+  std::vector<boids::RGB> colorvec = boids::generatecolors(eng, params);
   prova.update(params);
   std::cout << "dimesione dopo update " << prova.size_() << "\n";
   prova.update(params);
@@ -108,8 +108,8 @@ int main()
           boids::angle(boid)); // Assuming you have the angle in degrees
 
       // Arrow length and width
-     /* float arrowLength = 10;
-      float arrowWidth  = 5;*/
+      float arrowLength = 10;
+      float arrowWidth  = 5;
 
       // Calculate arrow positiion
       sf::Vector2<float> arrowPos(
@@ -117,14 +117,17 @@ int main()
           static_cast<float>(boid.pos[1] / boids::params::rate));
 
       // Draw arrow
-      /*sf::ConvexShape arrow(3);
+      sf::ConvexShape arrow(3);
       arrow.setPoint(0, sf::Vector2f(arrowLength, 0));
       arrow.setPoint(1, sf::Vector2f(0, -arrowWidth / 2));
       arrow.setPoint(2, sf::Vector2f(0, arrowWidth / 2));
-      arrow.setFillColor(sf::Color::Red);*/
-      boid.arrow.setPosition(arrowPos);
-      boid.arrow.setRotation(angle * 180 / static_cast<float>(M_PI));
-      window.draw(boid.arrow);
+      arrow.setFillColor(sf::Color::Red);
+      arrow.setFillColor(sf::Color(colorvec[boid.flockID].red,
+                                           colorvec[boid.flockID].green,
+                                           colorvec[boid.flockID].blue));
+      arrow.setPosition(arrowPos);
+      arrow.setRotation(angle * 180 / static_cast<float>(M_PI));
+      window.draw(arrow);
     }
 
     window.display();

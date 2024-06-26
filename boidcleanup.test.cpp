@@ -12,8 +12,11 @@ TEST_CASE("Testing rules")
   params.neigh_align     = 1000000;
   params.alpha           = M_PI;
   params.attraction      = 0;
-  params.speedlimit      = 80;
-  params.speedminimum    = 2;
+  params.speedlimit      = 8000;
+  params.speedminimum    = 0;
+  params.size            = 10;
+  params.deltaT          = 1 / 30.f;
+  params.flocknumber     = 10;
   boidstate boid1;
   boid1.pos = {700., 200.};
   boid1.vel = {300., -10.};
@@ -47,8 +50,6 @@ TEST_CASE("Testing rules")
 
   stormo set{boid1, boid2, boid3, boid4, boid5,
              boid6, boid7, boid8, boid9, boid10};
-  std::random_device r;
-  std::default_random_engine eng(r());
   ensemble flock{set};
 
   flock.update(params);
