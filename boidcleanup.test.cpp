@@ -12,8 +12,8 @@ TEST_CASE("Testing rules")
   params.neigh_align  = 1000000;
   params.alpha        = M_PI;
   params.attraction   = 0;
-  params.speedlimit   = 80;
-  params.speedminimum = 2;
+  params.speedlimit   = 10000.;
+  params.speedminimum = 0.;
   boidstate boid1;
   boid1.pos = {700., 200.};
   boid1.vel = {300., -10.};
