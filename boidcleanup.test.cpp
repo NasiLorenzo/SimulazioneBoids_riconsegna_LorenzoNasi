@@ -112,6 +112,7 @@ TEST_CASE("Testing the speed limits")
   boidstate boid4;
   boid4.pos = {1000., 150.};
   boid4.vel = {400., 77.};
+  std::vector<boidstate> boids{boid1, boid2, boid3, boid4};
 
   SUBCASE("Testing the velocity before the adjustment")
   {
@@ -121,12 +122,15 @@ TEST_CASE("Testing the speed limits")
     CHECK(boids::mod(boid4.vel) == doctest::Approx(407.344));
   }
 
-  speedadjust(boid1, params.speedlimit, params.speedminimum);
+  /*speedadjust(boid1, params.speedlimit, params.speedminimum);
   speedadjust(boid2, params.speedlimit, params.speedminimum);
   speedadjust(boid3, params.speedlimit, params.speedminimum);
-  speedadjust(boid4, params.speedlimit, params.speedminimum);
+  speedadjust(boid4, params.speedlimit, params.speedminimum);*/
+  std::for_each(boids.begin(), boids.end(), [&params](boidstate& boid) {
+    speedadjust(boid, params.speedlimit, params.speedminimum);
+  });
 
-  SUBCASE("Prova")
+  /*SUBCASE("Prova")
   {
     CHECK(boids::mod(boid1.vel)
           == doctest::Approx(params.speedlimit).epsilon(0.001));
@@ -136,6 +140,14 @@ TEST_CASE("Testing the speed limits")
           == doctest::Approx(params.speedlimit).epsilon(0.001));
     CHECK(boids::mod(boid4.vel)
           == doctest::Approx(params.speedlimit).epsilon(0.001));
+  }*/
+ 
+ SUBCASE("Testing the velocity after the adjustment")
+  {
+    for (const auto& boid : boids) {
+      CHECK(boids::mod(boid.vel)
+            == doctest::Approx(params.speedlimit).epsilon(0.001));
+    }
   }
 }
 // namespace boids
