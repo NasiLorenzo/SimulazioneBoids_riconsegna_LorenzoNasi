@@ -13,8 +13,11 @@ TEST_CASE("Testing rules")
   params.neigh_align     = 1000000;
   params.alpha           = M_PI;
   params.attraction      = 0;
-  params.speedlimit      = 10000.;
-  params.speedminimum    = 0.;
+  params.speedlimit      = 8000;
+  params.speedminimum    = 0;
+  params.size            = 10;
+  params.deltaT          = 1 / 30.f;
+  params.flocknumber     = 10;
   boidstate boid1;
   boid1.pos = {700., 200.};
   boid1.vel = {300., -10.};
@@ -48,8 +51,6 @@ TEST_CASE("Testing rules")
 
   stormo set{boid1, boid2, boid3, boid4, boid5,
              boid6, boid7, boid8, boid9, boid10};
-  std::random_device r;
-  std::default_random_engine eng(r());
   ensemble flock{set};
 
   flock.update(params);
@@ -111,19 +112,13 @@ TEST_CASE("Testing the speed limits")
   boidstate boid4;
   boid4.pos = {1000., 150.};
   boid4.vel = {400., 77.};
-  stormo set{boid1, boid2, boid3, boid4};
-  std::random_device r;
-  std::default_random_engine eng(r());
-  ensemble flock{set};
-  flock.update(params);
-  REQUIRE(flock.size_() == 4);
 
   SUBCASE("Testing the velocity before the adjustment")
   {
-    CHECK(mod_vel(boid1) == doctest::Approx(9738896.039));
-    CHECK(mod_vel(boid2) == doctest::Approx(4027689.323));
-    CHECK(mod_vel(boid3) == doctest::Approx(12796531.72));
-    CHECK(mod_vel(boid4) == doctest::Approx(27114302.51));
+    CHECK(boids::mod(boid1.vel) == doctest::Approx(300.167));
+    CHECK(boids::mod(boid2.vel) == doctest::Approx(5.));
+    CHECK(boids::mod(boid3.vel) == doctest::Approx(131.712));
+    CHECK(boids::mod(boid4.vel) == doctest::Approx(407.344));
   }
 
   speedadjust(boid1, params.speedlimit, params.speedminimum);
@@ -131,12 +126,16 @@ TEST_CASE("Testing the speed limits")
   speedadjust(boid3, params.speedlimit, params.speedminimum);
   speedadjust(boid4, params.speedlimit, params.speedminimum);
 
-  SUBCASE("Testing the velocity after the adjustment")
+  SUBCASE("Prova")
   {
-    for (auto& boid : flock.set_()) {
-      double vnorm = boids::mod(boid.vel);
-      CHECK(vnorm == doctest::Approx(params.speedlimit).epsilon(0.001));
-    }
+    CHECK(boids::mod(boid1.vel)
+          == doctest::Approx(params.speedlimit).epsilon(0.001));
+    CHECK(boids::mod(boid2.vel)
+          == doctest::Approx(params.speedlimit).epsilon(0.001));
+    CHECK(boids::mod(boid3.vel)
+          == doctest::Approx(params.speedlimit).epsilon(0.001));
+    CHECK(boids::mod(boid4.vel)
+          == doctest::Approx(params.speedlimit).epsilon(0.001));
   }
 }
 // namespace boids
