@@ -2,6 +2,7 @@
 #include "boidcleanup.hpp"
 #include "doctest.h"
 using namespace boids;
+
 TEST_CASE("Testing rules")
 {
   paramlist params{};
@@ -86,4 +87,55 @@ TEST_CASE("Testing rules")
   CHECK(flock.set_()[9].vel[1] == doctest::Approx(424.5));
 }
 
+TEST_CASE("Testing the speed limits")
+{
+  paramlist params{};
+  params.repulsione      = 0.7;
+  params.steering        = 0.1;
+  params.coesione        = 0.1;
+  params.neigh_repulsion = 1000000;
+  params.neigh_align     = 1000000;
+  params.alpha           = M_PI;
+  params.attraction      = 0;
+  params.speedlimit      = 3500.;
+  params.speedminimum    = 3500.;
+
+  boidstate boid1;
+  boid1.pos = {700., 200.};
+  boid1.vel = {300., -10.};
+  boidstate boid2;
+  boid2.pos = {500., 300.};
+  boid2.vel = {5., 0.};
+  boidstate boid3;
+  boid3.pos = {800., 250.};
+  boid3.vel = {-88., 98.};
+  boidstate boid4;
+  boid4.pos = {1000., 150.};
+  boid4.vel = {400., 77.};
+
+  SUBCASE("Testing the velocity before the adjustment")
+  {
+    CHECK(boids::mod(boid1.vel) == doctest::Approx(300.167));
+    CHECK(boids::mod(boid2.vel) == doctest::Approx(5.));
+    CHECK(boids::mod(boid3.vel) == doctest::Approx(131.712));
+    CHECK(boids::mod(boid4.vel) == doctest::Approx(407.344));
+  }
+
+  speedadjust(boid1, params.speedlimit, params.speedminimum);
+  speedadjust(boid2, params.speedlimit, params.speedminimum);
+  speedadjust(boid3, params.speedlimit, params.speedminimum);
+  speedadjust(boid4, params.speedlimit, params.speedminimum);
+
+  SUBCASE("Prova")
+  {
+    CHECK(boids::mod(boid1.vel)
+          == doctest::Approx(params.speedlimit).epsilon(0.001));
+    CHECK(boids::mod(boid2.vel)
+          == doctest::Approx(params.speedlimit).epsilon(0.001));
+    CHECK(boids::mod(boid3.vel)
+          == doctest::Approx(params.speedlimit).epsilon(0.001));
+    CHECK(boids::mod(boid4.vel)
+          == doctest::Approx(params.speedlimit).epsilon(0.001));
+  }
+}
 // namespace boids
