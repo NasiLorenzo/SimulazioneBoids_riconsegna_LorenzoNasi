@@ -7,6 +7,7 @@
 #include <cassert>
 #include <chrono>
 #include <cmath>
+#include <cstdint>
 #include <fstream>
 #include <functional>
 #include <iostream>
@@ -15,14 +16,12 @@
 #include <sstream>
 #include <string>
 #include <vector>
-
 namespace boids {
 
 struct params
 {
   static constexpr double sigma{0.01};
   static constexpr unsigned int dim{2}; // dimensione
-  static constexpr unsigned int n = 2;
   static constexpr double rate{
       1}; // rapporto tra la dimensione dello schermo e della generazione
   static constexpr double vel_factor{10000};
@@ -56,9 +55,9 @@ struct SFMLboid : boidstate
   sf::ConvexShape arrow;
   SFMLboid()
       : boidstate{}
-  { 
-    float arrowLength = 10;
-    float arrowWidth  = 5;
+  {
+    float arrowLength = 6;
+    float arrowWidth  = 3;
     arrow.setPointCount(3);
     arrow.setPoint(0, sf::Vector2f(arrowLength, 0));
     arrow.setPoint(1, sf::Vector2f(0, -arrowWidth / 2));
@@ -67,58 +66,11 @@ struct SFMLboid : boidstate
 };
 struct RGB
 {
-  int red;
-  int blue;
-  int green;
+  uint8_t red;
+  uint8_t blue;
+  uint8_t green;
 };
 
-/*inline boidstate generate(std::default_random_engine& eng);
-
-inline double distance(boidstate const&, boidstate const&);
-
-using stormo = std::vector<boidstate>;
-
-std::array<double, params::dim>
-operator+(std::array<double, params::dim> const&,
-          std::array<double, params::dim> const&);
-std::array<double, params::dim> operator*(const double,
-                                          std::array<double, params::dim>&);
-std::array<double, params::dim>
-operator+=(std::array<double, params::dim>&,
-           std::array<double, params::dim> const&);
-std::array<double, params::dim> operator/(double,
-                                          std::array<double, params::dim>&);
-std::array<double, params::dim>
-operator-(std::array<double, params::dim> const&,
-          std::array<double, params::dim> const&);
-std::array<double, params::dim> operator/(std::array<double, params::dim>&,
-                                          double);
-double mod(std::array<double, params::dim> const& vec);
-std::array<double, params::dim> normalize(std::array<double, params::dim>& vec);
-template <class boidtype>
-std::vector<boidtype> generator(std::default_random_engine&, paramlist const&);
-
-void regola1(stormo& neighbors, boidstate& boid_old,
-             const double repulsione); // repulsion
-void regola2(stormo& neighbors, boidstate& boidi, boidstate& boid,
-             const double steering); // steering
-void regola3(stormo& neighbors, boidstate& boidi,
-             const double cohesion); // cohesion
-std::array<double, params::dim>
-operator+=(std::array<double, params::dim>&,
-           std::array<double, params::dim> const&);
-
-void speedadjust(boidstate& boid, const double speedadjust,
-                 const double speedminimum);
-
-inline void meiosi(stormo& set, stormo& neighborss, boidstate& boid,
-                   std::default_random_engine eng,
-                   double distance); // requires revision
-
-double angle(boidstate const& boid);
-
-std::vector<RGB> generatecolors(std::default_random_engine& eng,
-                                paramlist const& params);*/
 template<class boidtype>
 struct functions
 {
@@ -138,27 +90,18 @@ struct functions
   }
 
   static std::vector<RGB> generatecolors(std::default_random_engine& eng,
-                                  paramlist const& params)
+                                         paramlist const& params)
   {
     std::vector<RGB> colorvec{};
-    for (int i = 0; i < params.size / params.flocknumber + 1; i++) {
+    for (unsigned int i = 0; i < params.size / params.flocknumber + 1; i++) {
       RGB color{};
       std::uniform_int_distribution dist(0, 255);
-      color.red   = dist(eng);
-      color.blue  = dist(eng);
-      color.green = dist(eng);
+      color.red   = static_cast<uint8_t>(dist(eng));
+      color.blue  = static_cast<uint8_t>(dist(eng));
+      color.green = static_cast<uint8_t>(dist(eng));
       colorvec.push_back(color);
     }
     return colorvec;
-  }
-
-  static auto mod_vel(boidtype const& boid) // Velocità singolo boid
-  {
-    double sum{};
-    for (auto it = boid.vel.begin(); it != boid.vel.end(); ++it) {
-      sum += pow(*it, 2);
-    }
-    return sum;
   }
 
   static double distance2(boidtype const& a, boidtype const& b)
@@ -200,7 +143,7 @@ struct functions
 
   static std::array<double, params::dim>
   add(const std::array<double, params::dim>& a,
-            const std::array<double, params::dim>& b)
+      const std::array<double, params::dim>& b)
   {
     std::array<double, params::dim> result{};
     std::transform(a.begin(), a.end(), b.begin(), result.begin(),
@@ -210,7 +153,7 @@ struct functions
 
   static std::array<double, params::dim>
   subtract(std::array<double, params::dim> const& a,
-            std::array<double, params::dim> const& b)
+           std::array<double, params::dim> const& b)
   {
     std::array<double, params::dim> result;
     std::transform(a.begin(), a.end(), b.begin(), result.begin(),
@@ -218,28 +161,29 @@ struct functions
     return result;
   }
 
-  static std::array<double, params::dim> multiply(const double a,
-                                            std::array<double, params::dim>& b)
+  static std::array<double, params::dim>
+  multiply(const double a, std::array<double, params::dim>& b)
   {
     std::for_each(b.begin(), b.end(), [a](double& x) { x = a * x; });
     return b;
   }
 
-  static std::array<double, params::dim> divide(double a,
-                                            std::array<double, params::dim>& b)
+  static std::array<double, params::dim>
+  divide(double a, std::array<double, params::dim>& b)
   {
     std::for_each(b.begin(), b.end(), [&a](double x) { return a / x; });
     return b;
   }
 
-  static std::array<double, params::dim> divide(std::array<double, params::dim>& b,
-                                            double a)
+  static std::array<double, params::dim>
+  divide(std::array<double, params::dim>& b, double a)
   {
     std::for_each(b.begin(), b.end(), [&a](double& x) { x = x / a; });
     return b;
   }
 
-  static std::vector<boidtype> generator(std::default_random_engine& eng, paramlist const& params)
+  static std::vector<boidtype> generator(std::default_random_engine& eng,
+                                         paramlist const& params)
   {
     std::vector<boidtype> set{};
     for (unsigned int i = 0; i < params.size; i++) {
@@ -259,31 +203,31 @@ struct functions
   }
 
   static void speedadjust(boidtype& boid, const double speedlimit,
-                   const double speedminimum)
+                          const double speedminimum)
   {
     auto vnorm = mod(boid.vel);
     if (vnorm > speedlimit) {
       normalize(boid.vel);
-      boid.vel = multiply(speedlimit,boid.vel);
+      boid.vel = multiply(speedlimit, boid.vel);
     }
     if (vnorm < speedminimum) {
       normalize(boid.vel);
-      boid.vel =multiply(speedminimum,boid.vel);
+      boid.vel = multiply(speedminimum, boid.vel);
     }
   }
   template<bool val>
-  static auto neighbors(std::vector<boidtype> const& set, boidtype const& boid, const double d,
-                 const double alpha)
+  static auto neighbors(std::vector<boidtype> const& set, boidtype const& boid,
+                        const double d, const double alpha)
   {
     std::vector<boidtype const*> neighbors{};
     int i = 0;
     std::for_each(set.begin(), set.end(), [&](auto& neighbor) {
       // if (i < 10) {
       if (distance2(boid, neighbor) < pow(d, 2)
-          && distance2(boid, neighbor) != 0
           && (val == 1 || (val == 0 && boid.flockID == neighbor.flockID))) {
-        std::array<double, params::dim> deltax = subtract(neighbor.pos,boid.pos);
-        std::array<double, params::dim> y      = boid.vel;
+        std::array<double, params::dim> deltax =
+            subtract(neighbor.pos, boid.pos);
+        std::array<double, params::dim> y = boid.vel;
         if (mod(boid.vel) != 0)
           deltax = normalize(deltax);
         y = normalize(y);
@@ -300,16 +244,18 @@ struct functions
   }
 
   static auto neighbors(std::vector<boidtype const*> const& set,
-                 boidtype const& boid, const double d, const double alpha)
+                        boidtype const& boid, const double d,
+                        const double alpha)
   {
     std::vector<boidtype const*> neighbors{};
     int i = 0;
     std::for_each(set.begin(), set.end(), [&](auto& neighbor) {
       // if (i < 10) {
       if (distance2(boid, *neighbor) < pow(d, 2)
-          && distance2(boid, *neighbor) != 0) {
-        std::array<double, params::dim> deltax = subtract(neighbor->pos , boid.pos);
-        std::array<double, params::dim> y      = boid.vel;
+          ) {
+        std::array<double, params::dim> deltax =
+            subtract(neighbor->pos, boid.pos);
+        std::array<double, params::dim> y = boid.vel;
         if (mod(boid.vel) != 0)
           deltax = normalize(deltax);
         y = normalize(y);
@@ -326,35 +272,36 @@ struct functions
   }
 
   static void regola1(std::vector<boidtype const*>& neighbors, boidtype& boid,
-               const double repulsione)
+                      const double repulsione)
   {
     std::for_each(neighbors.begin(), neighbors.end(), [&](auto& neighbor) {
-      auto x = subtract(neighbor->pos, boid.pos);
-      boid.vel = subtract(boid.vel ,multiply(repulsione ,x));
+      auto x   = subtract(neighbor->pos, boid.pos);
+      boid.vel = subtract(boid.vel, multiply(repulsione, x));
     });
   }
 
-  static void regola2(std::vector<boidtype const*>& neighbors, boidtype& oldboid,
-               boidtype& boid, const double steering)
+  static void regola2(std::vector<boidtype const*>& neighbors,
+                      boidtype& oldboid, boidtype& boid, const double steering)
   {
     auto n = neighbors.size();
     std::for_each(neighbors.begin(), neighbors.end(), [&](auto& neighbor) {
-      auto x = subtract(neighbor->vel, oldboid.vel);
-      boid.vel = add(boid.vel , multiply(steering / n , x));
+      auto x   = subtract(neighbor->vel, oldboid.vel);
+      boid.vel = add(boid.vel, multiply(steering / n, x));
     });
   }
 
   static void regola3(std::vector<boidtype const*>& neighbors, boidtype& boid,
-               const double cohesion)
+                      const double cohesion)
   {
     auto n = neighbors.size();
     std::for_each(neighbors.begin(), neighbors.end(), [&](auto& neighbor) {
-      auto x = subtract(neighbor->pos, boid.pos);
-      boid.vel =add(boid.vel, multiply(cohesion / n , x));
+      auto x   = subtract(neighbor->pos, boid.pos);
+      boid.vel = add(boid.vel, multiply(cohesion / n, x));
     });
   }
 
-  static auto meanvel(std::vector<boidtype> const& set) // Velocità quadratica media
+  static auto
+  meanvel(std::vector<boidtype> const& set) // Velocità quadratica media
   {
     double s{};
     for (auto it = set.begin(); it != set.end(); ++it) {
@@ -363,7 +310,8 @@ struct functions
     return sqrt(s) / static_cast<double>(set.size());
   }
 
-  static auto compx(std::vector<boidtype> const& set) // Media delle componenti x di vel
+  static auto
+  compx(std::vector<boidtype> const& set) // Media delle componenti x di vel
   {
     double s{};
     for (auto it = set.begin(); it != set.end(); ++it) {
@@ -373,7 +321,8 @@ struct functions
     return s / static_cast<double>(set.size());
   }
 
-  static auto compy(std::vector<boidtype> const& set) // Media delle componenti y di vel
+  static auto
+  compy(std::vector<boidtype> const& set) // Media delle componenti y di vel
   {
     double s{};
     for (auto it = set.begin(); it != set.end(); ++it) {
@@ -384,12 +333,10 @@ struct functions
   }
 
   static double angle(boidtype const& boid)
-{
-  return atan2(boid.vel[1], boid.vel[0]);
-}
+  {
+    return atan2(boid.vel[1], boid.vel[0]);
+  }
 };
-
-
 
 template<class boidtype>
 class ensemble
@@ -401,47 +348,49 @@ class ensemble
   ensemble(std::vector<boidtype>& old)
       : set{old}
   {}
-std::vector<boidtype>& set_()
-{
-  return set;
-}
+  std::vector<boidtype>& set_()
+  {
+    return set;
+  }
 
-std::vector<boidtype>& newset_()
-{
-  return newset;
-}
+  std::vector<boidtype>& newset_()
+  {
+    return newset;
+  }
 
-std::size_t size_()
-{
-  return set.size();
-}
+  std::size_t size_()
+  {
+    return set.size();
+  }
 
-void update(paramlist const& params)
-{
-  for (auto it = set.begin(), jt = newset.begin(); it != set.end();
-       ++it, ++jt) {
-    auto neighbor{boids::functions<boidtype>::template neighbors<0>(set, *it, params.neigh_align, params.alpha)};
-    auto close_neighbor{
-        functions<boidtype>::template neighbors<1>(set, *it, params.neigh_repulsion, params.alpha)};
-    functions<boidtype>::regola1(close_neighbor, *jt, params.repulsione);
-    functions<boidtype>::regola2(neighbor, *it, *jt, params.steering);
-    functions<boidtype>::regola3(neighbor, *jt, params.coesione);
-    functions<boidtype>::speedadjust(*jt, params.speedlimit, params.speedminimum);
-    auto pix = params.pixel.begin();
-    for (auto index = jt->pos.begin(), velind = jt->vel.begin();
-         index != (*jt).pos.end(); ++index, ++velind, ++pix) {
-      (*index) += (*velind) * params.deltaT;
-      if (*index > *pix - 100) {
-        *velind -= params.attraction;
-      } else {
-        if (*index < 100) {
-          *velind += params.attraction;
+  void update(paramlist const& params)
+  {
+    for (auto it = set.begin(), jt = newset.begin(); it != set.end();
+         ++it, ++jt) {
+      auto neighbor{boids::functions<boidtype>::template neighbors<0>(
+          set, *it, params.neigh_align, params.alpha)};
+      auto close_neighbor{functions<boidtype>::template neighbors<1>(
+          set, *it, params.neigh_repulsion, params.alpha)};
+      functions<boidtype>::regola1(close_neighbor, *jt, params.repulsione);
+      functions<boidtype>::regola2(neighbor, *it, *jt, params.steering);
+      functions<boidtype>::regola3(neighbor, *jt, params.coesione);
+      functions<boidtype>::speedadjust(*jt, params.speedlimit,
+                                       params.speedminimum);
+      auto pix = params.pixel.begin();
+      for (auto index = jt->pos.begin(), velind = jt->vel.begin();
+           index != (*jt).pos.end(); ++index, ++velind, ++pix) {
+        (*index) += (*velind) * params.deltaT;
+        if (*index > *pix - 100) {
+          *velind -= params.attraction;
+        } else {
+          if (*index < 100) {
+            *velind += params.attraction;
+          }
         }
       }
     }
+    set = newset;
   }
-  set = newset;
-}
 };
 } // namespace boids
 
