@@ -49,6 +49,10 @@ int main()
         params.size = value;
       else if (name == "flocknumber")
         params.flocknumber = static_cast<unsigned int>(value);
+      else if (name == "pixel.x")
+        params.pixel[0] = static_cast<unsigned int>(value);
+      else if (name == "pixel.y")
+        params.pixel[1] = static_cast<unsigned int>(value);
     }
   }
   std::cout << "repulsione: " << params.repulsione << std::endl;
@@ -64,17 +68,17 @@ int main()
   std::cout << "size" << params.size <<std::endl;
   std::random_device r;
   std::default_random_engine eng(r());
-  boids::stormo flock = boids::generator(eng, params);
-  boids::ensemble prova(flock);
-  std::vector<boids::RGB> colorvec = boids::generatecolors(eng, params);
+  std::vector<boids::SFMLboid> flock = boids::functions<boids::SFMLboid>::generator(eng, params);
+  boids::ensemble<boids::SFMLboid> prova(flock);
+  std::vector<boids::RGB> colorvec = boids::functions<boids::SFMLboid>::generatecolors(eng, params);
   prova.update(params);
   std::cout << "dimesione dopo update " << prova.size_() << "\n";
   prova.update(params);
   std::cout << "dimesione dopo update " << prova.size_() << "\n";
-  for (auto& it: prova.set_()){
-    std::cout<<"L'ID è "<<it.flockID<<"\n";
+  for (auto& it: colorvec){
+    std::cout<<"Il colore é"<<it.red<<"e "<<it.green<<"e "<<it.blue<<"\n";
   }
-  sf::RenderWindow window(sf::VideoMode(boids::pixel[0], boids::pixel[1]),
+  sf::RenderWindow window(sf::VideoMode(params.pixel[0], params.pixel[1]),
                           "Boids Simulation");
 
   // Desired frame rate
@@ -105,29 +109,28 @@ int main()
     //  Draw boids
     for (auto& boid : prova.set_()) {
       float angle = static_cast<float>(
-          boids::angle(boid)); // Assuming you have the angle in degrees
+          boids::functions<boids::SFMLboid>::angle(boid)); // Assuming you have the angle in degrees
 
       // Arrow length and width
-      float arrowLength = 10;
-      float arrowWidth  = 5;
+      /*float arrowLength = 10;
+      float arrowWidth  = 5;*/
 
       // Calculate arrow positiion
       sf::Vector2<float> arrowPos(
           static_cast<float>(boid.pos[0] / boids::params::rate),
           static_cast<float>(boid.pos[1] / boids::params::rate));
-
       // Draw arrow
-      sf::ConvexShape arrow(3);
+      /*sf::ConvexShape arrow(3);
       arrow.setPoint(0, sf::Vector2f(arrowLength, 0));
       arrow.setPoint(1, sf::Vector2f(0, -arrowWidth / 2));
       arrow.setPoint(2, sf::Vector2f(0, arrowWidth / 2));
-      arrow.setFillColor(sf::Color::Red);
-      arrow.setFillColor(sf::Color(colorvec[boid.flockID].red,
+      arrow.setFillColor(sf::Color::Red);*/
+      boid.arrow.setFillColor(sf::Color(colorvec[boid.flockID].red,
                                            colorvec[boid.flockID].green,
                                            colorvec[boid.flockID].blue));
-      arrow.setPosition(arrowPos);
-      arrow.setRotation(angle * 180 / static_cast<float>(M_PI));
-      window.draw(arrow);
+      boid.arrow.setPosition(arrowPos);
+      boid.arrow.setRotation(angle * 180 / static_cast<float>(M_PI));
+      window.draw(boid.arrow);
     }
 
     window.display();

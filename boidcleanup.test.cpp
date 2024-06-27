@@ -49,9 +49,9 @@ TEST_CASE("Testing rules")
   boid10.pos = {910., 415.};
   boid10.vel = {-300., -200.};
 
-  stormo set{boid1, boid2, boid3, boid4, boid5,
-             boid6, boid7, boid8, boid9, boid10};
-  ensemble flock{set};
+  std::vector<boidstate> set{boid1, boid2, boid3, boid4, boid5,
+                             boid6, boid7, boid8, boid9, boid10};
+  ensemble<boidstate> flock{set};
 
   flock.update(params);
   REQUIRE(flock.size_() == 10);
@@ -116,36 +116,24 @@ TEST_CASE("Testing the speed limits")
 
   SUBCASE("Testing the velocity before the adjustment")
   {
-    CHECK(boids::mod(boid1.vel) == doctest::Approx(300.167));
-    CHECK(boids::mod(boid2.vel) == doctest::Approx(5.));
-    CHECK(boids::mod(boid3.vel) == doctest::Approx(131.712));
-    CHECK(boids::mod(boid4.vel) == doctest::Approx(407.344));
+    CHECK(boids::functions<boidstate>::mod(boid1.vel)
+          == doctest::Approx(300.167));
+    CHECK(boids::functions<boidstate>::mod(boid2.vel) == doctest::Approx(5.));
+    CHECK(boids::functions<boidstate>::mod(boid3.vel)
+          == doctest::Approx(131.712));
+    CHECK(boids::functions<boidstate>::mod(boid4.vel)
+          == doctest::Approx(407.344));
   }
 
-  /*speedadjust(boid1, params.speedlimit, params.speedminimum);
-  speedadjust(boid2, params.speedlimit, params.speedminimum);
-  speedadjust(boid3, params.speedlimit, params.speedminimum);
-  speedadjust(boid4, params.speedlimit, params.speedminimum);*/
   std::for_each(boids.begin(), boids.end(), [&params](boidstate& boid) {
-    speedadjust(boid, params.speedlimit, params.speedminimum);
+    boids::functions<boidstate>::speedadjust(boid, params.speedlimit,
+                                             params.speedminimum);
   });
 
-  /*SUBCASE("Prova")
-  {
-    CHECK(boids::mod(boid1.vel)
-          == doctest::Approx(params.speedlimit).epsilon(0.001));
-    CHECK(boids::mod(boid2.vel)
-          == doctest::Approx(params.speedlimit).epsilon(0.001));
-    CHECK(boids::mod(boid3.vel)
-          == doctest::Approx(params.speedlimit).epsilon(0.001));
-    CHECK(boids::mod(boid4.vel)
-          == doctest::Approx(params.speedlimit).epsilon(0.001));
-  }*/
- 
- SUBCASE("Testing the velocity after the adjustment")
+  SUBCASE("Testing the velocity after the adjustment")
   {
     for (const auto& boid : boids) {
-      CHECK(boids::mod(boid.vel)
+      CHECK(boids::functions<boidstate>::mod(boid.vel)
             == doctest::Approx(params.speedlimit).epsilon(0.001));
     }
   }

@@ -42,6 +42,7 @@ struct paramlist
   float deltaT;
   unsigned int size;
   unsigned int flocknumber;
+  std::vector<unsigned int> pixel{1010, 710};
 };
 struct boidstate
 {
@@ -50,15 +51,28 @@ struct boidstate
   unsigned int flockID{0};
 };
 
-struct RGB{
+struct SFMLboid : boidstate
+{
+  sf::ConvexShape arrow;
+  SFMLboid()
+      : boidstate{}
+  { 
+    float arrowLength = 10;
+    float arrowWidth  = 5;
+    arrow.setPointCount(3);
+    arrow.setPoint(0, sf::Vector2f(arrowLength, 0));
+    arrow.setPoint(1, sf::Vector2f(0, -arrowWidth / 2));
+    arrow.setPoint(2, sf::Vector2f(0, arrowWidth / 2));
+  }
+};
+struct RGB
+{
   int red;
   int blue;
   int green;
 };
 
-static const std::vector<unsigned int> pixel{1010, 710};
-
-inline boidstate generate(std::default_random_engine& eng);
+/*inline boidstate generate(std::default_random_engine& eng);
 
 inline double distance(boidstate const&, boidstate const&);
 
@@ -81,7 +95,8 @@ std::array<double, params::dim> operator/(std::array<double, params::dim>&,
                                           double);
 double mod(std::array<double, params::dim> const& vec);
 std::array<double, params::dim> normalize(std::array<double, params::dim>& vec);
-stormo generator(std::default_random_engine&, paramlist const&);
+template <class boidtype>
+std::vector<boidtype> generator(std::default_random_engine&, paramlist const&);
 
 void regola1(stormo& neighbors, boidstate& boid_old,
              const double repulsione); // repulsion
@@ -103,22 +118,330 @@ inline void meiosi(stormo& set, stormo& neighborss, boidstate& boid,
 double angle(boidstate const& boid);
 
 std::vector<RGB> generatecolors(std::default_random_engine& eng,
-                                paramlist const& params);
+                                paramlist const& params);*/
+template<class boidtype>
+struct functions
+{
+  static boidtype generate(std::default_random_engine& eng)
+  { // genera pos e vel di un boid distribuiti secondo
+    // una gauss centrata in 0
+    boidtype boid{};
+    // std::array<double,2> Uniform2D {std::uniform_real_distribution<double>
+    // dis(0, static_cast<double>(pixe * params::rate));};
+
+    std::normal_distribution<double> dist(0.0, params::sigma);
+    std::for_each(boid.pos.begin(), boid.pos.end(),
+                  [&](double& x) { x = dist(eng); });
+    std::for_each(boid.vel.begin(), boid.vel.end(),
+                  [&](double& x) { x = params::vel_factor * dist(eng); });
+    return boid;
+  }
+
+  static std::vector<RGB> generatecolors(std::default_random_engine& eng,
+                                  paramlist const& params)
+  {
+    std::vector<RGB> colorvec{};
+    for (int i = 0; i < params.size / params.flocknumber + 1; i++) {
+      RGB color{};
+      std::uniform_int_distribution dist(0, 255);
+      color.red   = dist(eng);
+      color.blue  = dist(eng);
+      color.green = dist(eng);
+      colorvec.push_back(color);
+    }
+    return colorvec;
+  }
+
+  static auto mod_vel(boidtype const& boid) // Velocità singolo boid
+  {
+    double sum{};
+    for (auto it = boid.vel.begin(); it != boid.vel.end(); ++it) {
+      sum += pow(*it, 2);
+    }
+    return sum;
+  }
+
+  static double distance2(boidtype const& a, boidtype const& b)
+  {
+    return pow(a.pos[0] - b.pos[0], 2) + pow(a.pos[1] - b.pos[1], 2);
+  }
+
+  static double mod(std::array<double, params::dim> const& vec)
+  {
+    return sqrt(
+        std::accumulate(vec.begin(), vec.end(), 0, [](double sum, double x) {
+          return sum = sum + x * x;
+        }));
+  }
+
+  static std::array<double, params::dim>
+  normalize(std::array<double, params::dim>& vec)
+  {
+    auto modulo = mod(vec);
+    if (modulo == 0)
+      modulo = 1.;
+    return divide(vec, modulo);
+  }
+  static double distance(boidtype const& a, boidtype const& b)
+  {
+    return std::transform_reduce(
+        a.pos.begin(), a.pos.end(), b.pos.begin(), 0, std::plus<>(),
+        [](double a, double b) { return pow(a - b, 2); });
+  }
+
+  /*static std::array<double, params::dim>
+  operator+=(std::array<double, params::dim>& a,
+             std::array<double, params::dim> const& b)
+  {
+    std::transform(a.begin(), a.end(), b.begin(), a.begin(),
+                   [](double a, double b) { return a + b; });
+    return a;
+  }*/
+
+  static std::array<double, params::dim>
+  add(const std::array<double, params::dim>& a,
+            const std::array<double, params::dim>& b)
+  {
+    std::array<double, params::dim> result{};
+    std::transform(a.begin(), a.end(), b.begin(), result.begin(),
+                   [&](double c, double d) { return c + d; });
+    return result;
+  }
+
+  static std::array<double, params::dim>
+  subtract(std::array<double, params::dim> const& a,
+            std::array<double, params::dim> const& b)
+  {
+    std::array<double, params::dim> result;
+    std::transform(a.begin(), a.end(), b.begin(), result.begin(),
+                   [](double c, double d) { return c - d; });
+    return result;
+  }
+
+  static std::array<double, params::dim> multiply(const double a,
+                                            std::array<double, params::dim>& b)
+  {
+    std::for_each(b.begin(), b.end(), [a](double& x) { x = a * x; });
+    return b;
+  }
+
+  static std::array<double, params::dim> divide(double a,
+                                            std::array<double, params::dim>& b)
+  {
+    std::for_each(b.begin(), b.end(), [&a](double x) { return a / x; });
+    return b;
+  }
+
+  static std::array<double, params::dim> divide(std::array<double, params::dim>& b,
+                                            double a)
+  {
+    std::for_each(b.begin(), b.end(), [&a](double& x) { x = x / a; });
+    return b;
+  }
+
+  static std::vector<boidtype> generator(std::default_random_engine& eng, paramlist const& params)
+  {
+    std::vector<boidtype> set{};
+    for (unsigned int i = 0; i < params.size; i++) {
+      auto pix = params.pixel.begin(); // puntatore ai pixel
+      boidtype boidprova{generate(eng)};
+      boidprova.flockID = i / params.flocknumber;
+      for (auto it = boidprova.pos.begin(); it != boidprova.pos.end();
+           ++it, ++pix) {
+        std::uniform_real_distribution<double> dis(
+            0, static_cast<double>(*pix * params::rate));
+        *it += dis(eng);
+      }
+      set.push_back(boidprova);
+    }
+
+    return set;
+  }
+
+  static void speedadjust(boidtype& boid, const double speedlimit,
+                   const double speedminimum)
+  {
+    auto vnorm = mod(boid.vel);
+    if (vnorm > speedlimit) {
+      normalize(boid.vel);
+      boid.vel = multiply(speedlimit,boid.vel);
+    }
+    if (vnorm < speedminimum) {
+      normalize(boid.vel);
+      boid.vel =multiply(speedminimum,boid.vel);
+    }
+  }
+  template<bool val>
+  static auto neighbors(std::vector<boidtype> const& set, boidtype const& boid, const double d,
+                 const double alpha)
+  {
+    std::vector<boidtype const*> neighbors{};
+    int i = 0;
+    std::for_each(set.begin(), set.end(), [&](auto& neighbor) {
+      // if (i < 10) {
+      if (distance2(boid, neighbor) < pow(d, 2)
+          && distance2(boid, neighbor) != 0
+          && (val == 1 || (val == 0 && boid.flockID == neighbor.flockID))) {
+        std::array<double, params::dim> deltax = subtract(neighbor.pos,boid.pos);
+        std::array<double, params::dim> y      = boid.vel;
+        if (mod(boid.vel) != 0)
+          deltax = normalize(deltax);
+        y = normalize(y);
+        double prodscalare =
+            std::inner_product(deltax.begin(), deltax.end(), y.begin(), 0.);
+        if ((prodscalare) >= std::cos(alpha)) {
+          neighbors.emplace_back(&neighbor);
+          i++;
+        }
+      }
+      // }
+    });
+    return neighbors;
+  }
+
+  static auto neighbors(std::vector<boidtype const*> const& set,
+                 boidtype const& boid, const double d, const double alpha)
+  {
+    std::vector<boidtype const*> neighbors{};
+    int i = 0;
+    std::for_each(set.begin(), set.end(), [&](auto& neighbor) {
+      // if (i < 10) {
+      if (distance2(boid, *neighbor) < pow(d, 2)
+          && distance2(boid, *neighbor) != 0) {
+        std::array<double, params::dim> deltax = subtract(neighbor->pos , boid.pos);
+        std::array<double, params::dim> y      = boid.vel;
+        if (mod(boid.vel) != 0)
+          deltax = normalize(deltax);
+        y = normalize(y);
+        double prodscalare =
+            std::inner_product(deltax.begin(), deltax.end(), y.begin(), 0.);
+        if ((prodscalare) >= std::cos(alpha)) {
+          neighbors.emplace_back(neighbor);
+          i++;
+        }
+      }
+      //}
+    });
+    return neighbors;
+  }
+
+  static void regola1(std::vector<boidtype const*>& neighbors, boidtype& boid,
+               const double repulsione)
+  {
+    std::for_each(neighbors.begin(), neighbors.end(), [&](auto& neighbor) {
+      auto x = subtract(neighbor->pos, boid.pos);
+      boid.vel = subtract(boid.vel ,multiply(repulsione ,x));
+    });
+  }
+
+  static void regola2(std::vector<boidtype const*>& neighbors, boidtype& oldboid,
+               boidtype& boid, const double steering)
+  {
+    auto n = neighbors.size();
+    std::for_each(neighbors.begin(), neighbors.end(), [&](auto& neighbor) {
+      auto x = subtract(neighbor->vel, oldboid.vel);
+      boid.vel = add(boid.vel , multiply(steering / n , x));
+    });
+  }
+
+  static void regola3(std::vector<boidtype const*>& neighbors, boidtype& boid,
+               const double cohesion)
+  {
+    auto n = neighbors.size();
+    std::for_each(neighbors.begin(), neighbors.end(), [&](auto& neighbor) {
+      auto x = subtract(neighbor->pos, boid.pos);
+      boid.vel =add(boid.vel, multiply(cohesion / n , x));
+    });
+  }
+
+  static auto meanvel(std::vector<boidtype> const& set) // Velocità quadratica media
+  {
+    double s{};
+    for (auto it = set.begin(); it != set.end(); ++it) {
+      s += pow((*it).vel[0], 2) + pow((*it).vel[1], 2);
+    }
+    return sqrt(s) / static_cast<double>(set.size());
+  }
+
+  static auto compx(std::vector<boidtype> const& set) // Media delle componenti x di vel
+  {
+    double s{};
+    for (auto it = set.begin(); it != set.end(); ++it) {
+      s += (*it).vel[0];
+    }
+
+    return s / static_cast<double>(set.size());
+  }
+
+  static auto compy(std::vector<boidtype> const& set) // Media delle componenti y di vel
+  {
+    double s{};
+    for (auto it = set.begin(); it != set.end(); ++it) {
+      s += (*it).vel[1];
+    }
+
+    return s / static_cast<double>(set.size());
+  }
+
+  static double angle(boidtype const& boid)
+{
+  return atan2(boid.vel[1], boid.vel[0]);
+}
+};
+
+
+
+template<class boidtype>
 class ensemble
 {
-  stormo set;
-  stormo newset{set};
+  std::vector<boidtype> set;
+  std::vector<boidtype> newset{set};
 
  public:
-  ensemble(stormo& old)
+  ensemble(std::vector<boidtype>& old)
       : set{old}
   {}
-  stormo& set_();
-  stormo& newset_();
-  std::size_t size_();
-  boidstate delta();
-  void update(paramlist const&);
-  void update2(paramlist const&);
+std::vector<boidtype>& set_()
+{
+  return set;
+}
+
+std::vector<boidtype>& newset_()
+{
+  return newset;
+}
+
+std::size_t size_()
+{
+  return set.size();
+}
+
+void update(paramlist const& params)
+{
+  for (auto it = set.begin(), jt = newset.begin(); it != set.end();
+       ++it, ++jt) {
+    auto neighbor{boids::functions<boidtype>::template neighbors<0>(set, *it, params.neigh_align, params.alpha)};
+    auto close_neighbor{
+        functions<boidtype>::template neighbors<1>(set, *it, params.neigh_repulsion, params.alpha)};
+    functions<boidtype>::regola1(close_neighbor, *jt, params.repulsione);
+    functions<boidtype>::regola2(neighbor, *it, *jt, params.steering);
+    functions<boidtype>::regola3(neighbor, *jt, params.coesione);
+    functions<boidtype>::speedadjust(*jt, params.speedlimit, params.speedminimum);
+    auto pix = params.pixel.begin();
+    for (auto index = jt->pos.begin(), velind = jt->vel.begin();
+         index != (*jt).pos.end(); ++index, ++velind, ++pix) {
+      (*index) += (*velind) * params.deltaT;
+      if (*index > *pix - 100) {
+        *velind -= params.attraction;
+      } else {
+        if (*index < 100) {
+          *velind += params.attraction;
+        }
+      }
+    }
+  }
+  set = newset;
+}
 };
 } // namespace boids
 
