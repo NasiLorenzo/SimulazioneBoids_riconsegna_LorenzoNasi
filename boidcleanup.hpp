@@ -41,7 +41,14 @@ struct paramlist
   float deltaT;
   unsigned int size;
   unsigned int flocknumber;
-  std::vector<unsigned int> pixel{1010, 710};
+  std::vector<unsigned int> pixel{1010,710};
+};
+
+struct RGB
+{
+  uint8_t red;
+  uint8_t blue;
+  uint8_t green;
 };
 struct boidstate
 {
@@ -56,19 +63,18 @@ struct SFMLboid : boidstate
   SFMLboid()
       : boidstate{}
   {
-    float arrowLength = 10;
-    float arrowWidth  = 5;
+    float arrowLength = 10/params::rate;
+    float arrowWidth  = 5/params::rate;
     arrow.setPointCount(3);
     arrow.setPoint(0, sf::Vector2f(arrowLength, 0));
     arrow.setPoint(1, sf::Vector2f(0, -arrowWidth / 2));
     arrow.setPoint(2, sf::Vector2f(0, arrowWidth / 2));
   }
-};
-struct RGB
-{
-  uint8_t red;
-  uint8_t blue;
-  uint8_t green;
+  void setcolor(std::vector<RGB>const& colorvec){
+    arrow.setFillColor(sf::Color(colorvec[flockID].red,
+                                    colorvec[flockID].green,
+                                    colorvec[flockID].blue));
+  }
 };
 
 template<class boidtype> //boidstate o SFMLboid
@@ -220,10 +226,9 @@ struct functions
                         const double d, const double alpha)
   {
     std::vector<boidtype const*> neighbors{};
-    int i = 0;
     std::for_each(set.begin(), set.end(), [&](auto& neighbor) {
       // if (i < 10) {
-      if (distance2(boid, neighbor) < pow(d, 2)
+      if (distance(boid, neighbor) < pow(d, 2)
           && (val == 1 || (val == 0 && boid.flockID == neighbor.flockID))) {
         std::array<double, params::dim> deltax =
             subtract(neighbor.pos, boid.pos);
@@ -235,7 +240,6 @@ struct functions
             std::inner_product(deltax.begin(), deltax.end(), y.begin(), 0.);
         if ((prodscalare) >= std::cos(alpha)) {
           neighbors.emplace_back(&neighbor);
-          i++;
         }
       }
       // }
@@ -248,7 +252,6 @@ struct functions
                         const double alpha)
   {
     std::vector<boidtype const*> neighbors{};
-    int i = 0;
     std::for_each(set.begin(), set.end(), [&](auto& neighbor) {
       // if (i < 10) {
       if (distance2(boid, *neighbor) < pow(d, 2)
@@ -263,7 +266,6 @@ struct functions
             std::inner_product(deltax.begin(), deltax.end(), y.begin(), 0.);
         if ((prodscalare) >= std::cos(alpha)) {
           neighbors.emplace_back(neighbor);
-          i++;
         }
       }
       //}
@@ -379,14 +381,14 @@ class ensemble
       auto pix = params.pixel.begin();
       for (auto index = jt->pos.begin(), velind = jt->vel.begin();
            index != (*jt).pos.end(); ++index, ++velind, ++pix) {
-        (*index) += (*velind) * params.deltaT;
-        if (*index > *pix - 100) {
+        if (*index > params::rate*(*pix - 100)) {
           *velind -= params.attraction;
         } else {
-          if (*index < 100) {
+          if (*index < params::rate*100) {
             *velind += params.attraction;
           }
         }
+        (*index) += (*velind) * params.deltaT;
       }
     }
     set = newset;

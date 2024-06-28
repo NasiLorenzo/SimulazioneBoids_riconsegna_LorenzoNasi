@@ -65,31 +65,32 @@ int main()
   std::cout << "speedlimit: " << params.speedlimit << std::endl;
   std::cout << "speedminimum: " << params.speedminimum << std::endl;
   std::cout << "deltaT: " << params.deltaT << std::endl;
-  std::cout << "size" << params.size <<std::endl;
+  std::cout << "size" << params.size << std::endl;
   std::random_device r;
   std::default_random_engine eng(r());
-  std::vector<boids::SFMLboid> flock = boids::functions<boids::SFMLboid>::generator(eng, params);
+  std::vector<boids::SFMLboid> flock =
+      boids::functions<boids::SFMLboid>::generator(eng, params);
   boids::ensemble<boids::SFMLboid> prova(flock);
-  std::vector<boids::RGB> colorvec = boids::functions<boids::SFMLboid>::generatecolors(eng, params);
+  std::vector<boids::RGB> colorvec =
+      boids::functions<boids::SFMLboid>::generatecolors(eng, params);
   prova.update(params);
   std::cout << "dimesione dopo update " << prova.size_() << "\n";
   prova.update(params);
   std::cout << "dimesione dopo update " << prova.size_() << "\n";
-  for (auto& it: colorvec){
-    std::cout<<"Il colore é"<<it.red<<"e "<<it.green<<"e "<<it.blue<<"\n";
-  }
+
   sf::RenderWindow window(sf::VideoMode(params.pixel[0], params.pixel[1]),
                           "Boids Simulation");
-
   // Desired frame rate
   const sf::Time frameTime = sf::seconds(params.deltaT);
-
   sf::Clock clock;
   // sf::Time accumulator = sf::Time::Zero;
-
   /*sf::Texture texture;
   texture.loadFromFile("tramonto.jpg");
   sf::Sprite backgroundSprite(texture);*/
+  for (auto& it : prova.newset_()) {
+    it.setcolor(colorvec);
+    std::cout << "il colore è :" << it.arrow.getFillColor().toInteger() << "\n";
+  }
   while (window.isOpen()) {
     sf::Event event;
     while (window.pollEvent(event)) {
@@ -98,7 +99,6 @@ int main()
     }
     // Calculate elapsed time for this frame
     clock.restart();
-    // accumulator += elapsedTime;
 
     // Adding a background image
     /*sf::FileInputStream stream;
@@ -108,33 +108,20 @@ int main()
     // window.draw(backgroundSprite);
     //  Draw boids
     for (auto& boid : prova.set_()) {
-      float angle = static_cast<float>(
-          boids::functions<boids::SFMLboid>::angle(boid)); // Assuming you have the angle in degrees
-
-      // Arrow length and width
-      /*float arrowLength = 10;
-      float arrowWidth  = 5;*/
+      float angle = static_cast<float>(boids::functions<boids::SFMLboid>::angle(
+          boid)); // Assuming you have the angle in degrees
 
       // Calculate arrow positiion
       sf::Vector2<float> arrowPos(
           static_cast<float>(boid.pos[0] / boids::params::rate),
           static_cast<float>(boid.pos[1] / boids::params::rate));
-      // Draw arrow
-      /*sf::ConvexShape arrow(3);
-      arrow.setPoint(0, sf::Vector2f(arrowLength, 0));
-      arrow.setPoint(1, sf::Vector2f(0, -arrowWidth / 2));
-      arrow.setPoint(2, sf::Vector2f(0, arrowWidth / 2));
-      arrow.setFillColor(sf::Color::Red);*/
-      boid.arrow.setFillColor(sf::Color(colorvec[boid.flockID].red,
-                                           colorvec[boid.flockID].green,
-                                           colorvec[boid.flockID].blue));
       boid.arrow.setPosition(arrowPos);
       boid.arrow.setRotation(angle * 180 / static_cast<float>(M_PI));
+      //std::cout<<"Il color è "<<boid.arrow.getFillColor().g<<"\n";
       window.draw(boid.arrow);
     }
 
     window.display();
-
     // Delay to achieve desired frame rate
     if (frameTime < clock.getElapsedTime())
       std::cout << "Lag" << "\n";
