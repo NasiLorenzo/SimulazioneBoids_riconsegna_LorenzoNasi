@@ -214,7 +214,7 @@ struct functions
     int i = 0;
     std::for_each(set.begin(), set.end(), [&](auto& neighbor) {
       // if (i < 10) {
-      if (distance2(boid, neighbor) < pow(d, 2)
+      if (distance(boid, neighbor) < pow(d, 2)
           && (val == 1 || (val == 0 && boid.flockID == neighbor.flockID))) {
         Vector deltax = neighbor.pos - boid.pos;
         Vector y      = boid.vel;
@@ -241,7 +241,7 @@ struct functions
     int i = 0;
     std::for_each(set.begin(), set.end(), [&](auto& neighbor) {
       // if (i < 10) {
-      if (distance2(boid, *neighbor) < pow(d, 2)) {
+      if (distance(boid, *neighbor) < pow(d, 2)) {
         Vector deltax = neighbor->pos - boid.pos;
         Vector y      = boid.vel;
         if (mod(boid.vel) != 0)
