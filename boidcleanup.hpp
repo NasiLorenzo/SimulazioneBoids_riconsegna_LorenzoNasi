@@ -27,6 +27,8 @@ struct params
   static constexpr double vel_factor{10000};
 };
 
+typedef std::array<double, params::dim> Vector;
+
 struct paramlist
 {
   double repulsione;
@@ -41,19 +43,12 @@ struct paramlist
   float deltaT;
   unsigned int size;
   unsigned int flocknumber;
-  std::vector<unsigned int> pixel{1010,710};
-};
-
-struct RGB
-{
-  uint8_t red;
-  uint8_t blue;
-  uint8_t green;
+  std::vector<unsigned int> pixel{1010, 710};
 };
 struct boidstate
 {
-  std::array<double, params::dim> pos;
-  std::array<double, params::dim> vel;
+  Vector pos;
+  Vector vel;
   unsigned int flockID{0};
 };
 
@@ -63,21 +58,62 @@ struct SFMLboid : boidstate
   SFMLboid()
       : boidstate{}
   {
-    float arrowLength = 10/params::rate;
-    float arrowWidth  = 5/params::rate;
+    float arrowLength = 10;
+    float arrowWidth  = 5;
     arrow.setPointCount(3);
     arrow.setPoint(0, sf::Vector2f(arrowLength, 0));
     arrow.setPoint(1, sf::Vector2f(0, -arrowWidth / 2));
     arrow.setPoint(2, sf::Vector2f(0, arrowWidth / 2));
   }
-  void setcolor(std::vector<RGB>const& colorvec){
-    arrow.setFillColor(sf::Color(colorvec[flockID].red,
-                                    colorvec[flockID].green,
-                                    colorvec[flockID].blue));
-  }
 };
+struct RGB
+{
+  uint8_t red;
+  uint8_t blue;
+  uint8_t green;
+};
+inline Vector operator+(const Vector& a, const Vector& b)
+{
+  Vector result{};
+  std::transform(a.begin(), a.end(), b.begin(), result.begin(),
+                 [&](double c, double d) { return c + d; });
+  return result;
+}
 
-template<class boidtype> //boidstate o SFMLboid
+inline Vector operator-(Vector const& a, Vector const& b)
+{
+  Vector result;
+  std::transform(a.begin(), a.end(), b.begin(), result.begin(),
+                 [](double c, double d) { return c - d; });
+  return result;
+}
+
+inline Vector operator*(const double a, Vector& b)
+{
+  std::for_each(b.begin(), b.end(), [a](double& x) { x = a * x; });
+  return b;
+}
+
+inline Vector operator/(double a, Vector& b)
+{
+  std::for_each(b.begin(), b.end(), [&a](double x) { return a / x; });
+  return b;
+}
+
+inline Vector operator/(Vector& b, double a)
+{
+  std::for_each(b.begin(), b.end(), [&a](double& x) { x = x / a; });
+  return b;
+}
+
+inline Vector operator+=(Vector& a, Vector const& b)
+{
+  std::transform(a.begin(), a.end(), b.begin(), a.begin(),
+                 [](double a, double b) { return a + b; });
+  return a;
+}
+
+template<class boidtype> // boidstate o SFMLboid
 struct functions
 {
   static boidtype generate(std::default_random_engine& eng)
@@ -115,7 +151,7 @@ struct functions
     return pow(a.pos[0] - b.pos[0], 2) + pow(a.pos[1] - b.pos[1], 2);
   }
 
-  static double mod(std::array<double, params::dim> const& vec)
+  static double mod(Vector const& vec)
   {
     return sqrt(
         std::accumulate(vec.begin(), vec.end(), 0, [](double sum, double x) {
@@ -123,69 +159,18 @@ struct functions
         }));
   }
 
-  static std::array<double, params::dim>
-  normalize(std::array<double, params::dim>& vec)
+  static Vector normalize(Vector& vec)
   {
     auto modulo = mod(vec);
     if (modulo == 0)
       modulo = 1.;
-    return divide(vec, modulo);
+    return vec / modulo;
   }
   static double distance(boidtype const& a, boidtype const& b)
   {
     return std::transform_reduce(
         a.pos.begin(), a.pos.end(), b.pos.begin(), 0, std::plus<>(),
         [](double a, double b) { return pow(a - b, 2); });
-  }
-
-  /*static std::array<double, params::dim>
-  operator+=(std::array<double, params::dim>& a,
-             std::array<double, params::dim> const& b)
-  {
-    std::transform(a.begin(), a.end(), b.begin(), a.begin(),
-                   [](double a, double b) { return a + b; });
-    return a;
-  }*/
-
-  static std::array<double, params::dim>
-  add(const std::array<double, params::dim>& a,
-      const std::array<double, params::dim>& b)
-  {
-    std::array<double, params::dim> result{};
-    std::transform(a.begin(), a.end(), b.begin(), result.begin(),
-                   [&](double c, double d) { return c + d; });
-    return result;
-  }
-
-  static std::array<double, params::dim>
-  subtract(std::array<double, params::dim> const& a,
-           std::array<double, params::dim> const& b)
-  {
-    std::array<double, params::dim> result;
-    std::transform(a.begin(), a.end(), b.begin(), result.begin(),
-                   [](double c, double d) { return c - d; });
-    return result;
-  }
-
-  static std::array<double, params::dim>
-  multiply(const double a, std::array<double, params::dim>& b)
-  {
-    std::for_each(b.begin(), b.end(), [a](double& x) { x = a * x; });
-    return b;
-  }
-
-  static std::array<double, params::dim>
-  divide(double a, std::array<double, params::dim>& b)
-  {
-    std::for_each(b.begin(), b.end(), [&a](double x) { return a / x; });
-    return b;
-  }
-
-  static std::array<double, params::dim>
-  divide(std::array<double, params::dim>& b, double a)
-  {
-    std::for_each(b.begin(), b.end(), [&a](double& x) { x = x / a; });
-    return b;
   }
 
   static std::vector<boidtype> generator(std::default_random_engine& eng,
@@ -214,11 +199,11 @@ struct functions
     auto vnorm = mod(boid.vel);
     if (vnorm > speedlimit) {
       normalize(boid.vel);
-      boid.vel = multiply(speedlimit, boid.vel);
+      boid.vel = speedlimit * boid.vel;
     }
     if (vnorm < speedminimum) {
       normalize(boid.vel);
-      boid.vel = multiply(speedminimum, boid.vel);
+      boid.vel = speedminimum * boid.vel;
     }
   }
   template<bool val>
@@ -226,13 +211,13 @@ struct functions
                         const double d, const double alpha)
   {
     std::vector<boidtype const*> neighbors{};
+    int i = 0;
     std::for_each(set.begin(), set.end(), [&](auto& neighbor) {
       // if (i < 10) {
-      if (distance(boid, neighbor) < pow(d, 2)
+      if (distance2(boid, neighbor) < pow(d, 2)
           && (val == 1 || (val == 0 && boid.flockID == neighbor.flockID))) {
-        std::array<double, params::dim> deltax =
-            subtract(neighbor.pos, boid.pos);
-        std::array<double, params::dim> y = boid.vel;
+        Vector deltax = neighbor.pos - boid.pos;
+        Vector y      = boid.vel;
         if (mod(boid.vel) != 0)
           deltax = normalize(deltax);
         y = normalize(y);
@@ -240,6 +225,7 @@ struct functions
             std::inner_product(deltax.begin(), deltax.end(), y.begin(), 0.);
         if ((prodscalare) >= std::cos(alpha)) {
           neighbors.emplace_back(&neighbor);
+          i++;
         }
       }
       // }
@@ -252,13 +238,12 @@ struct functions
                         const double alpha)
   {
     std::vector<boidtype const*> neighbors{};
+    int i = 0;
     std::for_each(set.begin(), set.end(), [&](auto& neighbor) {
       // if (i < 10) {
-      if (distance2(boid, *neighbor) < pow(d, 2)
-          ) {
-        std::array<double, params::dim> deltax =
-            subtract(neighbor->pos, boid.pos);
-        std::array<double, params::dim> y = boid.vel;
+      if (distance2(boid, *neighbor) < pow(d, 2)) {
+        Vector deltax = neighbor->pos - boid.pos;
+        Vector y      = boid.vel;
         if (mod(boid.vel) != 0)
           deltax = normalize(deltax);
         y = normalize(y);
@@ -266,6 +251,7 @@ struct functions
             std::inner_product(deltax.begin(), deltax.end(), y.begin(), 0.);
         if ((prodscalare) >= std::cos(alpha)) {
           neighbors.emplace_back(neighbor);
+          i++;
         }
       }
       //}
@@ -277,8 +263,8 @@ struct functions
                       const double repulsione)
   {
     std::for_each(neighbors.begin(), neighbors.end(), [&](auto& neighbor) {
-      auto x   = subtract(neighbor->pos, boid.pos);
-      boid.vel = subtract(boid.vel, multiply(repulsione, x));
+      auto x = neighbor->pos - boid.pos;
+      boid.vel += -repulsione * x;
     });
   }
 
@@ -287,8 +273,8 @@ struct functions
   {
     auto n = neighbors.size();
     std::for_each(neighbors.begin(), neighbors.end(), [&](auto& neighbor) {
-      auto x   = subtract(neighbor->vel, oldboid.vel);
-      boid.vel = add(boid.vel, multiply(steering / n, x));
+      auto x = neighbor->vel - oldboid.vel;
+      boid.vel += steering / n * x;
     });
   }
 
@@ -297,8 +283,8 @@ struct functions
   {
     auto n = neighbors.size();
     std::for_each(neighbors.begin(), neighbors.end(), [&](auto& neighbor) {
-      auto x   = subtract(neighbor->pos, boid.pos);
-      boid.vel = add(boid.vel, multiply(cohesion / n, x));
+      auto x = neighbor->pos - boid.pos;
+      boid.vel += cohesion / n * x;
     });
   }
 
@@ -381,14 +367,14 @@ class ensemble
       auto pix = params.pixel.begin();
       for (auto index = jt->pos.begin(), velind = jt->vel.begin();
            index != (*jt).pos.end(); ++index, ++velind, ++pix) {
-        if (*index > params::rate*(*pix - 100)) {
+        (*index) += (*velind) * params.deltaT;
+        if (*index > *pix - 100) {
           *velind -= params.attraction;
         } else {
-          if (*index < params::rate*100) {
+          if (*index < 100) {
             *velind += params.attraction;
           }
         }
-        (*index) += (*velind) * params.deltaT;
       }
     }
     set = newset;
