@@ -56,8 +56,8 @@ struct SFMLboid : boidstate
   SFMLboid()
       : boidstate{}
   {
-    float arrowLength = 6;
-    float arrowWidth  = 3;
+    float arrowLength = 10;
+    float arrowWidth  = 5;
     arrow.setPointCount(3);
     arrow.setPoint(0, sf::Vector2f(arrowLength, 0));
     arrow.setPoint(1, sf::Vector2f(0, -arrowWidth / 2));
@@ -71,7 +71,7 @@ struct RGB
   uint8_t green;
 };
 
-template<class boidtype>
+template<class boidtype> //boidstate o SFMLboid
 struct functions
 {
   static boidtype generate(std::default_random_engine& eng)

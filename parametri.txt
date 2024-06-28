@@ -9,6 +9,6 @@ speedlimit       100
 speedminimum     40
 deltaT           0.0333
 size             300
-flocknumber      150
+flocknumber      50
 pixel.x          1210
 pixel.y          710
