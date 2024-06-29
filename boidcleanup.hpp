@@ -23,12 +23,10 @@ struct params
   static constexpr double sigma{0.01};
   static constexpr unsigned int dim{2}; // dimensione
   static constexpr unsigned int n = 2;
-  static constexpr double rate{
-      1}; // rapporto tra la dimensione dello schermo e della generazione
+  static double rate; // rapporto tra la dimensione dello schermo e della generazione
   static constexpr double vel_factor{10000};
 };
 typedef std::array<double, params::dim> DoubleVec;
-
 struct paramlist
 {
   double repulsione;
@@ -44,7 +42,7 @@ struct paramlist
   unsigned int size;
   unsigned int flocknumber;
   std::vector<unsigned int> pixel{1010, 710};
-};
+  };
 struct boidstate
 {
   DoubleVec pos;
@@ -52,26 +50,14 @@ struct boidstate
   unsigned int flockID{0};
 };
 
-struct SFMLboid : boidstate
-{
-  sf::ConvexShape arrow;
-  SFMLboid()
-      : boidstate{}
-  {
-    float arrowLength = 10;
-    float arrowWidth  = 5;
-    arrow.setPointCount(3);
-    arrow.setPoint(0, sf::Vector2f(arrowLength, 0));
-    arrow.setPoint(1, sf::Vector2f(0, -arrowWidth / 2));
-    arrow.setPoint(2, sf::Vector2f(0, arrowWidth / 2));
-  }
-};
-struct RGB
-{
-  int red;
-  int blue;
-  int green;
-};
+template<typename Iterator, typename predicate, typename operation> void //template argument deduction
+for_each_if(Iterator begin, Iterator end, predicate p, operation op) {
+    for(; begin != end; begin++) {
+        if (p) {
+            op(*begin);
+        }
+    }
+}
 
 inline DoubleVec operator+(const DoubleVec& a, const DoubleVec& b)
 {
@@ -129,21 +115,6 @@ struct functions
     std::for_each(boid.vel.begin(), boid.vel.end(),
                   [&](double& x) { x = params::vel_factor * dist(eng); });
     return boid;
-  }
-
-  static std::vector<RGB> generatecolors(std::default_random_engine& eng,
-                                         paramlist const& params)
-  {
-    std::vector<RGB> colorvec{};
-    for (int i = 0; i < params.size / params.flocknumber + 1; i++) {
-      RGB color{};
-      std::uniform_int_distribution dist(0, 255);
-      color.red   = dist(eng);
-      color.blue  = dist(eng);
-      color.green = dist(eng);
-      colorvec.push_back(color);
-    }
-    return colorvec;
   }
 
   static double distance2(boidtype const& a, boidtype const& b)
@@ -212,9 +183,9 @@ struct functions
   {
     std::vector<boidtype const*> neighbors{};
     int i = 0;
-    std::for_each(set.begin(), set.end(), [&](auto& neighbor) {
-      // if (i < 10) {
-      if (distance(boid, neighbor) < pow(d, 2) && distance2(boid, neighbor) != 0
+    boids::for_each_if(set.begin(), set.end(),i<200, [&](auto& neighbor) {
+      auto distanza = distance(boid,neighbor);
+      if (distanza < pow(d, 2) && distanza != 0
           && (val == 1 || (val == 0 && boid.flockID == neighbor.flockID))) {
         DoubleVec deltax = neighbor.pos - boid.pos;
         DoubleVec y      = boid.vel;
@@ -228,7 +199,6 @@ struct functions
           i++;
         }
       }
-      // }
     });
     return neighbors;
   }
@@ -269,17 +239,19 @@ struct functions
     });
   }
 
-  static void regola2(std::vector<boidtype const*>& neighbors,
-                      boidtype& oldboid, boidtype& boid, const double steering)
+  static void regola2_3(std::vector<boidtype const*>& neighbors,
+                      boidtype& oldboid, boidtype& boid, const double steering, const double cohesion)
   {
     auto n = neighbors.size();
     std::for_each(neighbors.begin(), neighbors.end(), [&](auto& neighbor) {
       auto x   = neighbor->vel - oldboid.vel;
       boid.vel +=  steering / n * x;
+      auto y   = neighbor->pos - boid.pos;
+      boid.vel += cohesion / n * y;
     });
   }
 
-  static void regola3(std::vector<boidtype const*>& neighbors, boidtype& boid,
+  /*static void regola3(std::vector<boidtype const*>& neighbors, boidtype& boid,
                       const double cohesion)
   {
     auto n = neighbors.size();
@@ -287,7 +259,7 @@ struct functions
       auto x   = neighbor->pos - boid.pos;
       boid.vel += cohesion / n * x;
     });
-  }
+  }*/
 
   static auto
   meanvel(std::vector<boidtype> const& set) // Velocità quadratica media
@@ -361,18 +333,17 @@ class ensemble
       auto close_neighbor{functions<boidtype>::template neighbors<1>(
           set, *it, params.neigh_repulsion, params.alpha)};
       functions<boidtype>::regola1(close_neighbor, *jt, params.repulsione);
-      functions<boidtype>::regola2(neighbor, *it, *jt, params.steering);
-      functions<boidtype>::regola3(neighbor, *jt, params.coesione);
+      functions<boidtype>::regola2_3(neighbor, *it, *jt, params.steering,params.coesione);
       functions<boidtype>::speedadjust(*jt, params.speedlimit,
                                        params.speedminimum);
       auto pix = params.pixel.begin();
       for (auto index = jt->pos.begin(), velind = jt->vel.begin();
            index != (*jt).pos.end(); ++index, ++velind, ++pix) {
         (*index) += (*velind) * params.deltaT;
-        if (*index > *pix - 100) {
+        if (*index > params::rate*(*pix - 100)) {
           *velind -= params.attraction;
         } else {
-          if (*index < 100) {
+          if (*index < params::rate*100) {
             *velind += params.attraction;
           }
         }
