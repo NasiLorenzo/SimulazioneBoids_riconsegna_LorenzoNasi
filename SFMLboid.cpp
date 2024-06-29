@@ -24,6 +24,7 @@ SFMLboid::SFMLboid()
     arrow.setPoint(0, sf::Vector2f(arrowlength, 0));
     arrow.setPoint(1, sf::Vector2f(0, -arrowidth / 2));
     arrow.setPoint(2, sf::Vector2f(0, arrowidth / 2));
+    arrow.setOrigin(arrowlength/2,0);
   }
   
 } // namespace boids

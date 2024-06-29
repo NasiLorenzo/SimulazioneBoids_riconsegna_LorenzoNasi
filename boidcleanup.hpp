@@ -18,12 +18,19 @@
 
 namespace boids {
 
+enum class Criterion : bool
+{
+  any=1,
+  similar=0,  
+};
+
 struct params
 {
   static constexpr double sigma{0.01};
   static constexpr unsigned int dim{2}; // dimensione
   static constexpr unsigned int n = 2;
-  static double rate; // rapporto tra la dimensione dello schermo e della generazione
+  static double
+      rate; // rapporto tra la dimensione dello schermo e della generazione
   static constexpr double vel_factor{10000};
 };
 typedef std::array<double, params::dim> DoubleVec;
@@ -42,7 +49,7 @@ struct paramlist
   unsigned int size;
   unsigned int flocknumber;
   std::vector<unsigned int> pixel{1010, 710};
-  };
+};
 struct boidstate
 {
   DoubleVec pos;
@@ -50,13 +57,17 @@ struct boidstate
   unsigned int flockID{0};
 };
 
-template<typename Iterator, typename predicate, typename operation> void //template argument deduction
-for_each_if(Iterator begin, Iterator end, predicate p, operation op) {
-    for(; begin != end; begin++) {
-        if (p) {
-            op(*begin);
-        }
+template<typename Iterator, typename predicate, typename operation>
+void // template argument deduction
+for_each_if(Iterator begin, Iterator end, predicate p, operation op)
+{
+  for (; begin != end; begin++) {
+    if (p()) {
+      op(*begin);
+    } else {
+      break;
     }
+  }
 }
 
 inline DoubleVec operator+(const DoubleVec& a, const DoubleVec& b)
@@ -177,29 +188,31 @@ struct functions
       boid.vel = speedminimum * boid.vel;
     }
   }
-  template<bool val>
+  template<Criterion criterion>
   static auto neighbors(std::vector<boidtype> const& set, boidtype const& boid,
                         const double d, const double alpha)
   {
     std::vector<boidtype const*> neighbors{};
     int i = 0;
-    boids::for_each_if(set.begin(), set.end(),i<200, [&](auto& neighbor) {
-      auto distanza = distance(boid,neighbor);
-      if (distanza < pow(d, 2) && distanza != 0
-          && (val == 1 || (val == 0 && boid.flockID == neighbor.flockID))) {
-        DoubleVec deltax = neighbor.pos - boid.pos;
-        DoubleVec y      = boid.vel;
-        if (mod(boid.vel) != 0)
-          deltax = normalize(deltax);
-        y = normalize(y);
-        double prodscalare =
-            std::inner_product(deltax.begin(), deltax.end(), y.begin(), 0.);
-        if ((prodscalare) >= std::cos(alpha)) {
-          neighbors.emplace_back(&neighbor);
-          i++;
-        }
-      }
-    });
+    std::for_each(
+        set.begin(), set.end(), /*[&i]() { return i < 10; },*/
+        [&](auto& neighbor) {
+          auto distanza = distance(boid, neighbor);
+          if (distanza < pow(d, 2) && distanza != 0
+              && (criterion == Criterion::any || (criterion == Criterion::similar && boid.flockID == neighbor.flockID))) {
+            DoubleVec deltax = neighbor.pos - boid.pos;
+            DoubleVec y      = boid.vel;
+            if (mod(boid.vel) != 0)
+              deltax = normalize(deltax);
+            y = normalize(y);
+            double prodscalare =
+                std::inner_product(deltax.begin(), deltax.end(), y.begin(), 0.);
+            if ((prodscalare) >= std::cos(alpha)) {
+              neighbors.emplace_back(&neighbor);
+              ++i;
+            }
+          }
+        });
     return neighbors;
   }
 
@@ -234,19 +247,20 @@ struct functions
                       const double repulsione)
   {
     std::for_each(neighbors.begin(), neighbors.end(), [&](auto& neighbor) {
-      auto x   = neighbor->pos - boid.pos;
+      auto x = neighbor->pos - boid.pos;
       boid.vel += -repulsione * x;
     });
   }
 
   static void regola2_3(std::vector<boidtype const*>& neighbors,
-                      boidtype& oldboid, boidtype& boid, const double steering, const double cohesion)
+                        boidtype& oldboid, boidtype& boid,
+                        const double steering, const double cohesion)
   {
     auto n = neighbors.size();
     std::for_each(neighbors.begin(), neighbors.end(), [&](auto& neighbor) {
-      auto x   = neighbor->vel - oldboid.vel;
-      boid.vel +=  steering / n * x;
-      auto y   = neighbor->pos - boid.pos;
+      auto x = neighbor->vel - oldboid.vel;
+      boid.vel += steering / n * x;
+      auto y = neighbor->pos - boid.pos;
       boid.vel += cohesion / n * y;
     });
   }
@@ -328,22 +342,23 @@ class ensemble
   {
     for (auto it = set.begin(), jt = newset.begin(); it != set.end();
          ++it, ++jt) {
-      auto neighbor{boids::functions<boidtype>::template neighbors<0>(
+      auto neighbor{boids::functions<boidtype>::template neighbors<Criterion::similar>(
           set, *it, params.neigh_align, params.alpha)};
-      auto close_neighbor{functions<boidtype>::template neighbors<1>(
+      auto close_neighbor{functions<boidtype>::template neighbors<Criterion::any>(
           set, *it, params.neigh_repulsion, params.alpha)};
       functions<boidtype>::regola1(close_neighbor, *jt, params.repulsione);
-      functions<boidtype>::regola2_3(neighbor, *it, *jt, params.steering,params.coesione);
+      functions<boidtype>::regola2_3(neighbor, *it, *jt, params.steering,
+                                     params.coesione);
       functions<boidtype>::speedadjust(*jt, params.speedlimit,
                                        params.speedminimum);
       auto pix = params.pixel.begin();
       for (auto index = jt->pos.begin(), velind = jt->vel.begin();
            index != (*jt).pos.end(); ++index, ++velind, ++pix) {
         (*index) += (*velind) * params.deltaT;
-        if (*index > params::rate*(*pix - 100)) {
+        if (*index > params::rate * (*pix - 100)) {
           *velind -= params.attraction;
         } else {
-          if (*index < params::rate*100) {
+          if (*index < params::rate * 100) {
             *velind += params.attraction;
           }
         }

@@ -78,9 +78,11 @@ int main()
   std::cout << "dimesione dopo update " << prova.size_() << "\n";
   prova.update(params);
   std::cout << "dimesione dopo update " << prova.size_() << "\n";
-  for (auto& it : colorvec) {
-    std::cout << "Il colore é" << it.red << "e " << it.green << "e " << it.blue
-              << "\n";
+  for(auto& it: prova.newset_()){
+    it.arrow.setFillColor(sf::Color(colorvec[it.flockID].red,
+                                        colorvec[it.flockID].green,
+                                        colorvec[it.flockID].blue));
+    std::cout<<"Id "<<it.flockID<<"\n";
   }
   sf::RenderWindow window(sf::VideoMode(params.pixel[0], params.pixel[1]),
                           "Boids Simulation");
@@ -111,7 +113,7 @@ int main()
     window.clear(sf::Color::White);
     // window.draw(backgroundSprite);
     //  Draw boids
-    for (auto& boid : prova.set_()) {
+    for (auto& boid : prova.newset_()) {
       float angle = static_cast<float>(boids::functions<boids::SFMLboid>::angle(
           boid)); // Assuming you have the angle in degrees
 
@@ -119,20 +121,9 @@ int main()
       /*float arrowLength = 10;
       float arrowWidth  = 5;*/
 
-      // Calculate arrow positiion
-      sf::Vector2<float> arrowPos(
-          static_cast<float>(boid.pos[0] / boids::params::rate),
+      // Calculate arrow positiion          ;
+      boid.arrow.setPosition(static_cast<float>(boid.pos[0] / boids::params::rate),
           static_cast<float>(boid.pos[1] / boids::params::rate));
-      // Draw arrow
-      /*sf::ConvexShape arrow(3);
-      arrow.setPoint(0, sf::Vector2f(arrowLength, 0));
-      arrow.setPoint(1, sf::Vector2f(0, -arrowWidth / 2));
-      arrow.setPoint(2, sf::Vector2f(0, arrowWidth / 2));
-      arrow.setFillColor(sf::Color::Red);*/
-      boid.arrow.setFillColor(sf::Color(colorvec[boid.flockID].red,
-                                        colorvec[boid.flockID].green,
-                                        colorvec[boid.flockID].blue));
-      boid.arrow.setPosition(arrowPos);
       boid.arrow.setRotation(angle * 180 / static_cast<float>(M_PI));
       window.draw(boid.arrow);
     }
