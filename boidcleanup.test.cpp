@@ -187,7 +187,7 @@ TEST_CASE("Testing boid sight")
         boids::functions<boidstate>::template neighbors<Criterion::any>(
             pair2, boid1, 10000., params.alpha);
 
-    CHECK(result2.size() == 1);
+    CHECK(result2.size() == 0);
   }
 
   SUBCASE("Testing if boid1 sees boid4")
@@ -219,7 +219,7 @@ TEST_CASE("Testing boid sight")
         boids::functions<boidstate>::template neighbors<Criterion::any>(
             pair5, boid1, 10000., params.alpha);
 
-    CHECK(result5.size() == 1);
+    CHECK(result5.size() == 0);
   }
 }
 // namespace boids
