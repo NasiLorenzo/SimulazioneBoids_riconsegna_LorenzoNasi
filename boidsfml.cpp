@@ -114,8 +114,8 @@ int main()
     // window.draw(backgroundSprite);
     //  Draw boids
     for (auto& boid : prova.newset_()) {
-      float angle = static_cast<float>(boids::functions<boids::SFMLboid>::angle(
-          boid)); // Assuming you have the angle in degrees
+      float angle = static_cast<float>(boids::angle(
+          boid.vel)); // Assuming you have the angle in degrees
 
       // Arrow length and width
       /*float arrowLength = 10;

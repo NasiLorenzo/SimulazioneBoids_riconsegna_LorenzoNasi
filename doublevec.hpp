@@ -1,0 +1,51 @@
+#ifndef DOUBLEVEC_HPP
+#define DOUBLEVEC_HPP
+#include <SFML/Graphics.hpp>
+#include <algorithm>
+#include <array>
+#include <bitset>
+#include <cassert>
+#include <chrono>
+#include <cmath>
+#include <fstream>
+#include <functional>
+#include <iostream>
+#include <iterator>
+#include <random>
+#include <sstream>
+#include <string>
+#include <vector>
+namespace boids {
+struct params
+{
+  static constexpr double sigma{0.01};
+  static constexpr unsigned int dim{2}; // dimensione
+  static constexpr unsigned int n = 2;
+  static double
+      rate; // rapporto tra la dimensione dello schermo e della generazione
+  static constexpr double vel_factor{10000};
+};
+typedef std::array<double, params::dim> DoubleVec;
+
+DoubleVec operator+(const DoubleVec& a, const DoubleVec& b);
+
+DoubleVec operator-(DoubleVec const& a, DoubleVec const& b);
+
+DoubleVec operator*(const double a, DoubleVec& b);
+
+DoubleVec operator/(double a, DoubleVec& b);
+
+DoubleVec operator/(DoubleVec& b, double a);
+
+DoubleVec operator+=(DoubleVec& a, DoubleVec const& b);
+
+double angle(DoubleVec const& vec);
+
+double mod(DoubleVec const& vec);
+
+DoubleVec normalize(DoubleVec& vec);
+
+double distance(DoubleVec const& a, DoubleVec const& b);
+} // namespace boids
+
+#endif

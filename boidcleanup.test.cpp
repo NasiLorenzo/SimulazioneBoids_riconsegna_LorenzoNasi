@@ -116,12 +116,12 @@ TEST_CASE("Testing the speed limits")
 
   SUBCASE("Testing the velocity before the adjustment")
   {
-    CHECK(boids::functions<boidstate>::mod(boid1.vel)
+    CHECK(boids::mod(boid1.vel)
           == doctest::Approx(300.167));
-    CHECK(boids::functions<boidstate>::mod(boid2.vel) == doctest::Approx(5.));
-    CHECK(boids::functions<boidstate>::mod(boid3.vel)
+    CHECK(boids::mod(boid2.vel) == doctest::Approx(5.));
+    CHECK(boids::mod(boid3.vel)
           == doctest::Approx(131.712));
-    CHECK(boids::functions<boidstate>::mod(boid4.vel)
+    CHECK(boids::mod(boid4.vel)
           == doctest::Approx(407.344));
   }
 
@@ -133,7 +133,7 @@ TEST_CASE("Testing the speed limits")
   SUBCASE("Testing the velocity after the adjustment")
   {
     for (const auto& boid : boids) {
-      CHECK(boids::functions<boidstate>::mod(boid.vel)
+      CHECK(boids::mod(boid.vel)
             == doctest::Approx(params.speedlimit).epsilon(0.001));
     }
   }
