@@ -20,8 +20,8 @@ namespace boids {
 
 enum class Criterion : bool
 {
-  any=1,
-  similar=0,  
+  any     = 1,
+  similar = 0,
 };
 
 struct params
@@ -194,25 +194,26 @@ struct functions
   {
     std::vector<boidtype const*> neighbors{};
     int i = 0;
-    std::for_each(
-        set.begin(), set.end(), /*[&i]() { return i < 10; },*/
-        [&](auto& neighbor) {
-          auto distanza = distance(boid, neighbor);
-          if (distanza < pow(d, 2) && distanza != 0
-              && (criterion == Criterion::any || (criterion == Criterion::similar && boid.flockID == neighbor.flockID))) {
-            DoubleVec deltax = neighbor.pos - boid.pos;
-            DoubleVec y      = boid.vel;
-            if (mod(boid.vel) != 0)
-              deltax = normalize(deltax);
-            y = normalize(y);
-            double prodscalare =
-                std::inner_product(deltax.begin(), deltax.end(), y.begin(), 0.);
-            if ((prodscalare) >= std::cos(alpha)) {
-              neighbors.emplace_back(&neighbor);
-              ++i;
-            }
-          }
-        });
+    std::for_each(set.begin(), set.end(), /*[&i]() { return i < 10; },*/
+                  [&](auto& neighbor) {
+                    auto distanza = distance(boid, neighbor);
+                    if (distanza < pow(d, 2) && distanza != 0
+                        && (criterion == Criterion::any
+                            || (criterion == Criterion::similar
+                                && boid.flockID == neighbor.flockID))) {
+                      DoubleVec deltax = neighbor.pos - boid.pos;
+                      DoubleVec y      = boid.vel;
+                      if (mod(boid.vel) != 0)
+                        deltax = normalize(deltax);
+                      y                  = normalize(y);
+                      double prodscalare = std::inner_product(
+                          deltax.begin(), deltax.end(), y.begin(), 0.);
+                      if ((prodscalare) >= std::cos(alpha)) {
+                        neighbors.emplace_back(&neighbor);
+                        ++i;
+                      }
+                    }
+                  });
     return neighbors;
   }
 
@@ -342,31 +343,34 @@ class ensemble
   {
     for (auto it = set.begin(), jt = newset.begin(); it != set.end();
          ++it, ++jt) {
-      auto neighbor{boids::functions<boidtype>::template neighbors<Criterion::similar>(
-          set, *jt, params.neigh_align, params.alpha)};
-      auto close_neighbor{functions<boidtype>::template neighbors<Criterion::any>(
-          set, *jt, params.neigh_repulsion, params.alpha)};
+      auto neighbor{
+          boids::functions<boidtype>::template neighbors<Criterion::similar>(
+              set, *jt, params.neigh_align, params.alpha)};
+      auto close_neighbor{
+          functions<boidtype>::template neighbors<Criterion::any>(
+              set, *jt, params.neigh_repulsion, params.alpha)};
       functions<boidtype>::regola1(close_neighbor, *jt, params.repulsione);
       functions<boidtype>::regola2_3(neighbor, *it, *jt, params.steering,
                                      params.coesione);
       functions<boidtype>::speedadjust(*jt, params.speedlimit,
-                                       params.speedminimum);
+        params.speedminimum);
       auto pix = params.pixel.begin();
       for (auto index = jt->pos.begin(), velind = jt->vel.begin();
            index != (*jt).pos.end(); ++index, ++velind, ++pix) {
-        (*index) += (*velind) * params.deltaT;
-        if (*index > params::rate * (*pix - 100)) {
-          *velind -= params.attraction;
-        } else {
-          if (*index < params::rate * 100) {
-            *velind += params.attraction;
+          if (*index > params::rate * (*pix - 100)) {
+            *velind -= params.attraction;
+          } else {
+            if (*index < params::rate * 100) {
+              *velind += params.attraction;
+            }
           }
+          (*index) += (*velind) * params.deltaT;
         }
+        
       }
+      set = newset;
     }
-    set = newset;
-  }
-};
+  };
 } // namespace boids
 
 #endif
