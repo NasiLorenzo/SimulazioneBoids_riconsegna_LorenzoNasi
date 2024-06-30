@@ -101,7 +101,7 @@ struct functions
                         const double d, const double alpha)
   {
     std::vector<boidtype const*> neighbors{};
-    int i = 0;
+    // int i = 0;
     std::for_each(set.begin(), set.end(), /*[&i]() { return i < 10; },*/
                   [&](auto& neighbor) {
                     auto distanza = distance(boid.pos, neighbor.pos);
@@ -118,7 +118,7 @@ struct functions
                           deltax.begin(), deltax.end(), y.begin(), 0.);
                       if ((prodscalare) >= std::cos(alpha)) {
                         neighbors.emplace_back(&neighbor);
-                        ++i;
+                        //++i;
                       }
                     }
                   });
@@ -130,9 +130,7 @@ struct functions
                         const double alpha)
   {
     std::vector<boidtype const*> neighbors{};
-    int i = 0;
     std::for_each(set.begin(), set.end(), [&](auto& neighbor) {
-      // if (i < 10) {
       if (distance(boid.pos, neighbor->pos) < pow(d, 2)
           && distance(boid.pos, neighbor->pos) != 0) {
         DoubleVec deltax = neighbor->pos - boid.pos;
@@ -144,10 +142,8 @@ struct functions
             std::inner_product(deltax.begin(), deltax.end(), y.begin(), 0.);
         if ((prodscalare) >= std::cos(alpha)) {
           neighbors.emplace_back(neighbor);
-          i++;
         }
       }
-      //}
     });
     return neighbors;
   }
@@ -172,38 +168,6 @@ struct functions
       auto y = neighbor->pos - boid.pos;
       boid.vel += cohesion / n * y;
     });
-  }
-
-  static auto
-  meanvel(std::vector<boidtype> const& set) // Velocità quadratica media
-  {
-    double s{};
-    for (auto it = set.begin(); it != set.end(); ++it) {
-      s += boids::mod(it->vel);
-    }
-    return sqrt(s) / static_cast<double>(set.size());
-  }
-
-  static auto
-  compx(std::vector<boidtype> const& set) // Media delle componenti x di vel
-  {
-    double s{};
-    for (auto it = set.begin(); it != set.end(); ++it) {
-      s += (*it).vel[0];
-    }
-
-    return s / static_cast<double>(set.size());
-  }
-
-  static auto
-  compy(std::vector<boidtype> const& set) // Media delle componenti y di vel
-  {
-    double s{};
-    for (auto it = set.begin(); it != set.end(); ++it) {
-      s += (*it).vel[1];
-    }
-
-    return s / static_cast<double>(set.size());
   }
 };
 
