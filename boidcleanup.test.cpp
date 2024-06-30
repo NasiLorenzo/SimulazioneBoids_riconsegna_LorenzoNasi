@@ -207,7 +207,6 @@ TEST_CASE("Testing boid sight")
   SUBCASE("Testing if boid1 sees boid5")
   {
     std::vector<boidstate> pair4{boid1, boid5};
-    ensemble<boidstate> flock4{pair4};
 
     auto result4 =
         boids::functions<boidstate>::template neighbors<Criterion::any>(
