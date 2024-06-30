@@ -24,6 +24,7 @@ struct paramlist
   unsigned int size;
   unsigned int flocknumber;
   std::vector<unsigned int> pixel{1010, 710};
+  double bordersize;
 };
 struct boidstate
 {
@@ -224,10 +225,10 @@ class ensemble
       auto pix = params.pixel.begin();
       for (auto index = jt->pos.begin(), velind = jt->vel.begin();
            index != (*jt).pos.end(); ++index, ++velind, ++pix) {
-        if (*index > params::rate * (*pix - 100)) {
+        if (*index > params::rate * (*pix - params.bordersize)) {
           *velind -= params.attraction;
         } else {
-          if (*index < params::rate * 100) {
+          if (*index < params::rate * params.bordersize) {
             *velind += params.attraction;
           }
         }

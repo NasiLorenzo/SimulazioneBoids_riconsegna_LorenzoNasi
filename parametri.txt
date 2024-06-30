@@ -1,15 +1,16 @@
-repulsione       0.3
-steering         0.4
-coesione         0.8
+repulsione       0.6    //tenere il parametro di repulsione un ordine di grandezza superiore agli altri due
+steering         0.04
+coesione         0.08
 neigh_align      200
 neigh_repulsion  15
-attraction       0.6
-alpha            0.55
+attraction       6
+alpha            0.3
 speedlimit       100
 speedminimum     40
 deltaT           0.0333
-size             400
-flocknumber      100
+size             500
+flocknumber      50
 pixel.x          1210
 pixel.y          710
-rate             1
+rate             2
+bordersize       50

@@ -55,6 +55,8 @@ int main()
         params.pixel[1] = static_cast<unsigned int>(value);
       else if (name == "rate")
         boids::params::rate = value;
+      else if (name == "bordersize")
+        params.bordersize = value;
     }
   }
   std::cout << "repulsione: " << params.repulsione << std::endl;
@@ -78,11 +80,11 @@ int main()
   std::cout << "dimesione dopo update " << prova.size_() << "\n";
   prova.update(params);
   std::cout << "dimesione dopo update " << prova.size_() << "\n";
-  for(auto& it: prova.newset_()){
+  for (auto& it : prova.newset_()) {
     it.arrow.setFillColor(sf::Color(colorvec[it.flockID].red,
-                                        colorvec[it.flockID].green,
-                                        colorvec[it.flockID].blue));
-    std::cout<<"Id "<<it.flockID<<"\n";
+                                    colorvec[it.flockID].green,
+                                    colorvec[it.flockID].blue));
+    std::cout << "Id " << it.flockID << "\n";
   }
   sf::RenderWindow window(sf::VideoMode(params.pixel[0], params.pixel[1]),
                           "Boids Simulation");
@@ -114,15 +116,16 @@ int main()
     // window.draw(backgroundSprite);
     //  Draw boids
     for (auto& boid : prova.newset_()) {
-      float angle = static_cast<float>(boids::angle(
-          boid.vel)); // Assuming you have the angle in degrees
+      float angle = static_cast<float>(
+          boids::angle(boid.vel)); // Assuming you have the angle in degrees
 
       // Arrow length and width
       /*float arrowLength = 10;
       float arrowWidth  = 5;*/
 
       // Calculate arrow positiion          ;
-      boid.arrow.setPosition(static_cast<float>(boid.pos[0] / boids::params::rate),
+      boid.arrow.setPosition(
+          static_cast<float>(boid.pos[0] / boids::params::rate),
           static_cast<float>(boid.pos[1] / boids::params::rate));
       boid.arrow.setRotation(angle * 180 / static_cast<float>(M_PI));
       window.draw(boid.arrow);
