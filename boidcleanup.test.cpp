@@ -156,7 +156,7 @@ TEST_CASE("Testing boid sight")
   boid2.pos = {400., 270.};
   boid2.vel = {-10., 0.};
   boidstate boid3;
-  boid3.pos = {200., 480.};
+  boid3.pos = {360., 300.};
   boid3.vel = {13., 45.};
   boidstate boid4;
   boid4.pos = {0., 0.};
@@ -219,7 +219,7 @@ TEST_CASE("Testing boid sight")
         boids::functions<boidstate>::template neighbors<Criterion::any>(
             pair5, boid1, 10000., params.alpha);
 
-    CHECK(result5.size() == 1);
+    CHECK(result5.size() == 0);
   }
 }
 // namespace boids
