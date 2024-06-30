@@ -116,13 +116,10 @@ TEST_CASE("Testing the speed limits")
 
   SUBCASE("Testing the velocity before the adjustment")
   {
-    CHECK(boids::mod(boid1.vel)
-          == doctest::Approx(300.167));
+    CHECK(boids::mod(boid1.vel) == doctest::Approx(300.167));
     CHECK(boids::mod(boid2.vel) == doctest::Approx(5.));
-    CHECK(boids::mod(boid3.vel)
-          == doctest::Approx(131.712));
-    CHECK(boids::mod(boid4.vel)
-          == doctest::Approx(407.344));
+    CHECK(boids::mod(boid3.vel) == doctest::Approx(131.712));
+    CHECK(boids::mod(boid4.vel) == doctest::Approx(407.344));
   }
 
   std::for_each(boids.begin(), boids.end(), [&params](boidstate& boid) {
