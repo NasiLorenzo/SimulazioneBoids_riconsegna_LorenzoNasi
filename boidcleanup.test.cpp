@@ -222,4 +222,47 @@ TEST_CASE("Testing boid sight")
     CHECK(result5.size() == 0);
   }
 }
+
+TEST_CASE("Testing the limit distance")
+{
+  paramlist params{};
+  params.repulsione      = 0.7;
+  params.steering        = 0.1;
+  params.coesione        = 0.1;
+  params.neigh_repulsion = 100;
+  params.neigh_align     = 100;
+  params.alpha           = 2*M_PI;
+  params.attraction      = 0;
+  params.speedlimit      = 3500.;
+  params.speedminimum    = 3500.;
+
+  boidstate boid1;
+  boid1.pos = {0., 50.};
+  boid1.vel = {30., 0.};
+  boidstate boid2;
+  boid2.pos = {700., 500.};
+  boid2.vel = {-10., 0.};
+  boidstate boid3;
+  boid3.pos = {2., 55.};
+  boid3.vel = {13., 45.};
+  
+  SUBCASE("Testing if boid1 sees boid2")
+  {
+    std::vector<boidstate> pair1{boid1, boid2};
+    auto result1 =
+        boids::functions<boidstate>::template neighbors<Criterion::any>(
+            pair1, boid1, 100., params.alpha);
+
+    CHECK(result1.size() == 1);
+  }
+  SUBCASE("Testing if boid1 sees boid3")
+  {
+    std::vector<boidstate> pair2{boid1, boid3};
+    auto result1 =
+        boids::functions<boidstate>::template neighbors<Criterion::any>(
+            pair2, boid1, 100., params.alpha);
+
+    CHECK(result1.size() == 0);
+  }
+}
 // namespace boids
