@@ -3,7 +3,7 @@
 namespace boids {
 
 std::bitset<8> FlagOpt;
-
+double params::rate=1;
 /*
 void ensemble::update2(paramlist const& params)
 {
