@@ -1,5 +1,5 @@
-#ifndef SFMLBOID_HPP
-#define SFMLBOID_HPP
+#ifndef SFMLBOIDS_HPP
+#define SFMLBOIDS_HPP
 #include "boids.hpp"
 namespace boids {
 struct RGB

@@ -1,4 +1,4 @@
-#include "sfmlboid.hpp"
+#include "sfmlboids.hpp"
 #include "boids.hpp"
 int main()
 {
