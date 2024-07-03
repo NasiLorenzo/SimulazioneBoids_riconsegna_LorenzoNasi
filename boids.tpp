@@ -62,62 +62,57 @@ auto functions<boidtype>::neighbors(std::vector<boidtype> const& set,
                                     const double alpha)
 {
   std::vector<boidtype const*> neighbors{};
-  std::for_each(set.begin(), set.end(),
-                [&](auto& neighbor) {
-                  auto distanza = distance(boid.pos, neighbor.pos);
-                  if (distanza < pow(d, 2) && distanza != 0
-                      && (criterion == Criterion::any
-                          || (criterion == Criterion::similar
-                              && boid.flockID == neighbor.flockID))) {
-                    auto cosangolo = cosangleij(neighbor.pos-boid.pos,boid.vel);
-                    if ((cosangolo) >= std::cos(alpha)) {
-                      neighbors.emplace_back(&neighbor);
-                    }
-                  }
-                });
-  return neighbors;
-}
-template<class boidtype>
-auto functions<boidtype>::neighbors(std::vector<boidtype const*> const& set,
-                      boidtype const& boid, const double d, const double alpha)
-{
-  std::vector<boidtype const*> neighbors{};
   std::for_each(set.begin(), set.end(), [&](auto& neighbor) {
-    auto distanza =distance(boid.pos, neighbor->pos);
-        if ( distanza< pow(d, 2)
-        && distanza != 0) {
-      auto cosangolo = cosangleij(neighbor->pos-boid.pos,boid.vel);
+    auto distanza = distance(boid.pos, neighbor.pos);
+    if (distanza < pow(d, 2) && distanza != 0
+        && (criterion == Criterion::any
+            || (criterion == Criterion::similar
+                && boid.flockID == neighbor.flockID))) {
+      auto cosangolo = cosangleij(neighbor.pos - boid.pos, boid.vel);
       if ((cosangolo) >= std::cos(alpha)) {
-        neighbors.emplace_back(neighbor);
+        neighbors.emplace_back(&neighbor);
       }
     }
   });
   return neighbors;
 }
 template<class boidtype>
-void functions<boidtype>::regola1(std::vector<boidtype const*>& neighbors, boidtype& boid,
-                      const double repulsione)
-  {
-    std::for_each(neighbors.begin(), neighbors.end(), [&](auto& neighbor) {
-      auto x = neighbor->pos - boid.pos;
-      boid.vel += -repulsione * x;
-    });
-  }
+auto functions<boidtype>::neighbors(std::vector<boidtype const*> const& set,
+                                    boidtype const& boid, const double d)
+{
+  std::vector<boidtype const*> neighbors{};
+  std::for_each(set.begin(), set.end(), [&](auto& neighbor) {
+    auto distanza = distance(boid.pos, neighbor->pos);
+    if (distanza < pow(d, 2) && distanza != 0) {
+      neighbors.emplace_back(neighbor);
+    }
+  });
+  return neighbors;
+}
+template<class boidtype>
+void functions<boidtype>::regola1(std::vector<boidtype const*>& neighbors,
+                                  boidtype& boid, const double repulsione)
+{
+  std::for_each(neighbors.begin(), neighbors.end(), [&](auto& neighbor) {
+    auto x = neighbor->pos - boid.pos;
+    boid.vel += -repulsione * x;
+  });
+}
 
 template<class boidtype>
 void functions<boidtype>::regola2_3(std::vector<boidtype const*>& neighbors,
-                        boidtype& oldboid, boidtype& boid,
-                        const double steering, const double cohesion)
-  {
-    auto n = neighbors.size();
-    std::for_each(neighbors.begin(), neighbors.end(), [&](auto& neighbor) {
-      auto x = neighbor->vel - oldboid.vel;
-      boid.vel += steering / n * x;
-      auto y = neighbor->pos - boid.pos;
-      boid.vel += cohesion / n * y;
-    });
-  }
-
+                                    boidtype& oldboid, boidtype& boid,
+                                    const double steering,
+                                    const double cohesion)
+{
+  auto n = neighbors.size();
+  std::for_each(neighbors.begin(), neighbors.end(), [&](auto& neighbor) {
+    auto x = neighbor->vel - oldboid.vel;
+    boid.vel += steering / n * x;
+    auto y = neighbor->pos - boid.pos;
+    boid.vel += cohesion / n * y;
+  });
+}
 
 } // namespace boids
 #endif

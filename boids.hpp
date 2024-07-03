@@ -65,8 +65,7 @@ struct functions
                         const double d, const double alpha);
 
   static auto neighbors(std::vector<boidtype const*> const& set,
-                        boidtype const& boid, const double d,
-                        const double alpha);
+                        boidtype const& boid, const double d);
 
   static void regola1(std::vector<boidtype const*>& neighbors, boidtype& boid,
                       const double repulsione);
@@ -107,7 +106,7 @@ class ensemble
          ++it, ++jt) {
       std::vector<boidtype const*> neighbor;
       std::vector<boidtype const*> close_neighbor;
-      if (params.flocksize / params.size == 0) {
+      if (params.flocksize < params.size) {
         neighbor =
             boids::functions<boidtype>::template neighbors<Criterion::similar>(
                 set, *jt, params.neigh_align, params.alpha);
@@ -119,7 +118,7 @@ class ensemble
             boids::functions<boidtype>::template neighbors<Criterion::any>(
                 set, *jt, params.neigh_align, params.alpha);
         close_neighbor = functions<boidtype>::neighbors(
-            neighbor, *jt, params.neigh_repulsion, params.alpha);
+            neighbor, *jt, params.neigh_repulsion);
       }
       functions<boidtype>::regola1(close_neighbor, *jt, params.repulsione);
       functions<boidtype>::regola2_3(neighbor, *it, *jt, params.steering,
