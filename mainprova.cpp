@@ -70,22 +70,9 @@ double distance2(boidstate const& a, boidstate const& b)
 
 int main()
 {
-  using std::chrono::duration;
-  using std::chrono::duration_cast;
-  using std::chrono::high_resolution_clock;
-  using std::chrono::milliseconds;
-  boidstate a{};
-  a.pos = {1., 1.};
-  boidstate b;
-  b.pos  = {1., 7.};
-  
-  auto t1 = high_resolution_clock::now();
-  auto c = distance2(a, b);
-  auto t2 = high_resolution_clock::now();
+  DoubleVec a{-1.,-1.};
+  DoubleVec b{1.,1.};
+  std::cout<<"cos angolo "<<boids::cosangleij(a,b)<<"\n";
 
-  /* Getting number of milliseconds as a double. */
-  duration<double, std::milli> ms_double = t2 - t1;
-  std::cout << c << "\n";
-  std::cout << ms_double.count() << "ms\n";
   
 }

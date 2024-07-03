@@ -150,6 +150,7 @@ TEST_CASE("Testing boid sight")
   params.speedlimit      = 3500.;
   params.speedminimum    = 3200.;
   params.flocksize       = 10;
+  params.size            = 10;
   boidstate boid1;
   boid1.pos = {350., 270.};
   boid1.vel = {30., 0.};
@@ -176,7 +177,7 @@ TEST_CASE("Testing boid sight")
     auto result1 =
         boids::functions<boidstate>::template neighbors<Criterion::any>(
             pair1, boid1, 10000., params.alpha);
-
+    CHECK(boids::cosangleij(boid2.pos-boid1.pos,boid1.vel)==doctest::Approx(cos(0)).epsilon(0.001));
     CHECK(result1.size() == 1);
   }
 
@@ -188,6 +189,7 @@ TEST_CASE("Testing boid sight")
         boids::functions<boidstate>::template neighbors<Criterion::any>(
             pair2, boid1, 10000., params.alpha);
 
+    CHECK(boids::cosangleij(boid3.pos-boid1.pos,boid1.vel)==doctest::Approx(cos(1.2490)).epsilon(0.001));
     CHECK(result2.size() == 0);
   }
 
@@ -198,7 +200,7 @@ TEST_CASE("Testing boid sight")
     auto result3 =
         boids::functions<boidstate>::template neighbors<Criterion::any>(
             pair3, boid1, 10000., params.alpha);
-
+    CHECK(boids::cosangleij(boid4.pos-boid1.pos,boid1.vel)==doctest::Approx(cos(3.798)).epsilon(0.001));
     CHECK(result3.size() == 0);
   }
 
@@ -209,6 +211,7 @@ TEST_CASE("Testing boid sight")
     auto result4 =
         boids::functions<boidstate>::template neighbors<Criterion::any>(
             pair4, boid1, 10000., params.alpha);
+    CHECK(boids::cosangleij(boid5.pos-boid1.pos,boid1.vel)==doctest::Approx(cos(M_PI)).epsilon(0.001));
     CHECK(result4.size() == 0);
   }
 
@@ -219,7 +222,6 @@ TEST_CASE("Testing boid sight")
     auto result5 =
         boids::functions<boidstate>::template neighbors<Criterion::any>(
             pair5, boid1, 10000., params.alpha);
-
     CHECK(result5.size() == 0);
   }
 }
