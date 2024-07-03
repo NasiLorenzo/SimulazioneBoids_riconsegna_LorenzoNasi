@@ -57,10 +57,19 @@ DoubleVec normalize(DoubleVec& vec)
 }
 
 double distance(DoubleVec const& a, DoubleVec const& b)
-  {
-    return std::transform_reduce(
-        a.begin(), a.end(), b.begin(), 0, std::plus<>(),
-        [](double a, double b) { return pow(a - b, 2); });
-  }
+{
+  return std::transform_reduce(
+      a.begin(), a.end(), b.begin(), 0, std::plus<>(),
+      [](double a, double b) { return pow(a - b, 2); });
+}
+
+double cosangleij(DoubleVec const& a, DoubleVec const& b)
+{
+  auto c = a;
+  auto d = b;
+  c      = normalize(c);
+  d      = normalize(d);
+  return std::inner_product(c.begin(), c.end(), d.begin(), 0.);
+}
 
 } // namespace boids

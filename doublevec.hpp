@@ -43,6 +43,8 @@ double mod(DoubleVec const& vec);
 DoubleVec normalize(DoubleVec& vec);
 
 double distance(DoubleVec const& a, DoubleVec const& b);
+
+double cosangleij(DoubleVec const&a, DoubleVec const&b);
 } // namespace boids
 
 #endif

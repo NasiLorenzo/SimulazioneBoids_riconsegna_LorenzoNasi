@@ -17,7 +17,7 @@ TEST_CASE("Testing rules")
   params.speedminimum    = 0;
   params.size            = 10;
   params.deltaT          = 1 / 30.f;
-  params.flocksize     = 10;
+  params.flocksize       = 10;
   boidstate boid1;
   boid1.pos = {700., 200.};
   boid1.vel = {300., -10.};
@@ -99,7 +99,8 @@ TEST_CASE("Testing the speed limits")
   params.attraction      = 0;
   params.speedlimit      = 3500.;
   params.speedminimum    = 3500.;
-
+  params.size            = 10;
+  params.flocksize       = 10;
   boidstate boid1;
   boid1.pos = {700., 200.};
   boid1.vel = {300., -10.};
@@ -148,7 +149,7 @@ TEST_CASE("Testing boid sight")
   params.attraction      = 0;
   params.speedlimit      = 3500.;
   params.speedminimum    = 3200.;
-
+  params.flocksize       = 10;
   boidstate boid1;
   boid1.pos = {350., 270.};
   boid1.vel = {30., 0.};
@@ -245,14 +246,14 @@ TEST_CASE("Testing the limit distance")
   boidstate boid3;
   boid3.pos = {2., 55.};
   boid3.vel = {13., 45.};
-  
+
   SUBCASE("Testing if boid1 sees boid2")
   {
     std::vector<boidstate> pair1{boid1, boid2};
     auto result1 =
         boids::functions<boidstate>::template neighbors<Criterion::any>(
             pair1, boid1, params.neigh_align, params.alpha);
-    CHECK(sqrt(distance(boid1.pos,boid2.pos))==doctest::Approx(832.165));
+    CHECK(sqrt(distance(boid1.pos, boid2.pos)) == doctest::Approx(832.165));
     CHECK(result1.size() == 0);
   }
   SUBCASE("Testing if boid1 sees boid3")
@@ -261,7 +262,7 @@ TEST_CASE("Testing the limit distance")
     auto result2 =
         boids::functions<boidstate>::template neighbors<Criterion::any>(
             pair2, boid1, params.neigh_align, params.alpha);
-    CHECK(sqrt(distance(boid1.pos,boid3.pos))==doctest::Approx(5.38516));
+    CHECK(sqrt(distance(boid1.pos, boid3.pos)) == doctest::Approx(5.38516));
     CHECK(result2.size() == 1);
   }
 }

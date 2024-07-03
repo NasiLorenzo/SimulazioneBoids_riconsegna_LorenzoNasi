@@ -62,25 +62,16 @@ auto functions<boidtype>::neighbors(std::vector<boidtype> const& set,
                                     const double alpha)
 {
   std::vector<boidtype const*> neighbors{};
-  // int i = 0;
-  std::for_each(set.begin(), set.end(), /*[&i]() { return i < 10; },*/
+  std::for_each(set.begin(), set.end(),
                 [&](auto& neighbor) {
                   auto distanza = distance(boid.pos, neighbor.pos);
-                  std::cout<<"la distanza è "<<distanza<<"\n";
                   if (distanza < pow(d, 2) && distanza != 0
                       && (criterion == Criterion::any
                           || (criterion == Criterion::similar
                               && boid.flockID == neighbor.flockID))) {
-                    auto deltax = neighbor.pos - boid.pos;
-                    auto velcopia      = boid.vel;
-                    if (mod(boid.vel) != 0)
-                      deltax = normalize(deltax);
-                    velcopia                  = normalize(velcopia);
-                    double prodscalare = std::inner_product(
-                        deltax.begin(), deltax.end(), velcopia.begin(), 0.);
-                    if ((prodscalare) >= std::cos(alpha)) {
+                    auto cosangolo = cosangleij(neighbor.pos-boid.pos,boid.vel);
+                    if ((cosangolo) >= std::cos(alpha)) {
                       neighbors.emplace_back(&neighbor);
-                      //++i;
                     }
                   }
                 });
@@ -92,16 +83,11 @@ auto functions<boidtype>::neighbors(std::vector<boidtype const*> const& set,
 {
   std::vector<boidtype const*> neighbors{};
   std::for_each(set.begin(), set.end(), [&](auto& neighbor) {
-    if (distance(boid.pos, neighbor->pos) < pow(d, 2)
-        && distance(boid.pos, neighbor->pos) != 0) {
-      DoubleVec deltax = neighbor->pos - boid.pos;
-      DoubleVec y      = boid.vel;
-      if (mod(boid.vel) != 0)
-        deltax = normalize(deltax);
-      y = normalize(y);
-      double prodscalare =
-          std::inner_product(deltax.begin(), deltax.end(), y.begin(), 0.);
-      if ((prodscalare) >= std::cos(alpha)) {
+    auto distanza =distance(boid.pos, neighbor->pos);
+        if ( distanza< pow(d, 2)
+        && distanza != 0) {
+      auto cosangolo = cosangleij(neighbor->pos-boid.pos,boid.vel);
+      if ((cosangolo) >= std::cos(alpha)) {
         neighbors.emplace_back(neighbor);
       }
     }
