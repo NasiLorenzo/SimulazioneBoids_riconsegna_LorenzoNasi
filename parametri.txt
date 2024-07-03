@@ -1,4 +1,4 @@
-repulsione       0.9    //tenere il parametro di repulsione un ordine di grandezza superiore agli altri due
+repulsione       0.6    //tenere il parametro di repulsione un ordine di grandezza superiore agli altri due
 steering         0.04
 coesione         0.08
 neigh_align      200

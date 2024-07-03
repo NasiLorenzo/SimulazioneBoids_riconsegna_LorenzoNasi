@@ -1,5 +1,5 @@
 #include "SFMLboid.hpp"
-#include "boidcleanup.hpp"
+#include "boids.hpp"
 int main()
 {
   boids::paramlist params{};

@@ -1,5 +1,5 @@
-#ifndef BOIDCLEANUP_HPP
-#define BOIDCLEANUP_HPP
+#ifndef BOIDS_HPP
+#define BOIDS_HPP
 #include "doublevec.hpp"
 namespace boids {
 
@@ -139,5 +139,5 @@ class ensemble
   }
 };
 } // namespace boids
-#include "boidcleanup.tpp" // namespace boids
+#include "boids.tpp" // namespace boids
 #endif

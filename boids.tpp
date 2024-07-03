@@ -1,11 +1,10 @@
-#ifndef BOIDCLEANUP_TPP
-#define BOIDCLEANUP_TPP
+#ifndef BOIDS_TPP
+#define BOIDS_TPP
 #include <algorithm>
 #include <cmath>
 #include <numeric>
 #include <random>
 #include <vector>
-// #include "boidcleanup.hpp"
 namespace boids {
 
 template<class boidtype>

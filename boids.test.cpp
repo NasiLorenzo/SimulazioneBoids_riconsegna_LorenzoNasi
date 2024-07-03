@@ -1,5 +1,5 @@
 #define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
-#include "boidcleanup.hpp"
+#include "boids.hpp"
 #include "doctest.h"
 using namespace boids;
 

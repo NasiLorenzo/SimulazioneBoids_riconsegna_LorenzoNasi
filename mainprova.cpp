@@ -1,4 +1,4 @@
-#include "boidcleanup.hpp"
+#include "boids.hpp"
 using namespace boids;
 using namespace std::chrono_literals;
 
