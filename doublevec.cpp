@@ -23,12 +23,6 @@ DoubleVec operator*(const double a, DoubleVec& b)
   return b;
 }
 
-DoubleVec operator/(double a, DoubleVec& b)
-{
-  std::for_each(b.begin(), b.end(), [&a](double x) { return a / x; });
-  return b;
-}
-
 DoubleVec operator/(DoubleVec& b, double a)
 {
   std::for_each(b.begin(), b.end(), [&a](double& x) { x = x / a; });

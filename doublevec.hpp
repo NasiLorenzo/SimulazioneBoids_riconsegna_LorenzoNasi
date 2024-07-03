@@ -32,8 +32,6 @@ DoubleVec operator-(DoubleVec const& a, DoubleVec const& b);
 
 DoubleVec operator*(const double a, DoubleVec& b);
 
-DoubleVec operator/(double a, DoubleVec& b);
-
 DoubleVec operator/(DoubleVec& b, double a);
 
 DoubleVec operator+=(DoubleVec& a, DoubleVec const& b);
