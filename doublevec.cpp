@@ -1,7 +1,7 @@
 #include "doublevec.hpp"
 
 namespace boids {
-DoubleVec operator+(const DoubleVec& a, const DoubleVec& b)
+DoubleVec operator+(DoubleVec const& a, DoubleVec const& b)
 {
   DoubleVec result{};
   std::transform(a.begin(), a.end(), b.begin(), result.begin(),
@@ -23,7 +23,7 @@ DoubleVec operator*(const double a, DoubleVec& b)
   return b;
 }
 
-DoubleVec operator/(DoubleVec& b, double a)
+DoubleVec operator/(DoubleVec& b, const double a)
 {
   std::for_each(b.begin(), b.end(), [&a](double& x) { x = x / a; });
   return b;
@@ -48,7 +48,7 @@ double mod(DoubleVec const& vec)
                       [](double sum, double x) { return sum = sum + x * x; }));
 }
 
-DoubleVec normalize(DoubleVec& vec)
+DoubleVec normalize(DoubleVec const& vec)
 {
   auto modulo = mod(vec);
   if (modulo == 0)

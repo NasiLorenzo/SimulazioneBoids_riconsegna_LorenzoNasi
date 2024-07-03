@@ -26,13 +26,13 @@ struct params
 };
 typedef std::array<double, params::dim> DoubleVec;
 
-DoubleVec operator+(const DoubleVec& a, const DoubleVec& b);
+DoubleVec operator+(DoubleVec const& a, DoubleVec const& b);
 
 DoubleVec operator-(DoubleVec const& a, DoubleVec const& b);
 
 DoubleVec operator*(const double a, DoubleVec& b);
 
-DoubleVec operator/(DoubleVec& b, double a);
+DoubleVec operator/(DoubleVec& b, const double a);
 
 DoubleVec operator+=(DoubleVec& a, DoubleVec const& b);
 
@@ -40,7 +40,7 @@ double angle(DoubleVec const& vec);
 
 double mod(DoubleVec const& vec);
 
-DoubleVec normalize(DoubleVec& vec);
+DoubleVec normalize(DoubleVec const& vec);
 
 double distance(DoubleVec const& a, DoubleVec const& b);
 } // namespace boids
