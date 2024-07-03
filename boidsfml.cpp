@@ -1,5 +1,5 @@
-#include "sfmlboids.hpp"
 #include "boids.hpp"
+#include "sfmlboids.hpp"
 int main()
 {
   boids::paramlist params{};
@@ -59,60 +59,55 @@ int main()
   std::cout << "speedminimum: " << params.speedminimum << std::endl;
   std::cout << "deltaT: " << params.deltaT << std::endl;
   std::cout << "size" << params.size << std::endl;
+
   std::random_device r;
+
   std::default_random_engine eng(r());
+
   std::vector<boids::SFMLboid> flock =
       boids::functions<boids::SFMLboid>::generator(eng, params);
+
   boids::ensemble<boids::SFMLboid> prova(flock);
   std::vector<boids::RGB> colorvec = boids::generatecolors(eng, params);
-  prova.update(params);
-  std::cout << "dimesione dopo update " << prova.size_() << "\n";
-  prova.update(params);
-  std::cout << "dimesione dopo update " << prova.size_() << "\n";
+
   for (auto& it : prova.newset_()) {
     it.arrow.setFillColor(sf::Color(colorvec[it.flockID].red,
                                     colorvec[it.flockID].green,
                                     colorvec[it.flockID].blue));
-    std::cout << "Id " << it.flockID << "\n";
   }
+
   sf::RenderWindow window(sf::VideoMode(params.pixel[0], params.pixel[1]),
                           "Boids Simulation");
 
-  // Desired frame rate
   const sf::Time frameTime = sf::seconds(params.deltaT);
 
   sf::Clock clock;
-  // sf::Time accumulator = sf::Time::Zero;
 
-  /*sf::Texture texture;
-  texture.loadFromFile("tramonto.jpg");
-  sf::Sprite backgroundSprite(texture);*/
-  while (window.isOpen()) {
-    sf::Event event;
-    while (window.pollEvent(event)) {
-      if (event.type == sf::Event::Closed)
+  sf::Texture texture;
+  texture.loadFromFile("cumuli-modified.jpg");
+  sf::Sprite backgroundSprite(texture);
+  auto resizeX = static_cast<float>(params.pixel[0]) / texture.getSize().x;
+  auto resizeY = static_cast<float>(params.pixel[1])/texture.getSize().y;
+  
+  backgroundSprite.setScale(resizeX,resizeY); 
+  
+  while (window.isOpen())
+  {
+    sf::Event evento;
+    while (window.pollEvent(evento)) {
+      if (evento.type == sf::Event::Closed)
         window.close();
     }
-    // Calculate elapsed time for this frame
+    
     clock.restart();
-    // accumulator += elapsedTime;
-
-    // Adding a background image
-    /*sf::FileInputStream stream;
-    stream.open("tramonto.jpg");*/
     prova.update(params);
     window.clear(sf::Color::White);
-    // window.draw(backgroundSprite);
+    //window.draw(backgroundSprite);
     //  Draw boids
     for (auto& boid : prova.newset_()) {
       float angle = static_cast<float>(
           boids::angle(boid.vel)); // Assuming you have the angle in degrees
 
-      // Arrow length and width
-      /*float arrowLength = 10;
-      float arrowWidth  = 5;*/
-
-      // Calculate arrow positiion          ;
       boid.arrow.setPosition(
           static_cast<float>(boid.pos[0] / boids::params::rate),
           static_cast<float>(boid.pos[1] / boids::params::rate));

@@ -54,6 +54,7 @@ void functions<boidtype>::speedadjust(boidtype& boid, const double speedlimit,
     boid.vel = speedminimum * boid.vel;
   }
 }
+
 template<class boidtype>
 template<Criterion criterion>
 auto functions<boidtype>::neighbors(std::vector<boidtype> const& set,
@@ -69,13 +70,13 @@ auto functions<boidtype>::neighbors(std::vector<boidtype> const& set,
                       && (criterion == Criterion::any
                           || (criterion == Criterion::similar
                               && boid.flockID == neighbor.flockID))) {
-                    DoubleVec deltax = neighbor.pos - boid.pos;
-                    DoubleVec y      = boid.vel;
+                    auto deltax = neighbor.pos - boid.pos;
+                    auto velcopia      = boid.vel;
                     if (mod(boid.vel) != 0)
                       deltax = normalize(deltax);
-                    y                  = normalize(y);
+                    velcopia                  = normalize(velcopia);
                     double prodscalare = std::inner_product(
-                        deltax.begin(), deltax.end(), y.begin(), 0.);
+                        deltax.begin(), deltax.end(), velcopia.begin(), 0.);
                     if ((prodscalare) >= std::cos(alpha)) {
                       neighbors.emplace_back(&neighbor);
                       //++i;
