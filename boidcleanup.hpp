@@ -49,97 +49,27 @@ for_each_if(Iterator begin, Iterator end, predicate p, operation op)
 template<class boidtype>
 struct functions
 {
-  static boidtype generate(std::default_random_engine&);
+  static auto generate(std::default_random_engine&);
 
-  static std::vector<boidtype> generator(std::default_random_engine& eng,
-                                         paramlist const& params);
+  static auto generator(std::default_random_engine& eng,
+                        paramlist const& params);
 
   static void speedadjust(boidtype& boid, const double speedlimit,
-                          const double speedminimum)
-  {
-    auto vnorm = mod(boid.vel);
-    if (vnorm > speedlimit) {
-      normalize(boid.vel);
-      boid.vel = speedlimit * boid.vel;
-    }
-    if (vnorm < speedminimum) {
-      normalize(boid.vel);
-      boid.vel = speedminimum * boid.vel;
-    }
-  }
+                          const double speedminimum);
   template<Criterion criterion>
   static auto neighbors(std::vector<boidtype> const& set, boidtype const& boid,
-                        const double d, const double alpha)
-  {
-    std::vector<boidtype const*> neighbors{};
-    // int i = 0;
-    std::for_each(set.begin(), set.end(), /*[&i]() { return i < 10; },*/
-                  [&](auto& neighbor) {
-                    auto distanza = distance(boid.pos, neighbor.pos);
-                    if (distanza < pow(d, 2) && distanza != 0
-                        && (criterion == Criterion::any
-                            || (criterion == Criterion::similar
-                                && boid.flockID == neighbor.flockID))) {
-                      DoubleVec deltax = neighbor.pos - boid.pos;
-                      DoubleVec y      = boid.vel;
-                      if (mod(boid.vel) != 0)
-                        deltax = normalize(deltax);
-                      y                  = normalize(y);
-                      double prodscalare = std::inner_product(
-                          deltax.begin(), deltax.end(), y.begin(), 0.);
-                      if ((prodscalare) >= std::cos(alpha)) {
-                        neighbors.emplace_back(&neighbor);
-                        //++i;
-                      }
-                    }
-                  });
-    return neighbors;
-  }
+                        const double d, const double alpha);
 
   static auto neighbors(std::vector<boidtype const*> const& set,
                         boidtype const& boid, const double d,
-                        const double alpha)
-  {
-    std::vector<boidtype const*> neighbors{};
-    std::for_each(set.begin(), set.end(), [&](auto& neighbor) {
-      if (distance(boid.pos, neighbor->pos) < pow(d, 2)
-          && distance(boid.pos, neighbor->pos) != 0) {
-        DoubleVec deltax = neighbor->pos - boid.pos;
-        DoubleVec y      = boid.vel;
-        if (mod(boid.vel) != 0)
-          deltax = normalize(deltax);
-        y = normalize(y);
-        double prodscalare =
-            std::inner_product(deltax.begin(), deltax.end(), y.begin(), 0.);
-        if ((prodscalare) >= std::cos(alpha)) {
-          neighbors.emplace_back(neighbor);
-        }
-      }
-    });
-    return neighbors;
-  }
+                        const double alpha);
 
   static void regola1(std::vector<boidtype const*>& neighbors, boidtype& boid,
-                      const double repulsione)
-  {
-    std::for_each(neighbors.begin(), neighbors.end(), [&](auto& neighbor) {
-      auto x = neighbor->pos - boid.pos;
-      boid.vel += -repulsione * x;
-    });
-  }
+                      const double repulsione);
 
   static void regola2_3(std::vector<boidtype const*>& neighbors,
                         boidtype& oldboid, boidtype& boid,
-                        const double steering, const double cohesion)
-  {
-    auto n = neighbors.size();
-    std::for_each(neighbors.begin(), neighbors.end(), [&](auto& neighbor) {
-      auto x = neighbor->vel - oldboid.vel;
-      boid.vel += steering / n * x;
-      auto y = neighbor->pos - boid.pos;
-      boid.vel += cohesion / n * y;
-    });
-  }
+                        const double steering, const double cohesion);
 };
 
 template<class boidtype>
@@ -208,6 +138,6 @@ class ensemble
     set = newset;
   }
 };
-} 
-#include "boidcleanup.tpp"// namespace boids
+} // namespace boids
+#include "boidcleanup.tpp" // namespace boids
 #endif

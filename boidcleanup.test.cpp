@@ -17,7 +17,7 @@ TEST_CASE("Testing rules")
   params.speedminimum    = 0;
   params.size            = 10;
   params.deltaT          = 1 / 30.f;
-  params.flocknumber     = 10;
+  params.flocksize     = 10;
   boidstate boid1;
   boid1.pos = {700., 200.};
   boid1.vel = {300., -10.};
