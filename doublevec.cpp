@@ -48,7 +48,7 @@ double mod(DoubleVec const& vec)
                       [](double sum, double x) { return sum = sum + x * x; }));
 }
 
-DoubleVec normalize(DoubleVec const& vec)
+DoubleVec normalize(DoubleVec& vec)
 {
   auto modulo = mod(vec);
   if (modulo == 0)

@@ -40,7 +40,7 @@ double angle(DoubleVec const& vec);
 
 double mod(DoubleVec const& vec);
 
-DoubleVec normalize(DoubleVec const& vec);
+DoubleVec normalize(DoubleVec& vec);
 
 double distance(DoubleVec const& a, DoubleVec const& b);
 } // namespace boids

@@ -1,19 +1,8 @@
-#include "SFMLboid.hpp"
+#include "sfmlboid.hpp"
 #include "boids.hpp"
 int main()
 {
   boids::paramlist params{};
-  /*params.repulsione      = 0.2;
-  params.steering        = 0.04;
-  params.coesione        = 0.08;
-  params.neigh_align     = 200;
-  params.neigh_repulsion = 15;
-  params.attraction      = 1.0;
-  params.alpha           = (1. / 3.) * M_PI;
-  params.speedlimit      = 100;
-  params.speedminimum    = 40;
-  params.deltaT          = 1 / 30.;*/
-
   std::ifstream input{"parametri.txt"};
   if (!input) {
     std::cerr << "File di input non trovato!\n";

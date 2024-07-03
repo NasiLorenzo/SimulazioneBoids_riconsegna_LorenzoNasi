@@ -23,8 +23,12 @@ struct paramlist
   float deltaT;
   unsigned int size;
   unsigned int flocksize;
-  std::vector<unsigned int> pixel{1010, 710};
+  std::vector<unsigned int> pixel;
   double bordersize;
+
+  paramlist()
+      : pixel(params::dim)
+  {}
 };
 struct boidstate
 {
