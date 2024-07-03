@@ -1,4 +1,4 @@
-#include "SFMLboid.hpp"
+#include "sfmlboid.hpp"
 namespace boids {
 std::vector<RGB> generatecolors(std::default_random_engine& eng,
                                 paramlist const& params)
