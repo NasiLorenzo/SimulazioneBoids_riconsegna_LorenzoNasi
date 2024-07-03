@@ -22,7 +22,7 @@ struct paramlist
   double speedminimum;
   float deltaT;
   unsigned int size;
-  unsigned int flocknumber;
+  unsigned int flocksize;
   std::vector<unsigned int> pixel{1010, 710};
   double bordersize;
 };
@@ -49,40 +49,10 @@ for_each_if(Iterator begin, Iterator end, predicate p, operation op)
 template<class boidtype>
 struct functions
 {
-  static boidtype generate(std::default_random_engine& eng)
-  { // genera pos e vel di un boid distribuiti secondo
-    // una gauss centrata in 0
-    boidtype boid{};
-    // std::array<double,2> Uniform2D {std::uniform_real_distribution<double>
-    // dis(0, static_cast<double>(pixe * params::rate));};
-
-    std::normal_distribution<double> dist(0.0, params::sigma);
-    std::for_each(boid.pos.begin(), boid.pos.end(),
-                  [&](double& x) { x = dist(eng); });
-    std::for_each(boid.vel.begin(), boid.vel.end(),
-                  [&](double& x) { x = params::vel_factor * dist(eng); });
-    return boid;
-  }
+  static boidtype generate(std::default_random_engine&);
 
   static std::vector<boidtype> generator(std::default_random_engine& eng,
-                                         paramlist const& params)
-  {
-    std::vector<boidtype> set{};
-    for (unsigned int i = 0; i < params.size; i++) {
-      auto pix = params.pixel.begin(); // puntatore ai pixel
-      boidtype boidprova{generate(eng)};
-      boidprova.flockID = i / params.flocknumber;
-      for (auto it = boidprova.pos.begin(); it != boidprova.pos.end();
-           ++it, ++pix) {
-        std::uniform_real_distribution<double> dis(
-            0, static_cast<double>(*pix * params::rate));
-        *it += dis(eng);
-      }
-      set.push_back(boidprova);
-    }
-
-    return set;
-  }
+                                         paramlist const& params);
 
   static void speedadjust(boidtype& boid, const double speedlimit,
                           const double speedminimum)
@@ -203,7 +173,7 @@ class ensemble
          ++it, ++jt) {
       std::vector<boidtype const*> neighbor;
       std::vector<boidtype const*> close_neighbor;
-      if (params.flocknumber / params.size == 0) {
+      if (params.flocksize / params.size == 0) {
         neighbor =
             boids::functions<boidtype>::template neighbors<Criterion::similar>(
                 set, *jt, params.neigh_align, params.alpha);
@@ -238,6 +208,6 @@ class ensemble
     set = newset;
   }
 };
-} // namespace boids
-
+} 
+#include "boidcleanup.tpp"// namespace boids
 #endif

@@ -4,7 +4,7 @@ std::vector<RGB> generatecolors(std::default_random_engine& eng,
                                 paramlist const& params)
 {
   std::vector<RGB> colorvec{};
-  for (unsigned i = 0; i < params.size / params.flocknumber + 1; i++) {
+  for (unsigned i = 0; i < params.size / params.flocksize + 1; i++) {
     RGB color{};
     std::uniform_int_distribution dist(0, 255);
     color.red   = static_cast<uint8_t>(dist(eng));

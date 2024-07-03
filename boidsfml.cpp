@@ -47,8 +47,8 @@ int main()
         params.deltaT = static_cast<float>(value);
       else if (name == "size")
         params.size = static_cast<unsigned int>(value);
-      else if (name == "flocknumber")
-        params.flocknumber = static_cast<unsigned int>(value);
+      else if (name == "flocksize")
+        params.flocksize = static_cast<unsigned int>(value);
       else if (name == "pixel.x")
         params.pixel[0] = static_cast<unsigned int>(value);
       else if (name == "pixel.y")
