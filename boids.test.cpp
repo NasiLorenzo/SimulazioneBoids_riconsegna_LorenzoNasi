@@ -147,7 +147,7 @@ TEST_CASE("Testing boid sight")
   params.alpha           = M_PI / 4;
   params.attraction      = 0;
   params.speedlimit      = 3500.;
-  params.speedminimum    = 3500.;
+  params.speedminimum    = 3200.;
 
   boidstate boid1;
   boid1.pos = {350., 270.};
@@ -231,7 +231,7 @@ TEST_CASE("Testing the limit distance")
   params.coesione        = 0.1;
   params.neigh_repulsion = 100;
   params.neigh_align     = 100;
-  params.alpha           = 2*M_PI;
+  params.alpha           = M_PI;
   params.attraction      = 0;
   params.speedlimit      = 3500.;
   params.speedminimum    = 3500.;
@@ -251,18 +251,18 @@ TEST_CASE("Testing the limit distance")
     std::vector<boidstate> pair1{boid1, boid2};
     auto result1 =
         boids::functions<boidstate>::template neighbors<Criterion::any>(
-            pair1, boid1, 100., params.alpha);
-
-    CHECK(result1.size() == 1);
+            pair1, boid1, params.neigh_align, params.alpha);
+    CHECK(sqrt(distance(boid1.pos,boid2.pos))==doctest::Approx(832.165));
+    CHECK(result1.size() == 0);
   }
   SUBCASE("Testing if boid1 sees boid3")
   {
     std::vector<boidstate> pair2{boid1, boid3};
-    auto result1 =
+    auto result2 =
         boids::functions<boidstate>::template neighbors<Criterion::any>(
-            pair2, boid1, 100., params.alpha);
-
-    CHECK(result1.size() == 0);
+            pair2, boid1, params.neigh_align, params.alpha);
+    CHECK(sqrt(distance(boid1.pos,boid3.pos))==doctest::Approx(5.38516));
+    CHECK(result2.size() == 1);
   }
 }
 // namespace boids

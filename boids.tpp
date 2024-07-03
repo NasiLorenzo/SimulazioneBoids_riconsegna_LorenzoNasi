@@ -66,6 +66,7 @@ auto functions<boidtype>::neighbors(std::vector<boidtype> const& set,
   std::for_each(set.begin(), set.end(), /*[&i]() { return i < 10; },*/
                 [&](auto& neighbor) {
                   auto distanza = distance(boid.pos, neighbor.pos);
+                  std::cout<<"la distanza è "<<distanza<<"\n";
                   if (distanza < pow(d, 2) && distanza != 0
                       && (criterion == Criterion::any
                           || (criterion == Criterion::similar
