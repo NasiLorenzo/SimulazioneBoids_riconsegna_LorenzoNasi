@@ -8,5 +8,9 @@ I test sono nel file `boids.test.cpp`, mentre il main di SFML è in `boidsfml.cp
 
 I vettori che specificano posizioni e velocità dei boids sono di tipo `DoubleVec`, che è un alias per `std::array<double, params::dim>`, in modo tale che la loro dimensione sia nota al compile time.
 
+Per questi sono state inoltre definite le operazioni di somma, sottrazione, e moltiplicazione per scalare.
+
+
+
 
 
