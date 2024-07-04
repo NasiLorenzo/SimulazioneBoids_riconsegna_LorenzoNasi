@@ -32,7 +32,7 @@ DoubleVec operator/(DoubleVec& b, const double a)
 DoubleVec operator+=(DoubleVec& a, DoubleVec const& b)
 {
   std::transform(a.begin(), a.end(), b.begin(), a.begin(),
-                 [](double a, double b) { return a + b; });
+                 [](double c, double d) { return c + d; });
   return a;
 }
 
@@ -60,7 +60,7 @@ double distance(DoubleVec const& a, DoubleVec const& b)
 {
   return std::transform_reduce(
       a.begin(), a.end(), b.begin(), 0, std::plus<>(),
-      [](double a, double b) { return pow(a - b, 2); });
+      [](double c, double d) { return pow(c - d, 2); });
 }
 
 double cosangleij(DoubleVec const& a, DoubleVec const& b)
