@@ -2,6 +2,6 @@
 
 namespace boids {
 
-double params::rate{};
+double params::rate{1};
 
 } // namespace boids
