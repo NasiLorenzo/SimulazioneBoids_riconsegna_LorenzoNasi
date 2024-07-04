@@ -18,11 +18,9 @@
 namespace boids {
 struct params
 {
-  static constexpr double sigma{0.01};
   static constexpr unsigned int dim{2}; // dimensione
   static double
       rate; // rapporto tra la dimensione dello schermo e della generazione
-  static constexpr double vel_factor{10000};
 };
 typedef std::array<double, params::dim> DoubleVec;
 
