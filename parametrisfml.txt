@@ -14,3 +14,6 @@ pixel.x          1510
 pixel.y          910
 rate             1
 bordersize       50
+sigma            100
+
+ 

@@ -8,16 +8,16 @@
 namespace boids {
 
 template<class boidtype>
-auto functions<boidtype>::generate(std::default_random_engine& eng)
+auto functions<boidtype>::generate(std::default_random_engine& eng, paramlist const& params)
 { // genera pos e vel di un boid distribuiti secondo
   // una gauss centrata in 0
   boidtype boid{};
   // std::array<double,2> Uniform2D {std::uniform_real_distribution<double>
   // dis(0, static_cast<double>(pixe * params::rate));};
 
-  std::normal_distribution<double> dist(0.0, params::sigma);
+  std::normal_distribution<double> dist(0.0, params.sigma);
   std::for_each(boid.vel.begin(), boid.vel.end(),
-                [&](double& x) { x = params::vel_factor * dist(eng); });
+                [&](double& x) { x = dist(eng); });
   return boid;
 }
 template<class boidtype>
@@ -27,7 +27,7 @@ auto functions<boidtype>::generator(std::default_random_engine& eng,
   std::vector<boidtype> set{};
   for (unsigned int i = 0; i < params.size; i++) {
     auto pix = params.pixel.begin(); // puntatore ai pixel
-    boidtype boidprova{generate(eng)};
+    boidtype boidprova{generate(eng,params)};
     boidprova.flockID = i / params.flocksize;
     for (auto it = boidprova.pos.begin(); it != boidprova.pos.end();
          ++it, ++pix) {

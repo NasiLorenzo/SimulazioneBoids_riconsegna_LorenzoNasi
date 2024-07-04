@@ -46,6 +46,8 @@ int main()
         boids::params::rate = value;
       else if (name == "bordersize")
         params.bordersize = value;
+      else if (name == "sigma")
+        params.sigma = value;
     }
   }
   std::cout << "repulsione: " << params.repulsione << std::endl;

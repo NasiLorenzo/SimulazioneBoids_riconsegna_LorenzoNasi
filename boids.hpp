@@ -25,6 +25,7 @@ struct paramlist
   unsigned int flocksize;
   std::vector<unsigned int> pixel;
   double bordersize;
+  double sigma;
 
   paramlist()
       : pixel(params::dim)
@@ -53,7 +54,7 @@ for_each_if(Iterator begin, Iterator end, predicate p, operation op)
 template<class boidtype>
 struct functions
 {
-  static auto generate(std::default_random_engine&);
+  static auto generate(std::default_random_engine&, paramlist const& params);
 
   static auto generator(std::default_random_engine& eng,
                         paramlist const& params);
