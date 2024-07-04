@@ -3,7 +3,7 @@
 int main()
 {
   boids::paramlist params{};
-  std::ifstream input{"parametri.txt"};
+  std::ifstream input{"parametrisfml.txt"};
   if (!input) {
     std::cerr << "File di input non trovato!\n";
     return 1;
