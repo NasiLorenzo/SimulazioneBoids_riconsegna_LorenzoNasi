@@ -87,7 +87,7 @@ int main()
   params.speedminimum    = 80;
   params.deltaT          = static_cast<float>(0.0333);
   params.size            = 400;
-  params.flocksize       = 400;
+  params.flocksize       = 100;
   params.pixel[0]         = 1510;
   params.pixel[1]         = 910;
   params::rate            = 1;
