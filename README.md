@@ -20,7 +20,7 @@ Inoltre il costruttore di default della classe derivata inizializza l'istanza di
 
 ### ensemble
 
-Le informazioni sullo stormo necessarie per applicare le regole sono contenute nella classe `ensemble`, costituita dai membri privati `set` e `newset`, anche se questa scelta non è la più ottimale. L'aggiornamento dello stato dello stormo avviene attraverso il metodo `update()`, che agisce sui due membri. 
+Le informazioni sullo stormo necessarie per applicare le regole sono contenute nella classe `ensemble`, costituita dai membri privati `set` e `newset`, anche se questa scelta non è la più ottimale. L'aggiornamento dello stato dello stormo avviene attraverso il metodo `update()`, che agisce sui due membri. L'inizializzazione di un'istanza della classe ensemble viene fatta tramite un `std::vector<boidstate>` i cui valori vengono assegnati a `set` e `newset`.
 
 Per poter applicare le regole di volo è necessario definire delle funzioni che agiscano su degli `std::vector<boidstate>`, ed essendo queste funzioni esterne non è possibile sfruttare l'ereditarietà sulla classe derivata `SFMLboid`, e per questo motivo sono state definite come funzioni template, e lo stesso vale per la classe ensemble.
 
@@ -32,6 +32,12 @@ Le prime due funzioni sono `generate` e `generator`, la prima che genera un boid
 La funzione `neighbors` crea un vettore di puntatori costanti a `boidstate`, prendendo come input, alternativamente, un `std::vector<boidstate>` o direttamente un altro vettore di puntatori, oltre alla distanza di vicinanza, l'angolo visivo, e il boid di riferimento rispetto a cui calcolare la distanza. Inoltre essa contiene la possibilità di controllare, tramite un criterio definito in una `enum class`, se i vicini appartengono allo stesso stormo, e quindi se considerarli o meno. Il calcolo dell'angolo visivo avviene tramite la funzione `cosangleij`, che calcola il coseno dell'angolo compreso tra due `DoubleVec`.
 
 Successivamente ci sono le regole di volo, suddivise nella `regola1`e nella `regola2_3`, quest'ultime accorpate in quanto agiscono sugli stessi vicini. Esse prendono in input un boid su cui applicare le regole, i parametri necessari, e un vettore di vicini da usare per applicare le regole. 
-Infine c'è la funzione `speedadjust`, che riscala la velocità di un boid preso in input entro il range determinato.
+Dopo questo c'è la funzione `speedadjust`, che riscala la velocità di un boid preso in input entro il range determinato.
+Infine la funzione `bordercheck_posupdate`, controlla le condizioni al bordo e aggiorna la posizione del boid.
 
-Il metodo update, che ha accesso a `newset` e `set`, applica le regole di volo ad ogni boid, all'interno di un `std::for_each`. Quindi per ogni boid vengono creati i vettori dei vicini, e poi vengono applicate le tre regole citate nel paragrafo precedente.
+Il metodo update, che ha accesso a `newset` e `set`, applica le regole di volo ad ogni boid, all'interno di un `std::for_each`. Quindi per ogni boid vengono creati i vettori dei vicini, e poi vengono applicate le tre regole citate nel paragrafo precedente. Le modifiche vengono fatte a newset, prendendo i dati di input delle velocità da set. Infine bisogna aggiornare lo stato di set, che per ora è stato usato solo in lettura.
+
+### SFML
+
+Per l'implementazione su SFML, all'interno di un main, in primo luogo vengono letti tutti i parametri delle funzioni dal file `parametrisfml.txt`. Successivamente, tramite la funzione `generatecolors`, si crea un vettore di elementi della struct `RGB`, che contiene le tre componenti di un colore all'interno di variabili di tipo `uint8_t`, che sono quelle utilizzate da SFML per identificare i colori. I colori sono generati casualmente, e la dimensione del vettore è pari al numero di stormi differenti presenti nella simulazione. Successivamente si assegnano i colori ai boid tramite la funzione `assigncolors`. 
+Dopo avere tutto quello che serve per la simulazione, si apre la finestra, con dimensioni determinate dal parametro pixel. Si setta il tempo di un frame al parametro deltaT, si crea la variabile `clock`, di tipo `sf::Clock`, e si stabilisce un sistema di gestione degli eventi, che qui è minimo. Successivamente si azzera la variabile `clock`, si esegue la funzione update, si ripulisce la finestra, e si disegnano i boid

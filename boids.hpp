@@ -38,18 +38,6 @@ struct boidstate
   unsigned int flockID{0};
 };
 
-template<typename Iterator, typename predicate, typename operation>
-void // template argument deduction
-for_each_if(Iterator begin, Iterator end, predicate p, operation op)
-{
-  for (; begin != end; begin++) {
-    if (p()) {
-      op(*begin);
-    } else {
-      break;
-    }
-  }
-}
 
 template<class boidtype>
 struct functions
@@ -62,13 +50,14 @@ struct functions
   static void speedadjust(boidtype& boid, const double speedlimit,
                           const double speedminimum);
 
-  void bordercheck_posupdate(boidtype& boid, std::vector<unsigned int> const& pixel,
-                   const double bordersize, const double attraction, const float deltaT);
+  void bordercheck_posupdate(boidtype& boid,
+                             std::vector<unsigned int> const& pixel,
+                             const double bordersize, const double attraction,
+                             const float deltaT);
 
   template<Criterion criterion>
-  static auto neighbors(std::vector<boidtype> const& set,
-                            boidtype const& boid, const double d,
-                            const double alpha);
+  static auto neighbors(std::vector<boidtype> const& set, boidtype const& boid,
+                        const double d, const double alpha);
 
   static auto neighbors(std::vector<boidtype const*> const& set,
                         boidtype const& boid, const double d);

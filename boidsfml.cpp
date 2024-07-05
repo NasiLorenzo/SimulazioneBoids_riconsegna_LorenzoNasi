@@ -50,18 +50,7 @@ int main()
         params.sigma = value;
     }
   }
-  std::cout << "repulsione: " << params.repulsione << std::endl;
-  std::cout << "steering: " << params.steering << std::endl;
-  std::cout << "coesione: " << params.coesione << std::endl;
-  std::cout << "neigh_align: " << params.neigh_align << std::endl;
-  std::cout << "neigh_repulsion: " << params.neigh_repulsion << std::endl;
-  std::cout << "attraction: " << params.attraction << std::endl;
-  std::cout << "alpha: " << params.alpha << std::endl;
-  std::cout << "speedlimit: " << params.speedlimit << std::endl;
-  std::cout << "speedminimum: " << params.speedminimum << std::endl;
-  std::cout << "deltaT: " << params.deltaT << std::endl;
-  std::cout << "size" << params.size << std::endl;
-
+  
   std::random_device r;
 
   std::default_random_engine eng(r());
@@ -69,37 +58,32 @@ int main()
   std::vector<boids::SFMLboid> flock =
       boids::functions<boids::SFMLboid>::generator(eng, params);
 
-  boids::ensemble<boids::SFMLboid> prova(flock);
+  boids::ensemble<boids::SFMLboid> ensemble{flock};
+
   std::vector<boids::RGB> colorvec = boids::generatecolors(eng, params);
 
-  for (auto& it : prova.newset_()) {
-    it.arrow.setFillColor(sf::Color(colorvec[it.flockID].red,
-                                    colorvec[it.flockID].green,
-                                    colorvec[it.flockID].blue));
-  }
+  assigncolors(ensemble, colorvec);
 
   sf::RenderWindow window(sf::VideoMode(params.pixel[0], params.pixel[1]),
-                          "Boids Simulation");
+                          "boids simulation");
 
   const sf::Time frameTime = sf::seconds(params.deltaT);
 
   sf::Clock clock;
-  
-  while (window.isOpen())
-  {
+
+  while (window.isOpen()) {
     sf::Event evento;
     while (window.pollEvent(evento)) {
       if (evento.type == sf::Event::Closed)
         window.close();
     }
-    
+
     clock.restart();
-    prova.update(params);
+    ensemble.update(params);
     window.clear(sf::Color::White);
-    
-    for (auto& boid : prova.newset_()) {
-      float angle = static_cast<float>(
-          boids::angle(boid.vel)); 
+
+    for (auto& boid : ensemble.newset_()) {
+      float angle = static_cast<float>(boids::angle(boid.vel));
 
       boid.arrow.setPosition(
           static_cast<float>(boid.pos[0] / boids::params::rate),

@@ -11,13 +11,18 @@ struct RGB
 
 std::vector<RGB> generatecolors(std::default_random_engine& eng,
                                 paramlist const& params);
+
+template<class boidtype>
+void assigncolors(ensemble<boidtype>& ensemble,
+                  std::vector<RGB> const& colorvec);
+
 struct SFMLboid : boidstate
 {
   sf::ConvexShape arrow;
 
   SFMLboid();
-  
 };
 
 } // namespace boids
+#include "sfmlboids.tpp"
 #endif
