@@ -8,7 +8,8 @@
 namespace boids {
 
 template<class boidtype>
-auto functions<boidtype>::generate(std::default_random_engine& eng, paramlist const& params)
+auto functions<boidtype>::generate(std::default_random_engine& eng,
+                                   paramlist const& params)
 { // genera pos e vel di un boid distribuiti secondo
   // una gauss centrata in 0
   boidtype boid{};
@@ -27,7 +28,7 @@ auto functions<boidtype>::generator(std::default_random_engine& eng,
   std::vector<boidtype> set{};
   for (unsigned int i = 0; i < params.size; i++) {
     auto pix = params.pixel.begin(); // puntatore ai pixel
-    boidtype boidprova{generate(eng,params)};
+    boidtype boidprova{generate(eng, params)};
     boidprova.flockID = i / params.flocksize;
     for (auto it = boidprova.pos.begin(); it != boidprova.pos.end();
          ++it, ++pix) {
@@ -52,6 +53,21 @@ void functions<boidtype>::speedadjust(boidtype& boid, const double speedlimit,
   if (vnorm < speedminimum) {
     normalize(boid.vel);
     boid.vel = speedminimum * boid.vel;
+  }
+}
+template<class boidtype>
+void bordercheck_posupdate(boidtype& boid, std::vector<unsigned int> const& pixel,
+                 const double bordersize, const double attraction, const float deltaT)
+{
+  auto pix = pixel.begin();
+  for (auto index = boid.pos.begin(), velind = boid.vel.begin();
+       index != boid.pos.end(); ++index, ++velind, ++pix) {
+    if (*index > params::rate * (*pix - bordersize)) {
+      *velind -= attraction;
+    } else if (*index < params::rate * bordersize) {
+      *velind += attraction;
+    }
+    *index+=*velind*deltaT;
   }
 }
 
@@ -101,16 +117,16 @@ void functions<boidtype>::regola1(std::vector<boidtype const*>& neighbors,
 
 template<class boidtype>
 void functions<boidtype>::regola2_3(std::vector<boidtype const*>& neighbors,
-                                    boidtype& oldboid, boidtype& boid,
+                                    boidtype const& oldboid, boidtype& boid,
                                     const double steering,
                                     const double cohesion)
 {
   auto n = neighbors.size();
   std::for_each(neighbors.begin(), neighbors.end(), [&](auto& neighbor) {
     auto x = neighbor->vel - oldboid.vel;
-    boid.vel += steering /static_cast<double>(n) * x;
+    boid.vel += steering / static_cast<double>(n) * x;
     auto y = neighbor->pos - boid.pos;
-    boid.vel += cohesion /static_cast<double>(n) * y;
+    boid.vel += cohesion / static_cast<double>(n) * y;
   });
 }
 
@@ -123,38 +139,30 @@ void ensemble<boidtype>::update(paramlist const& params)
     std::vector<boidtype const*> close_neighbor;
 
     if (params.flocksize < params.size) {
-      neighbor = boids::functions<boidtype>::template neighbors<Criterion::similar>(
-          set, *jt, params.neigh_align, params.alpha);
+      neighbor =
+          boids::functions<boidtype>::template neighbors<Criterion::similar>(
+              set, *jt, params.neigh_align, params.alpha);
       close_neighbor = functions<boidtype>::template neighbors<Criterion::any>(
           set, *jt, params.neigh_repulsion, params.alpha);
     } else {
       neighbor = boids::functions<boidtype>::template neighbors<Criterion::any>(
           set, *jt, params.neigh_align, params.alpha);
-      close_neighbor = functions<boidtype>::neighbors(
-          neighbor, *jt, params.neigh_repulsion);
+      close_neighbor =
+          functions<boidtype>::neighbors(neighbor, *jt, params.neigh_repulsion);
     }
 
     functions<boidtype>::regola1(close_neighbor, *jt, params.repulsione);
-    functions<boidtype>::regola2_3(neighbor, it, *jt, params.steering, params.coesione);
-    functions<boidtype>::speedadjust(*jt, params.speedlimit, params.speedminimum);
-
-    auto pix = params.pixel.begin();
-    for (auto index = jt->pos.begin(), velind = jt->vel.begin();
-         index != jt->pos.end(); ++index, ++velind, ++pix) {
-      if (*index > params::rate * (*pix - params.bordersize)) {
-        *velind -= params.attraction;
-      } else if (*index < params::rate * params.bordersize) {
-        *velind += params.attraction;
-      }
-      (*index) += (*velind) * params.deltaT;
-    }
+    functions<boidtype>::regola2_3(neighbor, it, *jt, params.steering,
+                                   params.coesione);
+    functions<boidtype>::speedadjust(*jt, params.speedlimit,
+                                     params.speedminimum);
+    bordercheck_posupdate(*jt,params.pixel,params.bordersize,params.attraction,params.deltaT);
     ++jt;
   });
 
   // Update set to newset
   set = newset;
 }
-
 
 } // namespace boids
 #endif

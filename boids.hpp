@@ -61,9 +61,14 @@ struct functions
 
   static void speedadjust(boidtype& boid, const double speedlimit,
                           const double speedminimum);
+
+  void bordercheck_posupdate(boidtype& boid, std::vector<unsigned int> const& pixel,
+                   const double bordersize, const double attraction, const float deltaT);
+
   template<Criterion criterion>
-  static auto neighbors(std::vector<boidtype> const& set, boidtype const& boid,
-                        const double d, const double alpha);
+  static auto neighbors(std::vector<boidtype> const& set,
+                            boidtype const& boid, const double d,
+                            const double alpha);
 
   static auto neighbors(std::vector<boidtype const*> const& set,
                         boidtype const& boid, const double d);
@@ -72,7 +77,7 @@ struct functions
                       const double repulsione);
 
   static void regola2_3(std::vector<boidtype const*>& neighbors,
-                        boidtype& oldboid, boidtype& boid,
+                        boidtype const& oldboid, boidtype& boid,
                         const double steering, const double cohesion);
 };
 
