@@ -84,14 +84,6 @@ int main()
   const sf::Time frameTime = sf::seconds(params.deltaT);
 
   sf::Clock clock;
-
-  sf::Texture texture;
-  texture.loadFromFile("cumuli-modified.jpg");
-  sf::Sprite backgroundSprite(texture);
-  auto resizeX = static_cast<float>(params.pixel[0]) / texture.getSize().x;
-  auto resizeY = static_cast<float>(params.pixel[1])/texture.getSize().y;
-  
-  backgroundSprite.setScale(resizeX,resizeY); 
   
   while (window.isOpen())
   {
@@ -104,11 +96,10 @@ int main()
     clock.restart();
     prova.update(params);
     window.clear(sf::Color::White);
-    //window.draw(backgroundSprite);
-    //  Draw boids
+    
     for (auto& boid : prova.newset_()) {
       float angle = static_cast<float>(
-          boids::angle(boid.vel)); // Assuming you have the angle in degrees
+          boids::angle(boid.vel)); 
 
       boid.arrow.setPosition(
           static_cast<float>(boid.pos[0] / boids::params::rate),
@@ -119,7 +110,6 @@ int main()
 
     window.display();
 
-    // Delay to achieve desired frame rate
     if (frameTime < clock.getElapsedTime())
       std::cout << "Lag" << "\n";
     sf::sleep(frameTime - clock.getElapsedTime());

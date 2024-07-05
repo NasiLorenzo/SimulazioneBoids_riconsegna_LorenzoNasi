@@ -108,9 +108,9 @@ void functions<boidtype>::regola2_3(std::vector<boidtype const*>& neighbors,
   auto n = neighbors.size();
   std::for_each(neighbors.begin(), neighbors.end(), [&](auto& neighbor) {
     auto x = neighbor->vel - oldboid.vel;
-    boid.vel += steering / n * x;
+    boid.vel += steering /static_cast<double>(n) * x;
     auto y = neighbor->pos - boid.pos;
-    boid.vel += cohesion / n * y;
+    boid.vel += cohesion /static_cast<double>(n) * y;
   });
 }
 
