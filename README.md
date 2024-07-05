@@ -45,3 +45,9 @@ Per mantenere costante il framerate, si imposta un delay corrispondente alla dif
 La simulazione procede fino a che non si chiude manualmente la finestra.
 
 ## Testing
+
+Il testing è stato svolto sulle tre regole, sul raggio visivo, sull'angolo visivo, e sui limiti di velocità.
+
+Per il testing sulle regole, è stata creata un'istanza di `ensemble` con 10 boid, le cui posizioni e velocità sono state impostate manualmente. Nonostante non sia formalmente corretto, invece di testare direttamente le funzioni che fanno riferimento alle regole, è stata testata la funzione update, in cui si impostando i parametri di distanza, angolo visivo, e limitì di velocità in modo che non apportino modifiche. Per controllare che le posizioni e velocità dei boid siano aggiornate correttamente, le si confrontano con quelle ottenute con un foglio excel, dove i calcoli per sono stati svolti manualmente. 
+Per il testing del raggio e dell'angolo visivo, sono state posizionate manualmente coppie di boid in posizioni specifiche,e si è controllato se il primo boid è in grado di vedere gli altri o meno. Inoltre sono stati calcolati e controllati direttamente i valori della distanza e del coseno dell'angolo utilizzati all'interno della funzione `neighbors` per svolgere il controllo di vicinanza. In questo caso i valori degli angoli attesi sono stati calcolati manualmente.
+Per il testing sui limiti di velocità, sono stati creati alcuni boid, è si è controllato il modulo della loro velocità prima e dopo l'applicazione della funzione `speedadjust`.

@@ -97,8 +97,8 @@ TEST_CASE("Testing the speed limits")
   params.neigh_align     = 1000000;
   params.alpha           = M_PI;
   params.attraction      = 0;
-  params.speedlimit      = 3500.;
-  params.speedminimum    = 3500.;
+  params.speedlimit      = 350.;
+  params.speedminimum    = 300.;
   params.size            = 10;
   params.flocksize       = 10;
   boidstate boid1;
@@ -130,10 +130,10 @@ TEST_CASE("Testing the speed limits")
 
   SUBCASE("Testing the velocity after the adjustment")
   {
-    for (const auto& boid : boids) {
-      CHECK(boids::mod(boid.vel)
-            == doctest::Approx(params.speedlimit).epsilon(0.001));
-    }
+    CHECK(boids::mod(boids[0].vel) == doctest::Approx(300.167));
+    CHECK(boids::mod(boids[1].vel) == doctest::Approx(params.speedminimum));
+    CHECK(boids::mod(boids[2].vel) == doctest::Approx(params.speedminimum));
+    CHECK(boids::mod(boids[3].vel) == doctest::Approx(params.speedlimit));
   }
 }
 
