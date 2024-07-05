@@ -40,4 +40,8 @@ Il metodo update, che ha accesso a `newset` e `set`, applica le regole di volo a
 ### SFML
 
 Per l'implementazione su SFML, all'interno di un main, in primo luogo vengono letti tutti i parametri delle funzioni dal file `parametrisfml.txt`. Successivamente, tramite la funzione `generatecolors`, si crea un vettore di elementi della struct `RGB`, che contiene le tre componenti di un colore all'interno di variabili di tipo `uint8_t`, che sono quelle utilizzate da SFML per identificare i colori. I colori sono generati casualmente, e la dimensione del vettore è pari al numero di stormi differenti presenti nella simulazione. Successivamente si assegnano i colori ai boid tramite la funzione `assigncolors`. 
-Dopo avere tutto quello che serve per la simulazione, si apre la finestra, con dimensioni determinate dal parametro pixel. Si setta il tempo di un frame al parametro deltaT, si crea la variabile `clock`, di tipo `sf::Clock`, e si stabilisce un sistema di gestione degli eventi, che qui è minimo. Successivamente si azzera la variabile `clock`, si esegue la funzione update, si ripulisce la finestra, e si disegnano i boid
+Dopo avere tutto quello che serve per la simulazione, si apre la finestra, con dimensioni determinate dal parametro pixel. Si setta il tempo di un frame al parametro deltaT, si crea la variabile `clock`, di tipo `sf::Clock`, e si stabilisce un sistema di gestione degli eventi, che qui è minimo. Successivamente si azzera la variabile `clock`, si esegue la funzione update, si ripulisce la finestra, e si disegnano i boid. 
+Per mantenere costante il framerate, si imposta un delay corrispondente alla differenza tra il tempo trascorso e il tempo di un frame. Dopodichè inizia la computazione per il frame successivo.
+La simulazione procede fino a che non si chiude manualmente la finestra.
+
+## Testing

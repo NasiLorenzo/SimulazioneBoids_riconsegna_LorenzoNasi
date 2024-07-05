@@ -88,9 +88,9 @@ int main()
   params.deltaT          = static_cast<float>(0.0333);
   params.size            = 400;
   params.flocksize       = 100;
-  params.pixel[0]         = 1510;
-  params.pixel[1]         = 910;
-  params::rate            = 1;
+  params.pixel[0]        = 1510;
+  params.pixel[1]        = 910;
+  params::rate           = 1;
   params.bordersize      = 50;
 
   std::default_random_engine eng;
@@ -102,6 +102,6 @@ int main()
 
   /* Getting number of milliseconds as a double. */
   duration<double, std::milli> ms_double = t2 - t1;
-  std::cout<<"posizione primo boid "<<flock.set_()[0].pos[0]<<"\n";
+  std::cout << "posizione primo boid " << flock.set_()[0].pos[0] << "\n";
   std::cout << ms_double.count() << "ms\n";
 }
