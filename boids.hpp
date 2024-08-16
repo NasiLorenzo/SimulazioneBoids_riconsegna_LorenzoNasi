@@ -31,63 +31,99 @@ struct paramlist
       : pixel(params::dim)
   {}
 };
-struct boidstate
+class boidstate
 {
-  DoubleVec pos;
-  DoubleVec vel;
+ private:
+  DoubleVec pos_;
+  DoubleVec vel_;
   unsigned int flockID{0};
-};
-
-
-template<class boidtype>
-struct functions
-{
-  static auto generate(std::default_random_engine&, paramlist const& params);
-
-  static auto generator(std::default_random_engine& eng,
-                        paramlist const& params);
-
-  static void speedadjust(boidtype& boid, const double speedlimit,
-                          const double speedminimum);
-
-  void bordercheck_posupdate(boidtype& boid,
-                             std::vector<unsigned int> const& pixel,
-                             const double bordersize, const double attraction,
-                             const float deltaT);
-
-  template<Criterion criterion>
-  static auto neighbors(std::vector<boidtype> const& set, boidtype const& boid,
-                        const double d, const double alpha);
-
-  static auto neighbors(std::vector<boidtype const*> const& set,
-                        boidtype const& boid, const double d);
-
-  static void regola1(std::vector<boidtype const*>& neighbors, boidtype& boid,
-                      const double repulsione);
-
-  static void regola2_3(std::vector<boidtype const*>& neighbors,
-                        boidtype const& oldboid, boidtype& boid,
-                        const double steering, const double cohesion);
-};
-
-template<class boidtype>
-class ensemble
-{
-  std::vector<boidtype> set;
-  std::vector<boidtype> newset{set};
+  std::vector<boidstate const*> neighbors{};
+  std::vector<boidstate const*> close_neighbors{};
 
  public:
-  ensemble(std::vector<boidtype>& old)
-      : set{old}
+  boidstate() = default;
+  boidstate(DoubleVec pos, DoubleVec vel)
+      : pos_{pos}
+      , vel_{vel}
+      , neighbors{}
+      , close_neighbors{}
   {}
-  std::vector<boidtype>& set_()
+  auto& get_pos() const
   {
-    return set;
+    return this->pos_;
   }
 
-  std::vector<boidtype>& newset_()
+  auto& get_vel() const
   {
-    return newset;
+    return this->vel_;
+  }
+
+  auto&& get_ID() const
+  {
+    return this->flockID;
+  }
+
+  auto& set_pos()
+  {
+    return this->pos_;
+  }
+
+  auto& set_vel()
+  {
+    return this->vel_;
+  }
+
+  auto& set_ID()
+  {
+    return this->flockID;
+  }
+
+  void random_boid(std::default_random_engine&, paramlist const& params);
+
+  void speedadjust(double speedlimit, double speedminimum);
+
+  void bordercheck(std::vector<unsigned int> const& pixel,
+                   const double bordersize, const double attraction,
+                   const float deltaT);
+
+  void update_neighbors(std::vector<boidstate> const& set,
+                        const double align_distance, const double alpha,
+                        Criterion criterion);
+
+  void update_close_neighbors(std::vector<boidstate const*> const& set,
+                              const double repulsion_distance);
+
+  void update_close_neighbors(std::vector<boidstate> const& set,
+                              const double repulsion_distance);
+
+  void regola1(const double repulsione);
+  void regola2_3(const double steering, const double cohesion);
+  void pos_update(const float deltaT);
+
+  void update_allneighbors(std::vector<boidstate> const& set,
+                           const double repulsion_distance,
+                           const double align_distance, const double alpha,
+                           unsigned int size, unsigned int flocksize);
+  void update_rules(paramlist const& params);
+};
+
+std::vector<boidstate> generate_flock(std::default_random_engine& eng,
+                                      paramlist const& params);
+
+class flock
+{
+  std::vector<boidstate> set;
+
+ public:
+  flock(std::default_random_engine& eng, paramlist const& params)
+      : set{generate_flock(eng, params)}
+  {}
+  flock(std::vector<boidstate> const& other)
+      : set{other}
+  {}
+  std::vector<boidstate>& set_()
+  {
+    return set;
   }
 
   std::size_t size_()

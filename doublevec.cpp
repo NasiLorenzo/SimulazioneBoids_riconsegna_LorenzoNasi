@@ -50,12 +50,12 @@ double mod(DoubleVec const& vec)
                       [](double sum, double x) { return sum = sum + x * x; }));
 }
 
-DoubleVec normalize(DoubleVec& vec)
+void normalize(DoubleVec& vec)
 {
   auto modulo = mod(vec);
   if (modulo == 0)
     modulo = 1.;
-  return vec / modulo;
+  vec / modulo;
 }
 
 double distance(DoubleVec const& a, DoubleVec const& b)
@@ -69,8 +69,8 @@ double cosangleij(DoubleVec const& a, DoubleVec const& b)
 {
   auto c = a;
   auto d = b;
-  c      = normalize(c);
-  d      = normalize(d);
+  normalize(c);
+  normalize(d);
   return std::inner_product(c.begin(), c.end(), d.begin(), 0.);
 }
 
