@@ -48,12 +48,12 @@ class boidstate
       , neighbors{}
       , close_neighbors{}
   {}
-  auto& get_pos() const
+  auto get_pos() const
   {
     return this->pos_;
   }
 
-  auto& get_vel() const
+  auto get_vel() const
   {
     return this->vel_;
   }
@@ -61,7 +61,7 @@ class boidstate
   {
     return this->vel_;
   }
-  auto&& get_ID() const
+  auto get_ID() const
   {
     return this->flockID;
   }
@@ -79,6 +79,16 @@ class boidstate
   auto& set_ID()
   {
     return this->flockID;
+  }
+
+  auto get_neighbors() const
+  {
+    return this->neighbors;
+  }
+
+  auto get_close_neighbors() const
+  {
+    return this->close_neighbors;
   }
 
   void random_boid(std::default_random_engine&, paramlist const& params);

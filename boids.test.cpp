@@ -52,11 +52,12 @@ TEST_CASE("Testing rules")
   std::vector<boidstate> set{boid1, boid2, boid3, boid4, boid5,
                              boid6, boid7, boid8, boid9, boid10};
 
-  for(auto& boid: set){
-    std::cout<<"Le velocità sono: "<<boid.get_vel()[0]<<", "<<boid.get_vel()[1]<<"\n";
-  }
-  
   flock stormo{set};
+
+  for (auto& boid : set) {
+    std::cout << "Le posizioni sono: " << boid.get_pos()[0] << ", "
+              << boid.get_pos()[1] << "\n";
+  }
 
   stormo.update(params);
 
@@ -176,65 +177,69 @@ TEST_CASE("Testing boid sight")
   boidstate boid6;
   boid6.set_pos() = {350., 270.};
   boid6.set_vel() = {-15., 10.};
-/*
-  SUBCASE("Testing if boid1 sees boid2")
-  {
-    std::vector<boidstate> pair1{boid1, boid2};
+  /*
+    SUBCASE("Testing if boid1 sees boid2")
+    {
+      std::vector<boidstate> pair1{boid1, boid2};
 
-    auto result1 =
-        boids::functions<boidstate>::template neighbors<Criterion::any>(
-            pair1, boid1, 10000., params.alpha);
-    CHECK(boids::cosangleij(boid2.get_pos() - boid1.get_pos(), boid1.get_vel())
-          == doctest::Approx(cos(0)).epsilon(0.001));
-    CHECK(result1.size() == 1);
-  }
+      auto result1 =
+          boids::functions<boidstate>::template neighbors<Criterion::any>(
+              pair1, boid1, 10000., params.alpha);
+      CHECK(boids::cosangleij(boid2.get_pos() - boid1.get_pos(),
+    boid1.get_vel())
+            == doctest::Approx(cos(0)).epsilon(0.001));
+      CHECK(result1.size() == 1);
+    }
 
-  SUBCASE("Testing if boid1 sees boid3")
-  {
-    std::vector<boidstate> pair2{boid1, boid3};
+    SUBCASE("Testing if boid1 sees boid3")
+    {
+      std::vector<boidstate> pair2{boid1, boid3};
 
-    auto result2 =
-        boids::functions<boidstate>::template neighbors<Criterion::any>(
-            pair2, boid1, 10000., params.alpha);
+      auto result2 =
+          boids::functions<boidstate>::template neighbors<Criterion::any>(
+              pair2, boid1, 10000., params.alpha);
 
-    CHECK(boids::cosangleij(boid3.get_pos() - boid1.get_pos(), boid1.get_vel())
-          == doctest::Approx(cos(1.2490)).epsilon(0.001));
-    CHECK(result2.size() == 0);
-  }
+      CHECK(boids::cosangleij(boid3.get_pos() - boid1.get_pos(),
+    boid1.get_vel())
+            == doctest::Approx(cos(1.2490)).epsilon(0.001));
+      CHECK(result2.size() == 0);
+    }
 
-  SUBCASE("Testing if boid1 sees boid4")
-  {
-    std::vector<boidstate> pair3{boid1, boid4};
+    SUBCASE("Testing if boid1 sees boid4")
+    {
+      std::vector<boidstate> pair3{boid1, boid4};
 
-    auto result3 =
-        boids::functions<boidstate>::template neighbors<Criterion::any>(
-            pair3, boid1, 10000., params.alpha);
-    CHECK(boids::cosangleij(boid4.get_pos() - boid1.get_pos(), boid1.get_vel())
-          == doctest::Approx(cos(3.798)).epsilon(0.001));
-    CHECK(result3.size() == 0);
-  }
+      auto result3 =
+          boids::functions<boidstate>::template neighbors<Criterion::any>(
+              pair3, boid1, 10000., params.alpha);
+      CHECK(boids::cosangleij(boid4.get_pos() - boid1.get_pos(),
+    boid1.get_vel())
+            == doctest::Approx(cos(3.798)).epsilon(0.001));
+      CHECK(result3.size() == 0);
+    }
 
-  SUBCASE("Testing if boid1 sees boid5")
-  {
-    std::vector<boidstate> pair4{boid1, boid5};
+    SUBCASE("Testing if boid1 sees boid5")
+    {
+      std::vector<boidstate> pair4{boid1, boid5};
 
-    auto result4 =
-        boids::functions<boidstate>::template neighbors<Criterion::any>(
-            pair4, boid1, 10000., params.alpha);
-    CHECK(boids::cosangleij(boid5.get_pos() - boid1.get_pos(), boid1.get_vel())
-          == doctest::Approx(cos(M_PI)).epsilon(0.001));
-    CHECK(result4.size() == 0);
-  }
+      auto result4 =
+          boids::functions<boidstate>::template neighbors<Criterion::any>(
+              pair4, boid1, 10000., params.alpha);
+      CHECK(boids::cosangleij(boid5.get_pos() - boid1.get_pos(),
+    boid1.get_vel())
+            == doctest::Approx(cos(M_PI)).epsilon(0.001));
+      CHECK(result4.size() == 0);
+    }
 
-  SUBCASE("Testing if boid1 sees boid6")
-  {
-    std::vector<boidstate> pair5{boid1, boid6};
+    SUBCASE("Testing if boid1 sees boid6")
+    {
+      std::vector<boidstate> pair5{boid1, boid6};
 
-    auto result5 =
-        boids::functions<boidstate>::template neighbors<Criterion::any>(
-            pair5, boid1, 10000., params.alpha);
-    CHECK(result5.size() == 0);
-  }*/
+      auto result5 =
+          boids::functions<boidstate>::template neighbors<Criterion::any>(
+              pair5, boid1, 10000., params.alpha);
+      CHECK(result5.size() == 0);
+    }*/
 }
 
 TEST_CASE("Testing the limit distance")
@@ -260,25 +265,25 @@ TEST_CASE("Testing the limit distance")
   boid3.set_pos() = {2., 55.};
   boid3.set_vel() = {13., 45.};
 
- /* SUBCASE("Testing if boid1 sees boid2")
-  {
-    std::vector<boidstate> pair1{boid1, boid2};
-    auto result1 =
-        boids::functions<boidstate>::template neighbors<Criterion::any>(
-            pair1, boid1, params.neigh_align, params.alpha);
-    CHECK(sqrt(distance(boid1.get_pos(), boid2.get_pos()))
-          == doctest::Approx(832.165));
-    CHECK(result1.size() == 0);
-  }
-  SUBCASE("Testing if boid1 sees boid3")
-  {
-    std::vector<boidstate> pair2{boid1, boid3};
-    auto result2 =
-        boids::functions<boidstate>::template neighbors<Criterion::any>(
-            pair2, boid1, params.neigh_align, params.alpha);
-    CHECK(sqrt(distance(boid1.get_pos(), boid3.get_pos()))
-          == doctest::Approx(5.38516));
-    CHECK(result2.size() == 1);
-  }*/
+  /* SUBCASE("Testing if boid1 sees boid2")
+   {
+     std::vector<boidstate> pair1{boid1, boid2};
+     auto result1 =
+         boids::functions<boidstate>::template neighbors<Criterion::any>(
+             pair1, boid1, params.neigh_align, params.alpha);
+     CHECK(sqrt(distance(boid1.get_pos(), boid2.get_pos()))
+           == doctest::Approx(832.165));
+     CHECK(result1.size() == 0);
+   }
+   SUBCASE("Testing if boid1 sees boid3")
+   {
+     std::vector<boidstate> pair2{boid1, boid3};
+     auto result2 =
+         boids::functions<boidstate>::template neighbors<Criterion::any>(
+             pair2, boid1, params.neigh_align, params.alpha);
+     CHECK(sqrt(distance(boid1.get_pos(), boid3.get_pos()))
+           == doctest::Approx(5.38516));
+     CHECK(result2.size() == 1);
+   }*/
 }
 // namespace boids

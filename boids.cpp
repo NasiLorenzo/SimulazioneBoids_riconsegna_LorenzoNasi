@@ -105,9 +105,12 @@ void boidstate::regola2_3(const double steering, const double cohesion)
 
 void boidstate::pos_update(const float deltaT)
 {
-  for(auto it=this->pos_.begin(),velit=this->vel_.begin();it!=this->pos_.end();++it,++velit){
+  /*for(auto it=this->pos_.begin(),velit=this->vel_.begin();it!=this->pos_.end();++it,++velit){
   *it+=deltaT * (*velit);
-  }
+  }*/
+  this->pos_[0]+=this->vel_[0]*deltaT;
+  this->pos_[1]+=this->vel_[1]*deltaT;
+
 }
 
 void boidstate::update_allneighbors(std::vector<boidstate> const& set,
@@ -127,10 +130,10 @@ void boidstate::update_allneighbors(std::vector<boidstate> const& set,
 
 void boidstate::update_rules(paramlist const& params)
 {
-  //regola1(params.repulsione);
-  regola2_3(params.steering, params.coesione);
-  speedadjust(params.speedlimit, params.speedminimum);
-  bordercheck(params.pixel, params.bordersize, params.attraction);
+  regola1(params.repulsione);
+  //regola2_3(params.steering, params.coesione);
+  //speedadjust(params.speedlimit, params.speedminimum);
+  //bordercheck(params.pixel, params.bordersize, params.attraction);
   pos_update(params.deltaT);
 }
 
@@ -160,6 +163,7 @@ void flock::update(paramlist const& params)
   std::for_each(set.begin(), set.end(), [&](auto& boid) {
     boid.update_allneighbors(set, params.neigh_repulsion, params.neigh_align,
                              params.alpha, params.size, params.flocksize);
+    //std::cout<<"il numero di vicini e molto vicini è "<<boid.get_neighbors().size()<<" e "<<boid.get_close_neighbors().size()<<"\n";
   });
   std::for_each(set.begin(), set.end(),
                 [&](auto& boid) { boid.update_rules(params); });
