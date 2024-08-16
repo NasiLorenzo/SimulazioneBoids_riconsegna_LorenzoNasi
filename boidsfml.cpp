@@ -50,19 +50,17 @@ int main()
         params.sigma = value;
     }
   }
-  
+
   std::random_device r;
-
   std::default_random_engine eng(r());
-
-  std::vector<boids::SFMLboid> flock =
+  boids::flock stormo{eng, params};
+  std::vector<boids::RGB> colorvec = boids::generatecolors(eng, params);
+  /*std::vector<boids::SFMLboid> flock =
       boids::functions<boids::SFMLboid>::generator(eng, params);
 
   boids::ensemble<boids::SFMLboid> ensemble{flock};
 
-  std::vector<boids::RGB> colorvec = boids::generatecolors(eng, params);
-
-  assigncolors(ensemble, colorvec);
+  assigncolors(ensemble, colorvec);*/
 
   sf::RenderWindow window(sf::VideoMode(params.pixel[0], params.pixel[1]),
                           "boids simulation");
@@ -79,17 +77,28 @@ int main()
     }
 
     clock.restart();
-    ensemble.update(params);
+    stormo.update(params);
     window.clear(sf::Color::White);
 
-    for (auto& boid : ensemble.newset_()) {
-      float angle = static_cast<float>(boids::angle(boid.vel));
+    for (auto& boid : stormo.set_()) {
+      float angle       = static_cast<float>(boids::angle(boid.get_vel()));
 
-      boid.arrow.setPosition(
-          static_cast<float>(boid.pos[0] / boids::params::rate),
-          static_cast<float>(boid.pos[1] / boids::params::rate));
-      boid.arrow.setRotation(angle * 180 / static_cast<float>(M_PI));
-      window.draw(boid.arrow);
+      sf::ConvexShape arrow;
+      float arrowlength = 10 / static_cast<float>(boids::params::rate);
+      float arrowidth   = 5 / static_cast<float>(boids::params::rate);
+      arrow.setPointCount(3);
+      arrow.setPoint(0, sf::Vector2f(arrowlength, 0));
+      arrow.setPoint(1, sf::Vector2f(0, -arrowidth / 2));
+      arrow.setPoint(2, sf::Vector2f(0, arrowidth / 2));
+      arrow.setOrigin(arrowlength / 2, 0);
+      arrow.setPosition(
+          static_cast<float>(boid.get_pos()[0] / boids::params::rate),
+          static_cast<float>(boid.get_pos()[1] / boids::params::rate));
+      arrow.setRotation(angle * 180 / static_cast<float>(M_PI));
+      arrow.setFillColor(sf::Color(colorvec[boid.get_ID()].red,
+                                    colorvec[boid.get_ID()].green,
+                                    colorvec[boid.get_ID()].blue));
+      window.draw(arrow);
     }
 
     window.display();

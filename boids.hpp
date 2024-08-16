@@ -57,7 +57,10 @@ class boidstate
   {
     return this->vel_;
   }
-
+  auto get_velcopy()
+  {
+    return this->vel_;
+  }
   auto&& get_ID() const
   {
     return this->flockID;
@@ -83,8 +86,7 @@ class boidstate
   void speedadjust(double speedlimit, double speedminimum);
 
   void bordercheck(std::vector<unsigned int> const& pixel,
-                   const double bordersize, const double attraction,
-                   const float deltaT);
+                   const double bordersize, const double attraction);
 
   void update_neighbors(std::vector<boidstate> const& set,
                         const double align_distance, const double alpha,

@@ -8,7 +8,7 @@
 namespace boids {
 
 
-template<class boidtype>
+/*template<class boidtype>
 void ensemble<boidtype>::update(paramlist const& params)
 {
   auto jt = newset.begin();
@@ -41,7 +41,7 @@ void ensemble<boidtype>::update(paramlist const& params)
 
   // Update set to newset
   set = newset;
-}
+}*/
 
 } // namespace boids
 #endif

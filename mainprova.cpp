@@ -43,7 +43,7 @@ operator*(const std::array<double, params::dim>& a,
 
 }*/
 
-std::array<double, params::dim>
+/*std::array<double, params::dim>
 operator+(const std::array<double, params::dim>& a,
           const std::array<double, params::dim>& b)
 {
@@ -66,7 +66,7 @@ operator*(const std::array<double, params::dim>& a,
 double distance2(boidstate const& a, boidstate const& b)
 {
   return pow(a.pos[0] - b.pos[0], 2) + pow(a.pos[1] - b.pos[1], 2);
-}
+}*/
 
 int main()
 {
@@ -94,14 +94,14 @@ int main()
   params.bordersize      = 50;
 
   std::default_random_engine eng;
-  auto stormo = boids::functions<boidstate>::generator(eng, params);
-  ensemble<boidstate> flock(stormo);
+  flock stormo{eng,params};
   auto t1 = high_resolution_clock::now();
-  flock.update(params);
+  stormo.update(params);
   auto t2 = high_resolution_clock::now();
 
   /* Getting number of milliseconds as a double. */
   duration<double, std::milli> ms_double = t2 - t1;
-  std::cout << "posizione primo boid " << flock.set_()[0].pos[0] << "\n";
-  std::cout << ms_double.count() << "ms\n";
+  /*std::cout << "posizione primo boid " << stormo.set_()[0].get_pos()[0] << "\n";
+  std::cout << ms_double.count() << "ms\n";*/
+  
 }

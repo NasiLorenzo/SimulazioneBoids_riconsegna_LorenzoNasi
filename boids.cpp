@@ -25,8 +25,7 @@ void boidstate::speedadjust(double speedlimit, double speedminimum)
   }
 }
 void boidstate::bordercheck(std::vector<unsigned int> const& pixel,
-                            const double bordersize, const double attraction,
-                            const float deltaT)
+                            const double bordersize, const double attraction)
 {
   auto pix = pixel.begin();
   for (auto index = this->pos_.begin(), velind = this->vel_.begin();
@@ -36,7 +35,6 @@ void boidstate::bordercheck(std::vector<unsigned int> const& pixel,
     } else if (*index < params::rate * bordersize) {
       *velind += attraction;
     }
-    //*index += *velind * deltaT;
   }
 }
 
@@ -47,11 +45,11 @@ void boidstate::update_neighbors(std::vector<boidstate> const& set,
   this->neighbors.clear();
   std::for_each(set.begin(), set.end(), [&](auto& neighbor) {
     auto distanza = distance(this->pos_, neighbor.get_pos());
-    if (distanza < pow(d, 2) && distanza != 0
+    if (distanza < pow(align_distance, 2) && distanza != 0
         && (criterion == Criterion::any
             || (criterion == Criterion::similar
-                && this->flockID == neighbor->getID()))) {
-      auto cosangolo = cosangleij(neighbor.pos - this->pos_, this->vel_);
+                && this->flockID == neighbor.get_ID()))) {
+      auto cosangolo = cosangleij(neighbor.get_pos() - this->pos_, this->vel_);
       if ((cosangolo) >= std::cos(alpha)) {
         this->neighbors.emplace_back(&neighbor);
       }
@@ -65,7 +63,7 @@ void boidstate::update_close_neighbors(std::vector<boidstate const*> const& set,
   this->close_neighbors.clear();
   std::for_each(set.begin(), set.end(), [&](auto& neighbor) {
     auto distanza = distance(this->pos_, neighbor->get_pos());
-    if (distanza < pow(d, 2) && distanza != 0) {
+    if (distanza < pow(repulsion_distance, 2) && distanza != 0) {
       this->close_neighbors.emplace_back(neighbor);
     }
   });
@@ -77,7 +75,7 @@ void boidstate::update_close_neighbors(std::vector<boidstate> const& set,
   this->close_neighbors.clear();
   std::for_each(set.begin(), set.end(), [&](auto& neighbor) {
     auto distanza = distance(this->pos_, neighbor.get_pos());
-    if (distanza < pow(d, 2) && distanza != 0) {
+    if (distanza < pow(repulsion_distance, 2) && distanza != 0) {
       this->close_neighbors.emplace_back(&neighbor);
     }
   });
@@ -107,7 +105,9 @@ void boidstate::regola2_3(const double steering, const double cohesion)
 
 void boidstate::pos_update(const float deltaT)
 {
-  this->pos_ += deltaT * this->vel_;
+  for(auto it=this->pos_.begin(),velit=this->vel_.begin();it!=this->pos_.end();++it,++velit){
+  *it+=deltaT * (*velit);
+  }
 }
 
 void boidstate::update_allneighbors(std::vector<boidstate> const& set,
@@ -125,12 +125,13 @@ void boidstate::update_allneighbors(std::vector<boidstate> const& set,
   }
 }
 
-void boidstate::update_rules(paramlist const& params) { 
-    regola1(params.repulsione);
-    regola2_3(params.steering,params.coesione); 
-    speedadjust(params.speedlimit,params.speedminimum);
-    bordercheck(params.pixel,params.bordersize,params.attraction,params.deltaT);  
-    pos_update(params.deltaT);
+void boidstate::update_rules(paramlist const& params)
+{
+  //regola1(params.repulsione);
+  regola2_3(params.steering, params.coesione);
+  speedadjust(params.speedlimit, params.speedminimum);
+  bordercheck(params.pixel, params.bordersize, params.attraction);
+  pos_update(params.deltaT);
 }
 
 std::vector<boidstate> generate_flock(std::default_random_engine& eng,
@@ -154,11 +155,14 @@ std::vector<boidstate> generate_flock(std::default_random_engine& eng,
   return set;
 }
 
-void flock::update(paramlist const& params){
-    std::for_each(set.begin(),set.end(),[&params](auto& boid){
-        boid.update_allneighbors();
-        boid.update_rules();
-    });
+void flock::update(paramlist const& params)
+{
+  std::for_each(set.begin(), set.end(), [&](auto& boid) {
+    boid.update_allneighbors(set, params.neigh_repulsion, params.neigh_align,
+                             params.alpha, params.size, params.flocksize);
+  });
+  std::for_each(set.begin(), set.end(),
+                [&](auto& boid) { boid.update_rules(params); });
 }
 
 } // namespace boids
