@@ -1,20 +1,17 @@
 #include "doublevec.hpp"
 
 namespace boids {
-DoubleVec operator+(DoubleVec const& a, DoubleVec const& b)
+
+DoubleVec& operator-=(DoubleVec& a, DoubleVec const& b)
 {
-  DoubleVec result{};
-  std::transform(a.begin(), a.end(), b.begin(), result.begin(),
-                 [&](double c, double d) { return c + d; });
-  return result;
+  std::transform(a.begin(), a.end(), b.begin(), a.begin(), std::minus<>());
+  return a;
 }
 
 DoubleVec operator-(DoubleVec const& a, DoubleVec const& b)
 {
-  DoubleVec result;
-  std::transform(a.begin(), a.end(), b.begin(), result.begin(),
-                 [](double c, double d) { return c - d; });
-  return result;
+  DoubleVec result{a};
+  return result-=b;
 }
 
 DoubleVec operator*(const double a, DoubleVec& b)
@@ -29,11 +26,16 @@ DoubleVec operator/(DoubleVec& b, const double a)
   return b;
 }
 
-DoubleVec operator+=(DoubleVec& a, DoubleVec const& b)
+DoubleVec& operator+=(DoubleVec& a, DoubleVec const& b)
 {
-  std::transform(a.begin(), a.end(), b.begin(), a.begin(),
-                 [](double c, double d) { return c + d; });
+  std::transform(a.begin(), a.end(), b.begin(), a.begin(), std::plus<>());
   return a;
+}
+
+DoubleVec operator+(DoubleVec const& a, DoubleVec const& b)
+{
+  DoubleVec result{a};
+  return result += b;
 }
 
 double angle(DoubleVec const& vec)
