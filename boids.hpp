@@ -31,64 +31,65 @@ struct paramlist
       : pixel(params::dim)
   {}
 };
+
+struct boid
+{
+  DoubleVec pos_;
+  unsigned int flockID{0};
+  DoubleVec vel_;
+  DoubleVec deltavel_;
+  boid() = default;
+  boid(DoubleVec pos, DoubleVec vel)
+      : pos_{pos}
+      , vel_{vel}
+      , deltavel_{}
+  {}
+};
 class boidstate
 {
  private:
-  DoubleVec pos_;
-  DoubleVec vel_;
-  unsigned int flockID{0};
-  std::vector<boidstate const*> neighbors{};
-  std::vector<boidstate const*> close_neighbors{};
+  boid boid_;
+  std::vector<boid const*> neighbors{};
+  std::vector<boid const*> close_neighbors{};
 
  public:
   boidstate() = default;
-  boidstate(DoubleVec pos, DoubleVec vel)
-      : pos_{pos}
-      , vel_{vel}
+  boidstate(boid& other)
+      : boid_{other}
       , neighbors{}
       , close_neighbors{}
   {}
   auto get_pos() const
   {
-    return this->pos_;
+    return this->boid_.pos_;
   }
 
   auto get_vel() const
   {
-    return this->vel_;
+    return this->boid_.vel_;
   }
   auto get_velcopy()
   {
-    return this->vel_;
+    return this->boid_.vel_;
   }
   auto get_ID() const
   {
-    return this->flockID;
+    return this->boid_.flockID;
   }
 
   auto& set_pos()
   {
-    return this->pos_;
+    return this->boid_.pos_;
   }
 
   auto& set_vel()
   {
-    return this->vel_;
+    return this->boid_.vel_;
   }
 
   auto& set_ID()
   {
-    return this->flockID;
-  }
-
-  auto get_neighbors() const
-  {
-    return this->neighbors;
-  }
-
-  auto get_close_neighbors() const
-  {
-    return this->close_neighbors;
+    return this->boid_.flockID;
   }
 
   void random_boid(std::default_random_engine&, paramlist const& params);
@@ -102,7 +103,7 @@ class boidstate
                         const double align_distance, const double alpha,
                         Criterion criterion);
 
-  void update_close_neighbors(std::vector<boidstate const*> const& set,
+  void update_close_neighbors(std::vector<boid const*> const& set,
                               const double repulsion_distance);
 
   void update_close_neighbors(std::vector<boidstate> const& set,
@@ -110,7 +111,7 @@ class boidstate
 
   void regola1(const double repulsione);
   void regola2_3(const double steering, const double cohesion);
-  void pos_update(const float deltaT);
+  void posvel_update(const float deltaT);
 
   void update_allneighbors(std::vector<boidstate> const& set,
                            const double repulsion_distance,
@@ -125,6 +126,7 @@ std::vector<boidstate> generate_flock(std::default_random_engine& eng,
 class flock
 {
   std::vector<boidstate> set;
+  std::vector<DoubleVec> velset;
 
  public:
   flock(std::default_random_engine& eng, paramlist const& params)

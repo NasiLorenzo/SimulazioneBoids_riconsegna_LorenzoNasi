@@ -54,12 +54,12 @@ TEST_CASE("Testing rules")
 
   flock stormo{set};
 
-  for (auto& boid : set) {
-    std::cout << "Le posizioni sono: " << boid.get_pos()[0] << ", "
-              << boid.get_pos()[1] << "\n";
-  }
-
   stormo.update(params);
+
+  /*for (auto& boid : stormo.set_()) {
+    std::cout << "Le velocità sono: " << boid.get_vel()[0] << ", "
+              << boid.get_vel()[1] << "\n";
+  }*/
 
   REQUIRE(stormo.size_() == 10);
 

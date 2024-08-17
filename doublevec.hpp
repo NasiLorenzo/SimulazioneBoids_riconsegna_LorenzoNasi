@@ -1,7 +1,9 @@
 #ifndef DOUBLEVEC_HPP
 #define DOUBLEVEC_HPP
 #include <SFML/Graphics.hpp>
+#include <oneapi/dpl/algorithm>
 #include <algorithm>
+#include <oneapi/dpl/execution>
 #include <array>
 #include <bitset>
 #include <cassert>

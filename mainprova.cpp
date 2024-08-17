@@ -101,7 +101,7 @@ int main()
 
   /* Getting number of milliseconds as a double. */
   duration<double, std::milli> ms_double = t2 - t1;
-  /*std::cout << "posizione primo boid " << stormo.set_()[0].get_pos()[0] << "\n";
-  std::cout << ms_double.count() << "ms\n";*/
+  std::cout << "posizione primo boid " << stormo.set_()[0].get_pos()[0] << "\n";
+  std::cout << ms_double.count() << "ms\n";
   
 }
