@@ -7,7 +7,7 @@ void boidstate::random_boid(std::default_random_engine& eng,
                             paramlist const& params)
 {
   std::normal_distribution<double> dist(0.0, params.sigma);
-  std::for_each(this->boid_.vel_.begin(), this->boid_.vel_.end(),
+  std::for_each(boid_.vel_.begin(), boid_.vel_.end(),
                 [&](double& x) { x = dist(eng); });
 }
 
@@ -162,7 +162,7 @@ std::vector<boidstate> generate_flock(std::default_random_engine& eng,
 
 void flock::update(paramlist const& params)
 {
-  std::for_each(std::execution::par_unseq,set.begin(), set.end(), [&](auto& boid) {
+  std::for_each(oneapi::dpl::execution::par_unseq,set.begin(), set.end(), [&](auto& boid) {
     boid.update_allneighbors(set, params.neigh_repulsion, params.neigh_align,
                              params.alpha, params.size, params.flocksize);
     boid.update_rules(params);

@@ -4,6 +4,7 @@
 #include <oneapi/dpl/algorithm>
 #include <algorithm>
 #include <oneapi/dpl/execution>
+#include <execution>
 #include <array>
 #include <bitset>
 #include <cassert>
