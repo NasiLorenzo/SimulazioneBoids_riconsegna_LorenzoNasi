@@ -123,7 +123,7 @@ class boidstate
 std::vector<boidstate> generate_flock(std::default_random_engine& eng,
                                       paramlist const& params);
 
-template<typename boidtype>
+template<class boidtype>
 class flock
 {
   std::vector<boidtype> set;
@@ -134,6 +134,9 @@ class flock
       : set{generate_flock(eng, params)}
   {}
   flock(std::vector<boidtype> const& other)
+      : set{other}
+  {}
+  flock(std::vector<boidtype>&& other)
       : set{other}
   {}
   std::vector<boidtype>& set_()
@@ -147,6 +150,8 @@ class flock
   }
 
   void update(paramlist const& params);
+  std::vector<boidtype> generate_flock(std::default_random_engine& eng,
+                                       paramlist const& params);
 };
 } // namespace boids
 #include "boids.tpp" // namespace boids

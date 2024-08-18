@@ -139,26 +139,4 @@ void boidstate::update_rules(paramlist const& params)
   bordercheck(params.pixel, params.bordersize, params.attraction);
 }
 
-std::vector<boidstate> generate_flock(std::default_random_engine& eng,
-                                      paramlist const& params)
-{
-  std::vector<boidstate> set{};
-  for (unsigned int i = 0; i < params.size; i++) {
-    auto pix = params.pixel.begin();
-    boidstate boidprova{};
-    boidprova.random_boid(eng, params);
-    boidprova.set_ID() = i / params.flocksize;
-    for (auto it = boidprova.set_pos().begin(); it != boidprova.set_pos().end();
-         ++it, ++pix) {
-      std::uniform_real_distribution<double> dis(
-          0, static_cast<double>(*pix * params::rate));
-      *it += dis(eng);
-    }
-    set.push_back(boidprova);
-  }
-
-  return set;
-}
-
-
 } // namespace boids
