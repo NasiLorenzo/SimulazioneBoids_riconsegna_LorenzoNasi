@@ -52,7 +52,7 @@ TEST_CASE("Testing rules")
   std::vector<boidstate> set{boid1, boid2, boid3, boid4, boid5,
                              boid6, boid7, boid8, boid9, boid10};
 
-  flock stormo{set};
+  flock<boids::boidstate> stormo{set};
 
   stormo.update(params);
 
@@ -63,35 +63,35 @@ TEST_CASE("Testing rules")
 
   REQUIRE(stormo.size_() == 10);
 
-  CHECK(stormo.set_()[0].get_vel()[0] == doctest::Approx(1636.744444));
-  CHECK(stormo.set_()[0].get_vel()[1] == doctest::Approx(-887.7222222));
+  CHECK(stormo.set_()[0]->get_vel()[0] == doctest::Approx(1636.744444));
+  CHECK(stormo.set_()[0]->get_vel()[1] == doctest::Approx(-887.7222222));
 
-  CHECK(stormo.set_()[1].get_vel()[0] == doctest::Approx(-3.255555556));
-  CHECK(stormo.set_()[1].get_vel()[1] == doctest::Approx(-189.9444444));
+  CHECK(stormo.set_()[1]->get_vel()[0] == doctest::Approx(-3.255555556));
+  CHECK(stormo.set_()[1]->get_vel()[1] == doctest::Approx(-189.9444444));
 
-  CHECK(stormo.set_()[2].get_vel()[0] == doctest::Approx(1980.744444));
-  CHECK(stormo.set_()[2].get_vel()[1] == doctest::Approx(-447.2777778));
+  CHECK(stormo.set_()[2]->get_vel()[0] == doctest::Approx(1980.744444));
+  CHECK(stormo.set_()[2]->get_vel()[1] == doctest::Approx(-447.2777778));
 
-  CHECK(stormo.set_()[3].get_vel()[0] == doctest::Approx(3792.3));
-  CHECK(stormo.set_()[3].get_vel()[1] == doctest::Approx(-1154.833333));
+  CHECK(stormo.set_()[3]->get_vel()[0] == doctest::Approx(3792.3));
+  CHECK(stormo.set_()[3]->get_vel()[1] == doctest::Approx(-1154.833333));
 
-  CHECK(stormo.set_()[4].get_vel()[0] == doctest::Approx(-1807.7));
-  CHECK(stormo.set_()[4].get_vel()[1] == doctest::Approx(1454.5));
+  CHECK(stormo.set_()[4]->get_vel()[0] == doctest::Approx(-1807.7));
+  CHECK(stormo.set_()[4]->get_vel()[1] == doctest::Approx(1454.5));
 
-  CHECK(stormo.set_()[5].get_vel()[0] == doctest::Approx(-1474.366667));
-  CHECK(stormo.set_()[5].get_vel()[1] == doctest::Approx(754.5));
+  CHECK(stormo.set_()[5]->get_vel()[0] == doctest::Approx(-1474.366667));
+  CHECK(stormo.set_()[5]->get_vel()[1] == doctest::Approx(754.5));
 
-  CHECK(stormo.set_()[6].get_vel()[0] == doctest::Approx(-174.3666667));
-  CHECK(stormo.set_()[6].get_vel()[1] == doctest::Approx(632.2777778));
+  CHECK(stormo.set_()[6]->get_vel()[0] == doctest::Approx(-174.3666667));
+  CHECK(stormo.set_()[6]->get_vel()[1] == doctest::Approx(632.2777778));
 
-  CHECK(stormo.set_()[7].get_vel()[0] == doctest::Approx(-2752.144444));
-  CHECK(stormo.set_()[7].get_vel()[1] == doctest::Approx(814.5));
+  CHECK(stormo.set_()[7]->get_vel()[0] == doctest::Approx(-2752.144444));
+  CHECK(stormo.set_()[7]->get_vel()[1] == doctest::Approx(814.5));
 
-  CHECK(stormo.set_()[8].get_vel()[0] == doctest::Approx(-2581.033333));
-  CHECK(stormo.set_()[8].get_vel()[1] == doctest::Approx(-825.5));
+  CHECK(stormo.set_()[8]->get_vel()[0] == doctest::Approx(-2581.033333));
+  CHECK(stormo.set_()[8]->get_vel()[1] == doctest::Approx(-825.5));
 
-  CHECK(stormo.set_()[9].get_vel()[0] == doctest::Approx(2550.077778));
-  CHECK(stormo.set_()[9].get_vel()[1] == doctest::Approx(424.5));
+  CHECK(stormo.set_()[9]->get_vel()[0] == doctest::Approx(2550.077778));
+  CHECK(stormo.set_()[9]->get_vel()[1] == doctest::Approx(424.5));
 }
 
 TEST_CASE("Testing the speed limits")

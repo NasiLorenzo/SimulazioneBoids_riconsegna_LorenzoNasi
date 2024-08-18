@@ -37,20 +37,20 @@ void boidstate::bordercheck(std::vector<unsigned int> const& pixel,
   }
 }
 
-void boidstate::update_neighbors(std::vector<boidstate> const& set,
+void boidstate::update_neighbors(std::vector<std::shared_ptr<boidstate>> & set,
                                  const double align_distance,
                                  const double alpha, Criterion criterion)
 {
   this->neighbors.clear();
   std::for_each(set.begin(), set.end(), [&](auto& neighbor) {
-    auto distanza = distance(this->boid_.pos_, neighbor.get_pos());
+    auto distanza = distance(this->boid_.pos_, neighbor->get_pos());
     if (distanza < pow(align_distance, 2) && distanza != 0
         && (criterion == Criterion::any
             || (criterion == Criterion::similar
-                && this->boid_.flockID == neighbor.get_ID()))) {
-      auto cosangolo = cosangleij(neighbor.get_pos() - this->boid_.pos_, this->boid_.vel_);
+                && this->boid_.flockID == neighbor->get_ID()))) {
+      auto cosangolo = cosangleij(neighbor->get_pos() - this->boid_.pos_, this->boid_.vel_);
       if ((cosangolo) >= std::cos(alpha)) {
-        this->neighbors.emplace_back(&(neighbor.boid_));
+        this->neighbors.emplace_back(&(neighbor->boid_));
       }
     }
   });
@@ -68,14 +68,14 @@ void boidstate::update_close_neighbors(std::vector<boid const*> const& set,
   });
 }
 
-void boidstate::update_close_neighbors(std::vector<boidstate> const& set,
+void boidstate::update_close_neighbors(std::vector<std::shared_ptr<boidstate>> & set,
                                        const double repulsion_distance)
 {
   this->close_neighbors.clear();
   std::for_each(set.begin(), set.end(), [&](auto& neighbor) {
-    auto distanza = distance(this->boid_.pos_, neighbor.get_pos());
+    auto distanza = distance(this->boid_.pos_, neighbor->get_pos());
     if (distanza < pow(repulsion_distance, 2) && distanza != 0) {
-      this->close_neighbors.emplace_back(&(neighbor.boid_));
+      this->close_neighbors.emplace_back(&(neighbor->boid_));
     }
   });
 }
@@ -104,19 +104,13 @@ void boidstate::regola2_3(const double steering, const double cohesion)
 
 void boidstate::posvel_update(const float deltaT)
 {
-  /*for(auto
-  it=this->boid_.pos_.begin(),velit=this->boid_.vel_.begin();it!=this->boid_.pos_.end();++it,++velit){
-  *it+=deltaT * (*velit);
-  }*/
-  //std::cout << "La velocità vale dio boia: " << this->boid_.vel_[0] << " e "        << this->boid_.vel_[1] << "\n";
   boid_.vel_+=boid_.deltavel_;
   boid_.pos_[0] += (this->get_vel()[0]) * deltaT;
   this->boid_.pos_[1] += (this->get_vel()[1]) * deltaT;
   boid_.deltavel_={0.,0.};
-  //std::cout << "La velocità vale: " << this->boid_.vel_[0] << " e " << this->boid_.vel_[1]       << "\n";
 }
 
-void boidstate::update_allneighbors(std::vector<boidstate> const& set,
+void boidstate::update_allneighbors(std::vector<std::shared_ptr<boidstate>> & set,
                                     const double repulsion_distance,
                                     const double align_distance,
                                     const double alpha, unsigned int size,

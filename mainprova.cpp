@@ -1,4 +1,5 @@
 #include "boids.hpp"
+#include "sfmlboids.hpp"
 using namespace boids;
 using namespace std::chrono_literals;
 
@@ -94,14 +95,15 @@ int main()
   params.bordersize      = 50;
 
   std::default_random_engine eng;
-  flock stormo{eng,params};
+  flock<boids::SFMLboid> stormo{eng,params};
   auto t1 = high_resolution_clock::now();
   stormo.update(params);
   auto t2 = high_resolution_clock::now();
-
+  auto sfmlboid_ptr = std::dynamic_pointer_cast<SFMLboid>(stormo.set_()[0]);
+  sfmlboid_ptr->arrow.setFillColor(sf::Color(50,50,50));
   /* Getting number of milliseconds as a double. */
   duration<double, std::milli> ms_double = t2 - t1;
-  std::cout << "posizione primo boid " << stormo.set_()[0].get_pos()[0] << "\n";
+  std::cout << "posizione primo boid " << stormo.set_()[0]->get_pos()[0] << "\n";
   std::cout << ms_double.count() << "ms\n";
   
 }

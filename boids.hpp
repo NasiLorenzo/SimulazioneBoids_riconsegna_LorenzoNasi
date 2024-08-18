@@ -53,7 +53,8 @@ class boidstate
   std::vector<boid const*> close_neighbors{};
 
  public:
-  boidstate() = default;
+  boidstate()          = default;
+  virtual ~boidstate() = default;
   boidstate(boid& other)
       : boid_{other}
       , neighbors{}
@@ -99,21 +100,21 @@ class boidstate
   void bordercheck(std::vector<unsigned int> const& pixel,
                    const double bordersize, const double attraction);
 
-  void update_neighbors(std::vector<boidstate> const& set,
+  void update_neighbors(std::vector<std::shared_ptr<boidstate>>& set,
                         const double align_distance, const double alpha,
                         Criterion criterion);
 
   void update_close_neighbors(std::vector<boid const*> const& set,
                               const double repulsion_distance);
 
-  void update_close_neighbors(std::vector<boidstate> const& set,
+  void update_close_neighbors(std::vector<std::shared_ptr<boidstate>>& set,
                               const double repulsion_distance);
 
   void regola1(const double repulsione);
   void regola2_3(const double steering, const double cohesion);
-  void posvel_update(const float deltaT);
+  virtual void posvel_update(const float deltaT);
 
-  void update_allneighbors(std::vector<boidstate> const& set,
+  void update_allneighbors(std::vector<std::shared_ptr<boidstate>>& set,
                            const double repulsion_distance,
                            const double align_distance, const double alpha,
                            unsigned int size, unsigned int flocksize);
@@ -126,20 +127,25 @@ std::vector<boidstate> generate_flock(std::default_random_engine& eng,
 template<class boidtype>
 class flock
 {
-  std::vector<boidtype> set;
-  std::vector<DoubleVec> velset;
+  std::vector<std::shared_ptr<boidstate>> set;
 
  public:
-  flock(std::default_random_engine& eng, paramlist const& params)
-      : set{generate_flock(eng, params)}
-  {}
-  flock(std::vector<boidtype> const& other)
+  flock(std::default_random_engine& eng, paramlist const& params);
+
+  flock(std::vector<std::shared_ptr<boidtype>> const& other)
       : set{other}
   {}
-  flock(std::vector<boidtype>&& other)
-      : set{other}
+  flock(std::vector<std::shared_ptr<boidtype>>&& other)
+      : set{std::move(other)}
   {}
-  std::vector<boidtype>& set_()
+  flock(std::vector<boidtype>& other)
+      : set{}
+  {
+    for (auto& boid : other) {
+      set.push_back(std::make_shared<boidtype>(boid));
+    }
+  }
+  auto& set_()
   {
     return set;
   }
@@ -150,8 +156,7 @@ class flock
   }
 
   void update(paramlist const& params);
-  std::vector<boidtype> generate_flock(std::default_random_engine& eng,
-                                       paramlist const& params);
+  void generate_flock(std::default_random_engine& eng, paramlist const& params);
 };
 } // namespace boids
 #include "boids.tpp" // namespace boids

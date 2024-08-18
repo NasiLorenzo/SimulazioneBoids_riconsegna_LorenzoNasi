@@ -25,10 +25,10 @@ include_directories("/opt/homebrew/Cellar/tbb/2021.13.0/include")
 find_package(TBB REQUIRED)
 find_package(SFML 2.5 COMPONENTS graphics REQUIRED)
 add_executable(boidsfml boids.cpp boidsfml.cpp doublevec.cpp sfmlboids.cpp)
-add_executable(boidss boids.cpp mainprova.cpp doublevec.cpp)
+add_executable(boidss boids.cpp mainprova.cpp doublevec.cpp sfmlboids.cpp)
 target_link_libraries(boidsfml PRIVATE sfml-graphics sfml-window sfml-system)
 target_link_libraries(boidsfml PRIVATE TBB::tbb TBB::tbbmalloc)
-target_link_libraries(boidss PRIVATE TBB::tbb TBB::tbbmalloc)
+target_link_libraries(boidss PRIVATE TBB::tbb TBB::tbbmalloc sfml-graphics sfml-window sfml-system)
 
 
 if (BUILD_TESTING)
