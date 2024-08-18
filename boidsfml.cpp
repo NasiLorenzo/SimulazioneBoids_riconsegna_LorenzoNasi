@@ -73,6 +73,7 @@ int main()
     clock.restart();
     stormo.update(params);
     window.clear(sf::Color::White);
+    
 
     for (auto& boid : stormo.set_()) {
       auto sfml_ptr=std::dynamic_pointer_cast<boids::SFMLboid>(boid);
