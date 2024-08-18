@@ -1,5 +1,10 @@
 #include "boids.hpp"
 #include "sfmlboids.hpp"
+using namespace std::chrono_literals;
+using std::chrono::duration;
+using std::chrono::duration_cast;
+using std::chrono::high_resolution_clock;
+using std::chrono::milliseconds;
 int main()
 {
   
@@ -19,7 +24,7 @@ int main()
       if (evento.type == sf::Event::Closed)
         window.close();
     }
-
+    auto t1 = high_resolution_clock::now();
     clock.restart();
     interface.get_flock().update(interface.get_params());
     window.clear(sf::Color::White);
@@ -36,7 +41,10 @@ int main()
     }
 
     window.display();
-
+    auto t2 = high_resolution_clock::now();
+    duration<double, std::milli> ms_double = t2 - t1;
+    std::cout << "posizione primo boid " << interface.get_flock().set_()[0].get_pos()[0] << "\n";
+    std::cout << ms_double.count() << "ms\n";
     if (frameTime < clock.getElapsedTime())
       std::cout << "Lag" << "\n";
     sf::sleep(frameTime - clock.getElapsedTime());
