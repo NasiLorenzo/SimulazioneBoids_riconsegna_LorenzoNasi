@@ -126,9 +126,12 @@ std::vector<boidstate> generate_flock(std::default_random_engine& eng,
 class flock
 {
   std::vector<boidstate> set;
-  std::vector<DoubleVec> velset;
 
  public:
+  flock()
+      : set{}
+  {}
+
   flock(std::default_random_engine& eng, paramlist const& params)
       : set{generate_flock(eng, params)}
   {}

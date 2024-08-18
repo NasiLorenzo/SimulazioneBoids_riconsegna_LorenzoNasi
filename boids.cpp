@@ -104,16 +104,11 @@ void boidstate::regola2_3(const double steering, const double cohesion)
 
 void boidstate::posvel_update(const float deltaT)
 {
-  /*for(auto
-  it=this->boid_.pos_.begin(),velit=this->boid_.vel_.begin();it!=this->boid_.pos_.end();++it,++velit){
-  *it+=deltaT * (*velit);
-  }*/
-  //std::cout << "La velocità vale dio boia: " << this->boid_.vel_[0] << " e "        << this->boid_.vel_[1] << "\n";
+  
   boid_.vel_+=boid_.deltavel_;
   boid_.pos_[0] += (this->get_vel()[0]) * deltaT;
   this->boid_.pos_[1] += (this->get_vel()[1]) * deltaT;
   boid_.deltavel_={0.,0.};
-  //std::cout << "La velocità vale: " << this->boid_.vel_[0] << " e " << this->boid_.vel_[1]       << "\n";
 }
 
 void boidstate::update_allneighbors(std::vector<boidstate> const& set,
