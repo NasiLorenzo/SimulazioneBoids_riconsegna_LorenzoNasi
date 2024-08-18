@@ -2,7 +2,7 @@
 
 namespace boids {
 
-/*void assigncolors(flock& ensemble,
+void assigncolors(flock& ensemble,
                   std::vector<RGB> const& colorvec)
 {
   for (auto& it : ensemble.set_()) {
@@ -10,6 +10,6 @@ namespace boids {
                                     colorvec[it.flockID].green,
                                     colorvec[it.flockID].blue));
   }
-}*/
+}
 
 } // namespace boids
