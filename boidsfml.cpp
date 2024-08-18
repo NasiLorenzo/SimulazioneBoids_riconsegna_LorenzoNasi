@@ -53,7 +53,7 @@ int main()
 
   std::random_device r;
   std::default_random_engine eng(r());
-  boids::flock stormo{eng, params};
+  boids::flock<boidstate> stormo{eng, params};
   std::vector<boids::RGB> colorvec = boids::generatecolors(eng, params);
   /*std::vector<boids::SFMLboid> flock =
       boids::functions<boids::SFMLboid>::generator(eng, params);

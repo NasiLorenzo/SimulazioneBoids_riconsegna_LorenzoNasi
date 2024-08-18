@@ -6,42 +6,23 @@
 #include <random>
 #include <vector>
 namespace boids {
-
-
-/*template<class boidtype>
-void ensemble<boidtype>::update(paramlist const& params)
+template<typename boidtype>
+void flock::update(paramlist const& params)
 {
-  auto jt = newset.begin();
-  std::for_each(set.begin(), set.end(), [&](auto& it) mutable {
-    std::vector<boidtype const*> neighbor;
-    std::vector<boidtype const*> close_neighbor;
+  std::for_each(oneapi::dpl::execution::par_unseq, set.begin(), set.end(),
+                [&](auto& boid) {
+                  boid.update_allneighbors(set, params.neigh_repulsion,
+                                           params.neigh_align, params.alpha,
+                                           params.size, params.flocksize);
+                  boid.update_rules(params);
 
-    if (params.flocksize < params.size) {
-      neighbor =
-          boids::functions<boidtype>::template neighbors<Criterion::similar>(
-              set, *jt, params.neigh_align, params.alpha);
-      close_neighbor = functions<boidtype>::template neighbors<Criterion::any>(
-          set, *jt, params.neigh_repulsion, params.alpha);
-    } else {
-      neighbor = boids::functions<boidtype>::template neighbors<Criterion::any>(
-          set, *jt, params.neigh_align, params.alpha);
-      close_neighbor =
-          functions<boidtype>::neighbors(neighbor, *jt, params.neigh_repulsion);
-    }
-
-    functions<boidtype>::regola1(close_neighbor, *jt, params.repulsione);
-    functions<boidtype>::regola2_3(neighbor, it, *jt, params.steering,
-                                   params.coesione);
-    functions<boidtype>::speedadjust(*jt, params.speedlimit,
-                                     params.speedminimum);
-    bordercheck_posupdate(*jt, params.pixel, params.bordersize,
-                          params.attraction, params.deltaT);
-    ++jt;
-  });
-
-  // Update set to newset
-  set = newset;
-}*/
+                  // std::cout<<"il numero di vicini e molto vicini è
+                  // "<<boid.get_neighbors().size()<<" e
+                  // "<<boid.get_close_neighbors().size()<<"\n";
+                });
+  std::for_each(std::execution::par_unseq, set.begin(), set.end(),
+                [&](auto& boid) { boid.posvel_update(params.deltaT); });
+}
 
 } // namespace boids
 #endif

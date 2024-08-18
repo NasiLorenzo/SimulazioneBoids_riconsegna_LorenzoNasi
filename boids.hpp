@@ -123,19 +123,20 @@ class boidstate
 std::vector<boidstate> generate_flock(std::default_random_engine& eng,
                                       paramlist const& params);
 
+template<typename boidtype>
 class flock
 {
-  std::vector<boidstate> set;
+  std::vector<boidtype> set;
   std::vector<DoubleVec> velset;
 
  public:
   flock(std::default_random_engine& eng, paramlist const& params)
       : set{generate_flock(eng, params)}
   {}
-  flock(std::vector<boidstate> const& other)
+  flock(std::vector<boidtype> const& other)
       : set{other}
   {}
-  std::vector<boidstate>& set_()
+  std::vector<boidtype>& set_()
   {
     return set;
   }
