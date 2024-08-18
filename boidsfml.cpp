@@ -2,6 +2,11 @@
 #include "sfmlboids.hpp"
 int main()
 {
+  using namespace std::chrono_literals;
+  using std::chrono::duration;
+  using std::chrono::duration_cast;
+  using std::chrono::high_resolution_clock;
+  using std::chrono::milliseconds;
   boids::paramlist params{};
   std::ifstream input{"parametrisfml.txt"};
   if (!input) {
@@ -52,7 +57,7 @@ int main()
   }
 
   std::random_device r;
-  std::default_random_engine eng(r());
+  std::default_random_engine eng(1);
   boids::flock<boids::SFMLboid> stormo{eng, params};
   std::vector<boids::RGB> colorvec = boids::generatecolors(eng, params);
   assigncolors(stormo, colorvec);
@@ -69,7 +74,7 @@ int main()
       if (evento.type == sf::Event::Closed)
         window.close();
     }
-
+    auto t1 = high_resolution_clock::now();
     clock.restart();
     stormo.update(params);
     window.clear(sf::Color::White);
@@ -86,7 +91,10 @@ int main()
     }
 
     window.display();
-
+    auto t2 = high_resolution_clock::now();
+    duration<double, std::milli> ms_double = t2 - t1;
+    std::cout << "posizione primo boid " << stormo.set_()[0]->get_pos()[0] << "\n";
+    std::cout << ms_double.count() << "ms\n";
     if (frameTime < clock.getElapsedTime())
       std::cout << "Lag" << "\n";
     sf::sleep(frameTime - clock.getElapsedTime());
