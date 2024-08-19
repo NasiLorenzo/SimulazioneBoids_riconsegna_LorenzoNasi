@@ -2,7 +2,11 @@
 namespace boids {
 
 double params::rate{1};
-
+using namespace std::chrono_literals;
+using std::chrono::duration;
+using std::chrono::duration_cast;
+using std::chrono::high_resolution_clock;
+using std::chrono::milliseconds;
 void boidstate::random_boid(std::default_random_engine& eng,
                             paramlist const& params)
 {
@@ -48,7 +52,8 @@ void boidstate::update_neighbors(std::vector<boidstate> const& set,
         && (criterion == Criterion::any
             || (criterion == Criterion::similar
                 && this->boid_.flockID == neighbor.get_ID()))) {
-      auto cosangolo = cosangleij(neighbor.get_pos() - this->boid_.pos_, this->boid_.vel_);
+      auto cosangolo =
+          cosangleij(neighbor.get_pos() - this->boid_.pos_, this->boid_.vel_);
       if ((cosangolo) >= std::cos(alpha)) {
         this->neighbors.emplace_back(&(neighbor.boid_));
       }
@@ -93,22 +98,21 @@ void boidstate::regola2_3(const double steering, const double cohesion)
 {
   auto n        = neighbors.size();
   auto velcopia = this->get_vel();
-  std::for_each(this->neighbors.begin(), this->neighbors.end(),
-                [&](auto& neighbor) {
-                  auto x = neighbor->vel_ - velcopia;
-                  this->boid_.deltavel_ += steering / static_cast<double>(n) * x;
-                  auto y = neighbor->pos_ - this->boid_.pos_;
-                  this->boid_.deltavel_ += cohesion / static_cast<double>(n) * y;
-                });
+  std::for_each(
+      this->neighbors.begin(), this->neighbors.end(), [&](auto& neighbor) {
+        auto x = neighbor->vel_ - velcopia;
+        this->boid_.deltavel_ += steering / static_cast<double>(n) * x;
+        auto y = neighbor->pos_ - this->boid_.pos_;
+        this->boid_.deltavel_ += cohesion / static_cast<double>(n) * y;
+      });
 }
 
 void boidstate::posvel_update(const float deltaT)
 {
-  
-  boid_.vel_+=boid_.deltavel_;
+  boid_.vel_ += boid_.deltavel_;
   boid_.pos_[0] += (this->get_vel()[0]) * deltaT;
   this->boid_.pos_[1] += (this->get_vel()[1]) * deltaT;
-  boid_.deltavel_={0.,0.};
+  boid_.deltavel_ = {0., 0.};
 }
 
 void boidstate::update_allneighbors(std::vector<boidstate> const& set,
@@ -157,20 +161,23 @@ std::vector<boidstate> generate_flock(std::default_random_engine& eng,
 
 void flock::update(paramlist const& params)
 {
-  std::for_each(oneapi::dpl::execution::par_unseq,set.begin(), set.end(), [&](auto& boid) {
-    boid.update_allneighbors(set, params.neigh_repulsion, params.neigh_align,
-                             params.alpha, params.size, params.flocksize);
-    boid.update_rules(params);
+  auto t1 = high_resolution_clock::now();
+  std::for_each(oneapi::dpl::execution::par_unseq, set.begin(), set.end(),
+                [&](auto& boid) {
+                  boid.update_allneighbors(set, params.neigh_repulsion,
+                                           params.neigh_align, params.alpha,
+                                           params.size, params.flocksize);
+                  boid.update_rules(params);
 
-                            
-    // std::cout<<"il numero di vicini e molto vicini è
-    // "<<boid.get_neighbors().size()<<" e
-    // "<<boid.get_close_neighbors().size()<<"\n";
-  });
-  std::for_each(std::execution::par_unseq,set.begin(), set.end(), [&](auto& boid) {
-    boid.posvel_update(params.deltaT);
-  });
-
+                  // std::cout<<"il numero di vicini e molto vicini è
+                  // "<<boid.get_neighbors().size()<<" e
+                  // "<<boid.get_close_neighbors().size()<<"\n";
+                });
+  auto t2 = high_resolution_clock::now();
+  duration<double, std::milli> ms_double = t2 - t1;
+  std::cout << "tempo creazione vicini: " << ms_double.count() << " ms\n";
+  std::for_each(std::execution::par_unseq, set.begin(), set.end(),
+                [&](auto& boid) { boid.posvel_update(params.deltaT); });
 }
 
 } // namespace boids
