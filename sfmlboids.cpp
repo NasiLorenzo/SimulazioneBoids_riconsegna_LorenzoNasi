@@ -52,18 +52,24 @@ std::vector<RGB> generatecolors(std::default_random_engine& eng,
         params.size = static_cast<unsigned int>(value);
       else if (name == "flocksize")
         params.flocksize = static_cast<unsigned int>(value);
-      else if (name == "pixel.x")
+      /*else if (name == "pixel.x")
         params.pixel[0] = static_cast<unsigned int>(value);
       else if (name == "pixel.y")
-        params.pixel[1] = static_cast<unsigned int>(value);
+        params.pixel[1] = static_cast<unsigned int>(value);*/
       else if (name == "rate")
         boids::params::rate = value;
       else if (name == "bordersize")
         params.bordersize = value;
       else if (name == "sigma")
         params.sigma = value;
+      else if (name == "rows")
+        params.rows = static_cast<int>(value);
+      else if (name == "columns")
+        params.columns = static_cast<int>(value);
     }
   }
+  params.pixel[0]=params.columns*params.neigh_align;
+  params.pixel[1]=params.rows*params.neigh_align;
   return params;
   }
 
