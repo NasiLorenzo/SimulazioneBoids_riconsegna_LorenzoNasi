@@ -115,21 +115,21 @@ class boidstate
   void bordercheck(std::vector<unsigned int> const& pixel,
                    const double bordersize, const double attraction);
 
-  void update_neighbors(std::unordered_multimap<int, boid const*> map,
+  void update_neighbors(std::unordered_multimap<int, boid const*>const& map,
                         const double align_distance, const double alpha,
                         Criterion criterion, const int columns);
 
   void update_close_neighbors(std::vector<boid const*> const& set,
                               const double repulsion_distance);
 
-  void update_close_neighbors(std::unordered_multimap<int,boid const*> map,
+  void update_close_neighbors(std::unordered_multimap<int,boid const*>const& map,
                               const double repulsion_distance, const double align_distance, const int columns);
 
   void regola1(const double repulsione);
   void regola2_3(const double steering, const double cohesion);
   void posvel_update(const float deltaT, const double view_range);
 
-  void update_allneighbors(std::unordered_multimap<int, boid const*> map,
+  void update_allneighbors(std::unordered_multimap<int, boid const*>const& map,
                                     const double repulsion_distance,
                                     const double align_distance,
                                     const double alpha, unsigned int size,

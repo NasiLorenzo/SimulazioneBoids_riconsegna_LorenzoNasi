@@ -54,7 +54,7 @@ void boidstate::bordercheck(std::vector<unsigned int> const& pixel,
   }
 }
 
-void boidstate::update_neighbors(std::unordered_multimap<int,boid const*> map,
+void boidstate::update_neighbors(std::unordered_multimap<int,boid const*>const& map,
                                  const double align_distance,
                                  const double alpha, Criterion criterion, const int columns)
 {
@@ -114,7 +114,7 @@ void boidstate::update_close_neighbors(std::vector<boid const*> const& set,
   });
 }
 
-void boidstate::update_close_neighbors(std::unordered_multimap<int,boid const*> map,
+void boidstate::update_close_neighbors(std::unordered_multimap<int,boid const*>const& map,
                                        const double repulsion_distance, const double align_distance, const int columns)
 {
   this->close_neighbors.clear();
@@ -179,7 +179,7 @@ void boidstate::posvel_update(const float deltaT,const double view_range)
   UpdateID(boid_,view_range);
 }
 
-void boidstate::update_allneighbors(std::unordered_multimap<int, boid const*> map,
+void boidstate::update_allneighbors(std::unordered_multimap<int, boid const*>const& map,
                                     const double repulsion_distance,
                                     const double align_distance,
                                     const double alpha, unsigned int size,
@@ -226,23 +226,27 @@ std::vector<boidstate> generate_flock(std::default_random_engine& eng,
 }
 
 void flock::update_HashMap(paramlist const& params){
-  auto t1=high_resolution_clock::now();
+  //auto t1=high_resolution_clock::now();
   HashMap.clear();
   std::for_each(set.begin(),set.end(),[&](auto& boid){
     HashMap.insert({hash_function(boid.set_GridID(),params.columns),&(boid.set_boid())});
   });
-  auto t2=high_resolution_clock::now();
+  /*auto t2=high_resolution_clock::now();
   duration<double, std::milli> ms_double=t2-t1;
-  std::cout<<"Tempo creazione mappa: "<<ms_double.count()<<" ms"<<"\n";
+  std::cout<<"Tempo creazione mappa: "<<ms_double.count()<<" ms"<<"\n";*/
 }
 
 void flock::update(paramlist const& params)
-{
+{ 
   std::for_each(oneapi::dpl::execution::par_unseq,set.begin(), set.end(), [&](auto& boid) {
+    auto t1=high_resolution_clock::now();
     boid.update_allneighbors(HashMap, params.neigh_repulsion, params.neigh_align,
                              params.alpha, params.size, params.flocksize,params.columns);
+    auto t2=high_resolution_clock::now();
+    duration<double, std::milli> ms_double=t2-t1;
+    //std::cout<<"Tempo creazione vicini e operazioni: "<<ms_double.count()<<" ms"<<"\n";
     boid.update_rules(params);
-
+    //std::cout<<"Chiave boid "<<boid.set_GridID().columns<<" e "<<boid.set_GridID().rows<<"\n";
                             
     // std::cout<<"il numero di vicini e molto vicini è
     // "<<boid.get_neighbors().size()<<" e
