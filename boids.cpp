@@ -46,7 +46,7 @@ void boidstate::update_neighbors(std::vector<boidstate> const& set,
                                  const double alpha, Criterion criterion)
 {
   this->neighbors.clear();
-  std::for_each(set.begin(), set.end(), [&](auto& neighbor) {
+  std::for_each(std::execution::par_unseq,set.begin(), set.end(), [&](auto& neighbor) {
     auto distanza = distance(this->boid_.pos_, neighbor.get_pos());
     if (distanza < pow(align_distance, 2) && distanza != 0
         && (criterion == Criterion::any
@@ -77,7 +77,7 @@ void boidstate::update_close_neighbors(std::vector<boidstate> const& set,
                                        const double repulsion_distance)
 {
   this->close_neighbors.clear();
-  std::for_each(set.begin(), set.end(), [&](auto& neighbor) {
+  std::for_each(std::execution::par_unseq,set.begin(), set.end(), [&](auto& neighbor) {
     auto distanza = distance(this->boid_.pos_, neighbor.get_pos());
     if (distanza < pow(repulsion_distance, 2) && distanza != 0) {
       this->close_neighbors.emplace_back(&(neighbor.boid_));
