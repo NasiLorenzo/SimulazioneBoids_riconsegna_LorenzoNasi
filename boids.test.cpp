@@ -9,8 +9,8 @@ TEST_CASE("Testing rules")
   params.repulsione      = 0.7;
   params.steering        = 0.1;
   params.coesione        = 0.1;
-  params.neigh_repulsion = 1000000;
-  params.neigh_align     = 1000000;
+  params.neigh_repulsion = 10000;
+  params.neigh_align     = 10000;
   params.alpha           = M_PI;
   params.attraction      = 0;
   params.speedlimit      = 8000;
@@ -18,6 +18,8 @@ TEST_CASE("Testing rules")
   params.size            = 10;
   params.deltaT          = 1 / 30.f;
   params.flocksize       = 10;
+  params.rows=1;
+  params.columns=1;
   boidstate boid1;
   boid1.set_pos() = {700., 200.};
   boid1.set_vel() = {300., -10.};
@@ -52,14 +54,14 @@ TEST_CASE("Testing rules")
   std::vector<boidstate> set{boid1, boid2, boid3, boid4, boid5,
                              boid6, boid7, boid8, boid9, boid10};
 
-  flock stormo{set};
+  flock stormo{set,params};
 
   stormo.update(params);
 
-  /*for (auto& boid : stormo.set_()) {
+  for (auto& boid : stormo.set_()) {
     std::cout << "Le velocità sono: " << boid.get_vel()[0] << ", "
               << boid.get_vel()[1] << "\n";
-  }*/
+  }
 
   REQUIRE(stormo.size_() == 10);
 

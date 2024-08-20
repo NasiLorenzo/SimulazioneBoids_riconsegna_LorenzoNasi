@@ -15,5 +15,5 @@ pixel.y          750
 rate             2      //rapporto tra l'area di generazione e la dimensione in pixel della finestra
 bordersize       50     //distanza dal bordo da cui si inizia ad applicare la repulsione ai bordi, in pixel
 sigma            100    //sigma della distribuzione binomiale delle velocità
-
- 
+rows             5
+columns          9

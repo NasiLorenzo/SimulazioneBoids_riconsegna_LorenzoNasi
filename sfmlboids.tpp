@@ -10,6 +10,7 @@ namespace boids {
                                     colorvec[it.flockID].green,
                                     colorvec[it.flockID].blue));
   }
-}
-*/
+
+}*/
+
 } // namespace boids
