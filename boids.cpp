@@ -229,7 +229,6 @@ void flock::update_HashMap(paramlist const& params){
   //auto t1=high_resolution_clock::now();
   HashMap.clear();
   std::for_each(set.begin(),set.end(),[&](auto& boid){
-    std::cout<<"La Hash key vale: "<<hash_function(boid.set_GridID(),params.columns)<<"\n";
     HashMap.insert({hash_function(boid.set_GridID(),params.columns),&(boid.set_boid())});
   });
   /*auto t2=high_resolution_clock::now();
