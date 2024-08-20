@@ -70,6 +70,8 @@ std::vector<RGB> generatecolors(std::default_random_engine& eng,
   }
   params.pixel[0]=params.columns*params.neigh_align;
   params.pixel[1]=params.rows*params.neigh_align;
+  params.columns*=params::rate;
+  params.rows*=params::rate;
   return params;
   }
 
