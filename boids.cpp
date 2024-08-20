@@ -162,7 +162,7 @@ std::vector<boidstate> generate_flock(std::default_random_engine& eng,
 void flock::update(paramlist const& params)
 {
   auto t1 = high_resolution_clock::now();
-  std::for_each(oneapi::dpl::execution::par_unseq, set.begin(), set.end(),
+  std::for_each(std::execution::par_unseq, set.begin(), set.end(),
                 [&](auto& boid) {
                   boid.update_allneighbors(set, params.neigh_repulsion,
                                            params.neigh_align, params.alpha,
