@@ -61,7 +61,6 @@ void boidstate::update_neighbors(std::unordered_multimap<int,boid const*>const& 
 {
   this->neighbors.clear();
   /*std::for_each(set.begin(), set.end(), [&](auto& neighbor) {
->>>>>>> master
     auto distanza = distance(this->boid_.pos_, neighbor.get_pos());
     if (distanza < pow(align_distance, 2) && distanza != 0
         && (criterion == Criterion::any
@@ -122,7 +121,6 @@ void boidstate::update_close_neighbors(std::unordered_multimap<int,boid const*>c
   this->close_neighbors.clear();
   /*std::for_each(set.begin(), set.end(), [&](auto& neighbor) {
     auto distanza = distance(this->boid_.pos_, neighbor.second.get_pos());
->>>>>>> master
     if (distanza < pow(repulsion_distance, 2) && distanza != 0) {
       this->close_neighbors.emplace_back(&(neighbor.second.boid_));
     }
@@ -163,18 +161,19 @@ void boidstate::regola2_3(const double steering, const double cohesion)
 {
   auto n        = neighbors.size();
   auto velcopia = this->get_vel();
-  std::for_each(
-      this->neighbors.begin(), this->neighbors.end(), [&](auto& neighbor) {
-        auto x = neighbor->vel_ - velcopia;
-        this->boid_.deltavel_ += steering / static_cast<double>(n) * x;
-        auto y = neighbor->pos_ - this->boid_.pos_;
-        this->boid_.deltavel_ += cohesion / static_cast<double>(n) * y;
-      });
+  std::for_each(this->neighbors.begin(), this->neighbors.end(),
+                [&](auto& neighbor) {
+                  auto x = neighbor->vel_ - velcopia;
+                  this->boid_.deltavel_ += steering / static_cast<double>(n) * x;
+                  auto y = neighbor->pos_ - this->boid_.pos_;
+                  this->boid_.deltavel_ += cohesion / static_cast<double>(n) * y;
+                });
 }
 
 void boidstate::posvel_update(const float deltaT,const double view_range)
 {
-  boid_.vel_ += boid_.deltavel_;
+  
+  boid_.vel_+=boid_.deltavel_;
   boid_.pos_[0] += (this->get_vel()[0]) * deltaT;
   this->boid_.pos_[1] += (this->get_vel()[1]) * deltaT;
   boid_.deltavel_={0.,0.};
@@ -226,6 +225,7 @@ std::vector<boidstate> generate_flock(std::default_random_engine& eng,
 
   return set;
 }
+
 void flock::update_HashMap(paramlist const& params){
   //auto t1=high_resolution_clock::now();
   HashMap.clear();
@@ -257,11 +257,7 @@ void flock::update(paramlist const& params)
     boid.posvel_update(params.deltaT,params.neigh_align);
   });
   update_HashMap(params);
-                  // std::cout<<"il numero di vicini e molto vicini è
-                  // "<<boid.get_neighbors().size()<<" e
-                  // "<<boid.get_close_neighbors().size()<<"\n";
-  std::for_each(std::execution::par_unseq, set.begin(), set.end(),
-                [&](auto& boid) { boid.posvel_update(params.deltaT,params.neigh_align); });
+
 }
 
 } // namespace boids
