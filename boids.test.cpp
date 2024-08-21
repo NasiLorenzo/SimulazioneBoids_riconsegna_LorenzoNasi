@@ -78,7 +78,7 @@ TEST_CASE("Testing rules")
       std::cout << "Vel close_vicino: " << neigh->cget_vel()[0] << "\n";
     }
   }
-  //stormo.update(params);
+  stormo.update(params);
   for (auto& boid : stormo.set_()) {
     std::cout << "La velocità dopo il secondo update è: " << boid.get_vel()[0] << ", "
               << boid.get_vel()[1] << "\n";
