@@ -114,9 +114,7 @@ class boidstate
   auto& get_close_neighbors(){
     return close_neighbors;
   }
-  void set_neighbors(std::vector<boid const*>&& other){
-
-  }
+  
   void random_boid(std::default_random_engine&, paramlist const& params);
 
   void speedadjust(double speedlimit, double speedminimum);
