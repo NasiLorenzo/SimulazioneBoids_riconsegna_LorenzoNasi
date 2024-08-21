@@ -18,6 +18,7 @@
 #include <sstream>
 #include <string>
 #include <vector>
+#include <mutex>
 namespace boids {
 struct params
 {

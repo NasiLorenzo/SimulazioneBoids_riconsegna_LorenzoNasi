@@ -17,7 +17,7 @@ int main()
   const sf::Time frameTime = sf::seconds(interface.get_params().deltaT);
 
   sf::Clock clock;
-
+  int i=0;
   while (window.isOpen()) {
     sf::Event evento;
     while (window.pollEvent(evento)) {
@@ -41,9 +41,10 @@ int main()
     }
 
     window.display();
+    i++;
     auto t2 = high_resolution_clock::now();
     duration<double, std::milli> ms_double = t2 - t1;
-    std::cout << "posizione primo boid " << interface.get_flock().set_()[0].get_pos()[0] << "\n";
+    std::cout << "posizione primo boid " << interface.get_flock().set_()[0].get_pos()[0] <<" "<<i<< "\n";
     std::cout << ms_double.count() << "ms\n";
     if (frameTime < clock.getElapsedTime())
       std::cout << "Lag" << "\n";

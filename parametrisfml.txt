@@ -2,7 +2,7 @@ repulsione       0.6    //tenere il parametro di repulsione un ordine di grandez
 steering         0.04   //parametro di allineamento
 coesione         0.08
 neigh_align      150    //distanza di vicinanza, per le regole 2 e 3
-neigh_repulsion  15     //distanza di repulsione, per la regola 1
+neigh_repulsion  20     //distanza di repulsione, per la regola 1
 attraction       200      //parametro di repulsione ai bordi dell'area di generazione
 alpha            0.55   //metà dell'angolo visivo in funzione di pi greco
 speedlimit       100    // limiti superiori e inferiori di velocità

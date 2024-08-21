@@ -147,11 +147,13 @@ void boidstate::update_neighbors(
 void boidstate::update_close_neighbors(std::vector<boid const*> const& set,
                                        const double repulsion_distance)
 {
+  std::mutex neighs_mutex;
   this->close_neighbors.clear();
-  std::for_each(std::execution::par_unseq, set.begin(), set.end(),
+  std::for_each(/*std::execution::par_unseq,*/set.begin(), set.end(),
                 [&](auto& neighbor) {
                   auto distanza = distance(this->boid_.pos_, neighbor->pos_);
                   if (distanza < pow(repulsion_distance, 2) && distanza != 0) {
+                    //std::lock_guard<std::mutex> guard(neighs_mutex);
                     this->close_neighbors.emplace_back(neighbor);
                   }
                 });
@@ -306,7 +308,7 @@ void flock::update_HashMap(paramlist const& params)
 
 void flock::update(paramlist const& params)
 {
-  std::for_each(oneapi::dpl::execution::par_unseq, set.begin(), set.end(),
+  std::for_each(/*oneapi::dpl::execution::par_unseq,*/ set.begin(), set.end(),
                 [&](auto& boid) {
                   auto t1 = high_resolution_clock::now();
                   boid.update_allneighbors(HashMap, params.neigh_repulsion,
@@ -325,7 +327,7 @@ void flock::update(paramlist const& params)
                   // "<<boid.get_neighbors().size()<<" e
                   // "<<boid.get_close_neighbors().size()<<"\n";
                 });
-  std::for_each(std::execution::par_unseq, set.begin(), set.end(),
+  std::for_each(/*std::execution::par_unseq, */set.begin(), set.end(),
                 [&](auto& boid) {
                   boid.posvel_update(params.deltaT, params.neigh_align);
                 });
