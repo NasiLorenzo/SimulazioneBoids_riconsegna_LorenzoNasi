@@ -217,6 +217,10 @@ class flock
   flock(std::vector<boidstate> const& other, paramlist const& params)
       : set{other}
   {
+    std::for_each(set.begin(),set.end(),[&params](auto& boid){
+      UpdateID(boid.set_boid(),params.neigh_align);
+    });
+    update_HashMap(params);
     std::for_each(set.begin(), set.end(), [&params](auto& boid) {
       UpdateID(boid.set_boid(), params.neigh_align);
     });

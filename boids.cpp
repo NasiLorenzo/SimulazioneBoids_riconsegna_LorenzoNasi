@@ -122,12 +122,9 @@ void boidstate::update_close_neighbors(std::vector<boid const*> const& set,
 void boidstate::update_close_neighbors(
     std::unordered_multimap<int, boid const*> const& map,
     const double repulsion_distance, const double align_distance,
-    const int columns, const double alpha)
+    const int columns,const double alpha)
 {
-  close_neighbors.clear();
-  assert(close_neighbors.empty());
-  // create_neighbors_range(*this, map, close_neighbors, align_distance,
-  // columns);
+  this->close_neighbors.clear();
   /*std::for_each(set.begin(), set.end(), [&](auto& neighbor) {
     auto distanza = distance(this->boid_.pos_, neighbor.second.get_pos());
     if (distanza < pow(repulsion_distance, 2) && distanza != 0) {
@@ -149,32 +146,14 @@ void boidstate::update_close_neighbors(
       auto neighrange = map.equal_range(startkey);
       std::for_each(neighrange.first, neighrange.second, [&](auto& neighbor) {
         auto distanza = distance(this->boid_.pos_, neighbor.second->pos_);
-        if ((distanza < pow(repulsion_distance, 2) && distanza != 0
-             && this->boid_.flockID == neighbor.second->flockID)) {
-          auto cosangolo = cosangleij(neighbor.second->pos_ - this->boid_.pos_,
-                                      this->boid_.vel_);
-          if ((cosangolo) >= std::cos(alpha)) {
-            this->close_neighbors.emplace_back(neighbor.second);
-          }
+        if (distanza < pow(repulsion_distance, 2) && distanza != 0) {
+          this->close_neighbors.emplace_back(neighbor.second);
         }
       });
       startkey++;
     }
     startkey += columns - 3;
   }
-
-  /*close_neighbors.erase(
-      std::remove_if(std::execution::par_unseq,
-          close_neighbors.begin(), close_neighbors.end(),
-          [&](auto& neighbor) {
-            auto cosangolo =
-                cosangleij(neighbor->pos_ - this->boid_.pos_, this->boid_.vel_);
-            auto distanza = distance(this->boid_.pos_, neighbor->pos_);
-            return ((distanza >= pow(align_distance, 2))
-                    || (this->boid_.flockID != neighbor->flockID)
-                    || (cosangolo < std::cos(alpha)) || distanza == 0);
-          }),
-      close_neighbors.end());*/
 }
 
 void boidstate::regola1(const double repulsione)
@@ -284,7 +263,7 @@ void flock::update(paramlist const& params)
                   boid.update_rules(params);
                   // std::cout<<"Chiave boid "<<boid.set_GridID().columns<<" e
                   // "<<boid.set_GridID().rows<<"\n";
-
+                  std::cout<<"La chiave vale: "<<hash_function(boid.set_GridID(),params.columns)<<"\n";
                   // std::cout<<"il numero di vicini e molto vicini è
                   // "<<boid.get_neighbors().size()<<" e
                   // "<<boid.get_close_neighbors().size()<<"\n";

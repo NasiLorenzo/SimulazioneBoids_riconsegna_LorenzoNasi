@@ -12,14 +12,14 @@ TEST_CASE("Testing rules")
   params.neigh_repulsion = 10000.;
   params.neigh_align     = 10000.;
   params.alpha           = M_PI;
-  params.attraction      = 8000;
-  params.speedlimit      = 0;
+  params.attraction      = 0;
+  params.speedlimit      = 80000;
   params.speedminimum    = 1;
   params.size            = 4;
   params.deltaT          = 1 / 30.f;
   params.flocksize       = 4;
-  params.rows            = 1;
-  params.columns         = 1;
+  params.rows=1;
+  params.columns=1;
   params.pixel[0]=static_cast<unsigned int>(params.columns*params.neigh_align);
   params.pixel[1]=static_cast<unsigned int>(params.rows*params.neigh_align);
   params.columns*=static_cast<int>(params::rate);
@@ -37,8 +37,8 @@ TEST_CASE("Testing rules")
   boid4.get_pos() = {1000., 150.};
   boid4.get_vel() = {400., 77.};
   /*boidstate boid5;
-  boid5.get_pos() = {200., 500.};
-  boid5.get_vel() = {300., 300.};
+  boid5.set_pos() = {200., 500.};
+  boid5.set_vel() = {300., 300.};
   boidstate boid6;
   boid6.get_pos() = {300., 450.};
   boid6.get_vel() = {-100., -100.};
@@ -52,10 +52,10 @@ TEST_CASE("Testing rules")
   boid9.get_pos() = {120., 200.};
   boid9.get_vel() = {50., 60.};
   boidstate boid10;
-  boid10.get_pos() = {910., 415.};
-  boid10.get_vel() = {-300., -200.};*/
+  boid10.set_pos() = {910., 415.};
+  boid10.set_vel() = {-300., -200.};*/
 
-  std::vector<boidstate> set{boid1, boid2, boid3, boid4 /*boid5,
+  std::vector<boidstate> set{boid1, boid2, boid3, boid4/* , boid5,
                              boid6, boid7, boid8, boid9, boid10*/};
 
   flock stormo{set, params};
@@ -82,8 +82,7 @@ TEST_CASE("Testing rules")
   for (auto& boid : stormo.set_()) {
     std::cout << "La velocità dopo il secondo update è: " << boid.get_vel()[0] << ", "
               << boid.get_vel()[1] << "\n";
-    std::cout << "I vicini sono " << boid.get_neighbors().size() << " e "
-              << boid.get_close_neighbors().size() << "\n";
+    std::cout<<"Le posizioni sono: "<<boid.get_pos()[0]<<", "<<boid.get_pos()[1]<<"\n";
   }
 
   REQUIRE(stormo.size_() == 10);
