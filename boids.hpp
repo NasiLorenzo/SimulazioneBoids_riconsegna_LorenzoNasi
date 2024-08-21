@@ -108,6 +108,15 @@ class boidstate
   {
     return boid_;
   }
+  auto& get_neighbors(){
+    return neighbors;
+  }
+  auto& get_close_neighbors(){
+    return close_neighbors;
+  }
+  void set_neighbors(std::vector<boid const*>&& other){
+
+  }
   void random_boid(std::default_random_engine&, paramlist const& params);
 
   void speedadjust(double speedlimit, double speedminimum);
@@ -122,8 +131,8 @@ class boidstate
   void update_close_neighbors(std::vector<boid const*> const& set,
                               const double repulsion_distance);
 
-  void update_close_neighbors(std::unordered_multimap<int,boid const*>const& map,
-                              const double repulsion_distance, const double align_distance, const int columns);
+  void update_close_neighbors(std::unordered_multimap<int, boid const*>const& map,
+                              const double repulsion_distance, const double align_distance, const int columns, const double alpha);
 
   void regola1(const double repulsione);
   void regola2_3(const double steering, const double cohesion);

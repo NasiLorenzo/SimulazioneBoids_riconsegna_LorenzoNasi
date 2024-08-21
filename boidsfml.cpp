@@ -11,9 +11,9 @@ int main()
 
   boids::SFML_interface interface("parametrisfml.txt");
 
-  sf::RenderWindow window(sf::VideoMode(interface.get_params().pixel[0], interface.get_params().pixel[1]),
+  sf::VideoMode desktop = sf::VideoMode::getDesktopMode();  
+  sf::RenderWindow window(sf::VideoMode(interface.get_params().pixel[0], interface.get_params().pixel[1],desktop.bitsPerPixel),
                           "boids simulation");
-
   const sf::Time frameTime = sf::seconds(interface.get_params().deltaT);
 
   sf::Clock clock;
