@@ -249,7 +249,7 @@ void flock::update_HashMap(paramlist const& params)
 
 void flock::update(paramlist const& params)
 {
-  std::for_each(/*oneapi::dpl::execution::par_unseq,*/ set.begin(), set.end(),
+  std::for_each(oneapi::dpl::execution::par_unseq, set.begin(), set.end(),
                 [&](auto& boid) {
                   auto t1 = high_resolution_clock::now();
                   boid.update_allneighbors(HashMap, params.neigh_repulsion,
@@ -263,12 +263,12 @@ void flock::update(paramlist const& params)
                   boid.update_rules(params);
                   // std::cout<<"Chiave boid "<<boid.set_GridID().columns<<" e
                   // "<<boid.set_GridID().rows<<"\n";
-                  std::cout<<"La chiave vale: "<<hash_function(boid.set_GridID(),params.columns)<<"\n";
+                  //std::cout<<"La chiave vale: "<<hash_function(boid.set_GridID(),params.columns)<<"\n";
                   // std::cout<<"il numero di vicini e molto vicini è
                   // "<<boid.get_neighbors().size()<<" e
                   // "<<boid.get_close_neighbors().size()<<"\n";
                 });
-  std::for_each(/*std::execution::par_unseq, */ set.begin(), set.end(),
+  std::for_each(std::execution::par_unseq, set.begin(), set.end(),
                 [&](auto& boid) {
                   boid.posvel_update(params.deltaT, params.neigh_align);
                 });
