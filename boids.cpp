@@ -21,11 +21,15 @@ void UpdateID(boid& boid, const double view_range)
       static_cast<int>(std::floor(boid.pos_[0] / view_range) + 1);
   boid.GridID.rows =
       static_cast<int>(std::floor(boid.pos_[1] / view_range) + 1);
+  // std::cout << "Valori ID in uscita: " << boid.GridID.columns << " " <<
+  // boid.GridID.rows << "\n";
 }
 
 int hash_function(gridID const& GridID, const int columns)
 {
+  std::cout << "Valori ID: " << GridID.columns << " " << GridID.rows << "\n";
   int key = (GridID.rows - 1) * columns + GridID.columns;
+  // assert(key>0);
   return key;
 }
 
@@ -36,12 +40,14 @@ void create_neighbors_range(
 {
   neighbors.clear();
   gridID startID{};
-  if (boid_.set_boid().GridID.columns == 0)
-    startID.columns = 0;
-  startID.columns = boid_.set_boid().GridID.columns - 1;
-  if (boid_.set_boid().GridID.rows == 0)
-    startID.rows = 0;
-  startID.rows  = boid_.set_boid().GridID.rows - 1;
+  if (boid_.set_boid().GridID.columns == 1)
+    startID.columns = 1;
+  else
+    startID.columns = boid_.set_GridID().columns - 1;
+  if (boid_.set_boid().GridID.rows == 1)
+    startID.rows = 1;
+  else
+    startID.rows = boid_.set_GridID().rows - 1;
   auto startkey = hash_function(startID, columns);
   for (int j = 0; j < 3; j++) {
     for (int i = 0; i < 3; i++) {
@@ -104,13 +110,18 @@ void boidstate::update_neighbors(
     }
   });*/
   gridID startID{};
-  if (boid_.GridID.columns == 0)
-    startID.columns = 0;
-  startID.columns = boid_.GridID.columns - 1;
-  if (boid_.GridID.rows == 0)
-    startID.rows = 0;
-  startID.rows  = boid_.GridID.rows - 1;
+  if (boid_.GridID.columns == 1)
+    startID.columns = 1;
+  else {
+    startID.columns = boid_.GridID.columns - 1;
+  }
+  if (boid_.GridID.rows == 1)
+    startID.rows = 1;
+  else {
+    startID.rows = boid_.GridID.rows - 1;
+  }
   auto startkey = hash_function(startID, columns);
+  //std::cout << "Valore startkey " << startkey << "\n";
   for (int j = 0; j < 3; j++) {
     for (int i = 0; i < 3; i++) {
       auto neighrange = map.equal_range(startkey);
@@ -176,12 +187,14 @@ void boidstate::update_close_neighbors(
     }
   });*/
   gridID startID{};
-  if (boid_.GridID.columns == 0)
-    startID.columns = 0;
-  startID.columns = boid_.GridID.columns - 1;
-  if (boid_.GridID.rows == 0)
-    startID.rows = 0;
-  startID.rows  = boid_.GridID.rows - 1;
+  if (boid_.GridID.columns == 1)
+    startID.columns = 1;
+  else
+    startID.columns = boid_.GridID.columns - 1;
+  if (boid_.GridID.rows == 1)
+    startID.rows = 1;
+  else
+    startID.rows = boid_.GridID.rows - 1;
   auto startkey = hash_function(startID, columns);
   for (int j = 0; j < 3; j++) {
     for (int i = 0; i < 3; i++) {
@@ -221,7 +234,7 @@ void boidstate::regola1(const double repulsione)
   std::for_each(this->close_neighbors.begin(), this->close_neighbors.end(),
                 [&](auto& neighbor) {
                   auto x = neighbor->get_poscopy() - this->boid_.get_poscopy();
-                  //auto x{DoubleVec{1,1}};
+                  // auto x{DoubleVec{1,1}};
                   this->boid_.deltavel_ += -repulsione * x;
                 });
 }
@@ -232,11 +245,9 @@ void boidstate::regola2_3(const double steering, const double cohesion)
   auto velcopia = this->get_vel();
   std::for_each(
       this->neighbors.begin(), this->neighbors.end(), [&](auto& neighbor) {
-        auto x = neighbor->get_velcopy() - velcopia;
-        //auto x{DoubleVec{1,1}};
+        auto x = neighbor->vel_ - velcopia;
         this->boid_.deltavel_ += steering / static_cast<double>(n) * x;
-        auto y = neighbor->get_poscopy() - this->boid_.get_poscopy();
-        //auto y{DoubleVec{1,1}};
+        auto y = neighbor->pos_ - this->boid_.pos_;
         this->boid_.deltavel_ += cohesion / static_cast<double>(n) * y;
       });
 }
@@ -245,9 +256,10 @@ void boidstate::posvel_update(const float deltaT, const double view_range)
 {
   boid_.vel_ += boid_.deltavel_;
   boid_.pos_[0] += (this->cget_vel()[0]) * deltaT;
-  this->boid_.pos_[1] += (this->cget_vel()[1]) * deltaT;
+  boid_.pos_[1] += (this->cget_vel()[1]) * deltaT;
   boid_.deltavel_ = {0., 0.};
   UpdateID(boid_, view_range);
+  //std::cout << "La posizione è " << get_pos()[0] << " e " << get_pos()[1]         << "\n";
 }
 
 void boidstate::update_allneighbors(
@@ -271,7 +283,7 @@ void boidstate::update_rules(paramlist const& params)
   regola1(params.repulsione);
   regola2_3(params.steering, params.coesione);
   speedadjust(params.speedlimit, params.speedminimum);
-  bordercheck(params.pixel, params.bordersize, params.attraction);
+  // bordercheck(params.pixel, params.bordersize, params.attraction);
 }
 
 std::vector<boidstate> generate_flock(std::default_random_engine& eng,
@@ -302,6 +314,7 @@ void flock::update_HashMap(paramlist const& params)
 {
   // auto t1=high_resolution_clock::now();
   HashMap.clear();
+  assert(HashMap.empty());
   std::for_each(set.begin(), set.end(), [&](auto& boid) {
     HashMap.insert(
         {hash_function(boid.set_GridID(), params.columns), &(boid.set_boid())});
@@ -313,26 +326,28 @@ void flock::update_HashMap(paramlist const& params)
 
 void flock::update(paramlist const& params)
 {
-  std::for_each(/*std::execution::par_unseq,*/ set.begin(), set.end(),
-                [&](auto& boid) {
-                  auto t1 = high_resolution_clock::now();
-                  boid.update_allneighbors(HashMap, params.neigh_repulsion,
-                                           params.neigh_align, params.alpha,
-                                           params.size, params.flocksize,
-                                           params.columns);
-                  auto t2 = high_resolution_clock::now();
-                  duration<double, std::milli> ms_double = t2 - t1;
-                  // std::cout<<"Tempo creazione vicini e operazioni:
-                  // "<<ms_double.count()<<" ms"<<"\n";
-                  boid.update_rules(params);
-                  // std::cout<<"Chiave boid "<<boid.set_GridID().columns<<" e
-                  // "<<boid.set_GridID().rows<<"\n";
+  std::for_each(
+      /*std::execution::par_unseq,*/ set.begin(), set.end(), [&](auto& boid) {
+        auto t1 = high_resolution_clock::now();
+        boid.update_allneighbors(HashMap, params.neigh_repulsion,
+                                 params.neigh_align, params.alpha, params.size,
+                                 params.flocksize, params.columns);
+        auto t2                                = high_resolution_clock::now();
+        duration<double, std::milli> ms_double = t2 - t1;
+        // std::cout<<"Tempo creazione vicini e operazioni:
+        // "<<ms_double.count()<<" ms"<<"\n";
+        boid.update_rules(params);
+        // std::cout<<"Chiave boid "<<boid.set_GridID().columns<<" e
+        // "<<boid.set_GridID().rows<<"\n";
 
-                  // std::cout<<"il numero di vicini e molto vicini è
-                  // "<<boid.get_neighbors().size()<<" e
-                  // "<<boid.get_close_neighbors().size()<<"\n";
-                });
-  std::for_each(/*std::execution::par_unseq,*/set.begin(), set.end(),
+        // std::cout<<"il numero di vicini e molto vicini è
+        // "<<boid.get_neighbors().size()<<" e
+        // "<<boid.get_close_neighbors().size()<<"\n";
+        std::cout << "Posizione e ID " << boid.get_pos()[0] << " "
+                  << boid.get_pos()[1] << " " << boid.set_GridID().columns << " "
+                  << boid.set_GridID().rows << "\n";
+      });
+  std::for_each(/*std::execution::par_unseq,*/ set.begin(), set.end(),
                 [&](auto& boid) {
                   boid.posvel_update(params.deltaT, params.neigh_align);
                 });

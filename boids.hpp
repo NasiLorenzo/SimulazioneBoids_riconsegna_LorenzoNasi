@@ -147,8 +147,6 @@ class boidstate
   }
   auto& set_boid()
   {
-    std::mutex idmutex;
-    std::lock_guard<std::mutex> lock(idmutex);
     return boid_;
   }
   auto& get_neighbors()
@@ -219,10 +217,10 @@ class flock
   flock(std::vector<boidstate> const& other, paramlist const& params)
       : set{other}
   {
-    update_HashMap(params);
     std::for_each(set.begin(), set.end(), [&params](auto& boid) {
       UpdateID(boid.set_boid(), params.neigh_align);
     });
+    update_HashMap(params);
   }
   std::vector<boidstate>& set_()
   {

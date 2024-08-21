@@ -4,7 +4,7 @@
 using namespace boids;
 
 TEST_CASE("Testing rules")
-{
+{ params::rate=1;
   paramlist params{};
   params.repulsione      = 0.7;
   params.steering        = 0.1;
@@ -12,14 +12,18 @@ TEST_CASE("Testing rules")
   params.neigh_repulsion = 10000.;
   params.neigh_align     = 10000.;
   params.alpha           = M_PI;
-  params.attraction      = 0;
-  params.speedlimit      = 8000;
-  params.speedminimum    = 0;
-  params.size            = 10;
+  params.attraction      = 8000;
+  params.speedlimit      = 0;
+  params.speedminimum    = 1;
+  params.size            = 4;
   params.deltaT          = 1 / 30.f;
-  params.flocksize       = 10;
-  params.rows=1;
-  params.columns=1;
+  params.flocksize       = 4;
+  params.rows            = 1;
+  params.columns         = 1;
+  params.pixel[0]=static_cast<unsigned int>(params.columns*params.neigh_align);
+  params.pixel[1]=static_cast<unsigned int>(params.rows*params.neigh_align);
+  params.columns*=static_cast<int>(params::rate);
+  params.rows*=static_cast<int>(params::rate);
   boidstate boid1;
   boid1.get_pos() = {700., 200.};
   boid1.get_vel() = {300., -10.};
@@ -51,30 +55,35 @@ TEST_CASE("Testing rules")
   boid10.get_pos() = {910., 415.};
   boid10.get_vel() = {-300., -200.};*/
 
-  std::vector<boidstate> set{boid1, boid2, boid3, boid4, /*boid5,
+  std::vector<boidstate> set{boid1, boid2, boid3, boid4 /*boid5,
                              boid6, boid7, boid8, boid9, boid10*/};
 
-  flock stormo{set,params};
-
+  flock stormo{set, params};
+  /*for (auto& boid : stormo.set_()) {
+    std::cout << "La velocità senza update è: " << boid.get_vel()[0] << ", "
+              << boid.get_vel()[1] << "\n";
+  }*/
   stormo.update(params);
   for (auto& boid : stormo.set_()) {
-    std::cout << "La velocità è: " << boid.get_vel()[0] << ", "
+    std::cout << "La velocità dopo il primo update è: " << boid.get_vel()[0] << ", "
               << boid.get_vel()[1] << "\n";
-    std::cout << "La pos è: " << boid.get_pos()[0] << ", "
-              << boid.get_pos()[1] << "\n";
-    std::cout<<"I vicini sono "<<boid.get_neighbors().size()<<" e "<<boid.get_close_neighbors().size()<<"\n";
-    for(auto& neigh: boid.get_neighbors()){
-      std::cout<<"Vel vicino: "<<neigh->cget_vel()[0]<<"\n";
+    std::cout << "La pos è: " << boid.get_pos()[0] << ", " << boid.get_pos()[1]
+              << "\n";
+    std::cout << "I vicini sono " << boid.get_neighbors().size() << " e "
+              << boid.get_close_neighbors().size() << "\n";
+    for (auto& neigh : boid.get_neighbors()) {
+      std::cout << "Vel vicino: " << neigh->cget_vel()[0] << "\n";
     }
-    for(auto& neigh: boid.get_close_neighbors()){
-      std::cout<<"Vel vicino: "<<neigh->cget_vel()[0]<<"\n";
+    for (auto& neigh : boid.get_close_neighbors()) {
+      std::cout << "Vel close_vicino: " << neigh->cget_vel()[0] << "\n";
     }
   }
-  stormo.update(params);
+  //stormo.update(params);
   for (auto& boid : stormo.set_()) {
-    std::cout << "La velocità è: " << boid.get_vel()[0] << ", "
+    std::cout << "La velocità dopo il secondo update è: " << boid.get_vel()[0] << ", "
               << boid.get_vel()[1] << "\n";
-    std::cout<<"I vicini sono "<<boid.get_neighbors().size()<<" e "<<boid.get_close_neighbors().size()<<"\n";
+    std::cout << "I vicini sono " << boid.get_neighbors().size() << " e "
+              << boid.get_close_neighbors().size() << "\n";
   }
 
   REQUIRE(stormo.size_() == 10);
@@ -157,7 +166,8 @@ TEST_CASE("Testing the speed limits")
           == doctest::Approx(params.speedminimum));
     CHECK(boids::mod(boids[2].cget_vel())
           == doctest::Approx(params.speedminimum));
-    CHECK(boids::mod(boids[3].cget_vel()) == doctest::Approx(params.speedlimit));
+    CHECK(boids::mod(boids[3].cget_vel())
+          == doctest::Approx(params.speedlimit));
   }
 }
 
