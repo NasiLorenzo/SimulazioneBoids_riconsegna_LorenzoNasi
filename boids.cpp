@@ -39,7 +39,6 @@ void boidstate::speedadjust(double speedlimit, double speedminimum)
     normalize(this->boid_.vel_);
     this->boid_.vel_ = speedminimum * this->boid_.vel_;
   }
-  std::cout<<"La velocità massima è "<<boid_.vel_[0]<<"\n";
 }
 void boidstate::bordercheck(std::vector<unsigned int> const& pixel,
                             const double bordersize, const double attraction)
