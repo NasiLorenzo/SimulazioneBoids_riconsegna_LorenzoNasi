@@ -52,6 +52,31 @@ struct boid
       , vel_{vel}
       , deltavel_{}
   {}
+  auto& cget_pos() const
+  {
+    std::mutex idmutex;
+    std::lock_guard<std::mutex> lock(idmutex);
+    return this->pos_;
+  }
+
+  auto& cget_vel() const
+  {
+    std::mutex idmutex;
+    std::lock_guard<std::mutex> lock(idmutex);
+    return this->vel_;
+  }
+  auto get_velcopy() const
+  {
+    std::mutex idmutex;
+    std::lock_guard<std::mutex> lock(idmutex);
+    return this->vel_;
+  }
+  auto get_poscopy() const
+  {
+    std::mutex idmutex;
+    std::lock_guard<std::mutex> lock(idmutex);
+    return this->pos_;
+  }
 };
 class boidstate
 {
@@ -67,31 +92,47 @@ class boidstate
       , neighbors{}
       , close_neighbors{}
   {}
-  auto get_pos() const
+  auto& cget_pos() const
   {
+    std::mutex idmutex;
+    std::lock_guard<std::mutex> lock(idmutex);
     return this->boid_.pos_;
   }
 
-  auto get_vel() const
+  auto& cget_vel() const
   {
+    std::mutex idmutex;
+    std::lock_guard<std::mutex> lock(idmutex);
     return this->boid_.vel_;
   }
-  auto get_velcopy()
+  auto get_velcopy() const
   {
+    std::mutex idmutex;
+    std::lock_guard<std::mutex> lock(idmutex);
     return this->boid_.vel_;
+  }
+  auto get_poscopy() const
+  {
+    std::mutex idmutex;
+    std::lock_guard<std::mutex> lock(idmutex);
+    return this->boid_.pos_;
   }
   auto get_ID() const
   {
     return this->boid_.flockID;
   }
 
-  auto& set_pos()
+  auto& get_pos()
   {
+    std::mutex idmutex;
+    std::lock_guard<std::mutex> lock(idmutex);
     return this->boid_.pos_;
   }
 
-  auto& set_vel()
+  auto& get_vel()
   {
+    std::mutex idmutex;
+    std::lock_guard<std::mutex> lock(idmutex);
     return this->boid_.vel_;
   }
 
@@ -106,15 +147,23 @@ class boidstate
   }
   auto& set_boid()
   {
+    std::mutex idmutex;
+    std::lock_guard<std::mutex> lock(idmutex);
     return boid_;
   }
-  auto& get_neighbors(){
+  auto& get_neighbors()
+  {
+    std::mutex idmutex;
+    std::lock_guard<std::mutex> lock(idmutex);
     return neighbors;
   }
-  auto& get_close_neighbors(){
+  auto& get_close_neighbors()
+  {
+    std::mutex idmutex;
+    std::lock_guard<std::mutex> lock(idmutex);
     return close_neighbors;
   }
-  
+
   void random_boid(std::default_random_engine&, paramlist const& params);
 
   void speedadjust(double speedlimit, double speedminimum);
@@ -122,25 +171,28 @@ class boidstate
   void bordercheck(std::vector<unsigned int> const& pixel,
                    const double bordersize, const double attraction);
 
-  void update_neighbors(std::unordered_multimap<int, boid const*>const& map,
+  void update_neighbors(std::unordered_multimap<int, boid const*> const& map,
                         const double align_distance, const double alpha,
                         Criterion criterion, const int columns);
 
   void update_close_neighbors(std::vector<boid const*> const& set,
                               const double repulsion_distance);
 
-  void update_close_neighbors(std::unordered_multimap<int, boid const*>const& map,
-                              const double repulsion_distance, const double align_distance, const int columns, const double alpha);
+  void
+  update_close_neighbors(std::unordered_multimap<int, boid const*> const& map,
+                         const double repulsion_distance,
+                         const double align_distance, const int columns,
+                         const double alpha);
 
   void regola1(const double repulsione);
   void regola2_3(const double steering, const double cohesion);
   void posvel_update(const float deltaT, const double view_range);
 
-  void update_allneighbors(std::unordered_multimap<int, boid const*>const& map,
-                                    const double repulsion_distance,
-                                    const double align_distance,
-                                    const double alpha, unsigned int size,
-                                    unsigned int flocksize, const int columns);
+  void update_allneighbors(std::unordered_multimap<int, boid const*> const& map,
+                           const double repulsion_distance,
+                           const double align_distance, const double alpha,
+                           unsigned int size, unsigned int flocksize,
+                           const int columns);
   void update_rules(paramlist const& params);
 };
 
@@ -168,8 +220,8 @@ class flock
       : set{other}
   {
     update_HashMap(params);
-    std::for_each(set.begin(),set.end(),[&params](auto& boid){
-      UpdateID(boid.set_boid(),params.neigh_align);
+    std::for_each(set.begin(), set.end(), [&params](auto& boid) {
+      UpdateID(boid.set_boid(), params.neigh_align);
     });
   }
   std::vector<boidstate>& set_()

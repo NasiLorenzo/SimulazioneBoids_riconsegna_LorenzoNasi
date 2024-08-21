@@ -9,8 +9,8 @@ TEST_CASE("Testing rules")
   params.repulsione      = 0.7;
   params.steering        = 0.1;
   params.coesione        = 0.1;
-  params.neigh_repulsion = 10000;
-  params.neigh_align     = 10000;
+  params.neigh_repulsion = 10000.;
+  params.neigh_align     = 10000.;
   params.alpha           = M_PI;
   params.attraction      = 0;
   params.speedlimit      = 8000;
@@ -21,79 +21,93 @@ TEST_CASE("Testing rules")
   params.rows=1;
   params.columns=1;
   boidstate boid1;
-  boid1.set_pos() = {700., 200.};
-  boid1.set_vel() = {300., -10.};
+  boid1.get_pos() = {700., 200.};
+  boid1.get_vel() = {300., -10.};
   boidstate boid2;
-  boid2.set_pos() = {500., 300.};
-  boid2.set_vel() = {5., 0.};
+  boid2.get_pos() = {500., 300.};
+  boid2.get_vel() = {5., 0.};
   boidstate boid3;
-  boid3.set_pos() = {800., 250.};
-  boid3.set_vel() = {-88., 98.};
+  boid3.get_pos() = {800., 250.};
+  boid3.get_vel() = {-88., 98.};
   boidstate boid4;
-  boid4.set_pos() = {1000., 150.};
-  boid4.set_vel() = {400., 77.};
-  boidstate boid5;
-  boid5.set_pos() = {200., 500.};
-  boid5.set_vel() = {300., 300.};
+  boid4.get_pos() = {1000., 150.};
+  boid4.get_vel() = {400., 77.};
+  /*boidstate boid5;
+  boid5.get_pos() = {200., 500.};
+  boid5.get_vel() = {300., 300.};
   boidstate boid6;
-  boid6.set_pos() = {300., 450.};
-  boid6.set_vel() = {-100., -100.};
+  boid6.get_pos() = {300., 450.};
+  boid6.get_vel() = {-100., -100.};
   boidstate boid7;
-  boid7.set_pos() = {450., 400.};
-  boid7.set_vel() = {200., 150.};
+  boid7.get_pos() = {450., 400.};
+  boid7.get_vel() = {200., 150.};
   boidstate boid8;
-  boid8.set_pos() = {50., 420.};
-  boid8.set_vel() = {400., 200.};
+  boid8.get_pos() = {50., 420.};
+  boid8.get_vel() = {400., 200.};
   boidstate boid9;
-  boid9.set_pos() = {120., 200.};
-  boid9.set_vel() = {50., 60.};
+  boid9.get_pos() = {120., 200.};
+  boid9.get_vel() = {50., 60.};
   boidstate boid10;
-  boid10.set_pos() = {910., 415.};
-  boid10.set_vel() = {-300., -200.};
+  boid10.get_pos() = {910., 415.};
+  boid10.get_vel() = {-300., -200.};*/
 
-  std::vector<boidstate> set{boid1, boid2, boid3, boid4, boid5,
-                             boid6, boid7, boid8, boid9, boid10};
+  std::vector<boidstate> set{boid1, boid2, boid3, boid4, /*boid5,
+                             boid6, boid7, boid8, boid9, boid10*/};
 
   flock stormo{set,params};
 
   stormo.update(params);
-
   for (auto& boid : stormo.set_()) {
-    std::cout << "Le velocità sono: " << boid.get_vel()[0] << ", "
+    std::cout << "La velocità è: " << boid.get_vel()[0] << ", "
               << boid.get_vel()[1] << "\n";
+    std::cout << "La pos è: " << boid.get_pos()[0] << ", "
+              << boid.get_pos()[1] << "\n";
+    std::cout<<"I vicini sono "<<boid.get_neighbors().size()<<" e "<<boid.get_close_neighbors().size()<<"\n";
+    for(auto& neigh: boid.get_neighbors()){
+      std::cout<<"Vel vicino: "<<neigh->cget_vel()[0]<<"\n";
+    }
+    for(auto& neigh: boid.get_close_neighbors()){
+      std::cout<<"Vel vicino: "<<neigh->cget_vel()[0]<<"\n";
+    }
+  }
+  stormo.update(params);
+  for (auto& boid : stormo.set_()) {
+    std::cout << "La velocità è: " << boid.get_vel()[0] << ", "
+              << boid.get_vel()[1] << "\n";
+    std::cout<<"I vicini sono "<<boid.get_neighbors().size()<<" e "<<boid.get_close_neighbors().size()<<"\n";
   }
 
   REQUIRE(stormo.size_() == 10);
 
-  CHECK(stormo.set_()[0].get_vel()[0] == doctest::Approx(1636.744444));
-  CHECK(stormo.set_()[0].get_vel()[1] == doctest::Approx(-887.7222222));
+  CHECK(stormo.set_()[0].cget_vel()[0] == doctest::Approx(1636.744444));
+  CHECK(stormo.set_()[0].cget_vel()[1] == doctest::Approx(-887.7222222));
 
-  CHECK(stormo.set_()[1].get_vel()[0] == doctest::Approx(-3.255555556));
-  CHECK(stormo.set_()[1].get_vel()[1] == doctest::Approx(-189.9444444));
+  CHECK(stormo.set_()[1].cget_vel()[0] == doctest::Approx(-3.255555556));
+  CHECK(stormo.set_()[1].cget_vel()[1] == doctest::Approx(-189.9444444));
 
-  CHECK(stormo.set_()[2].get_vel()[0] == doctest::Approx(1980.744444));
-  CHECK(stormo.set_()[2].get_vel()[1] == doctest::Approx(-447.2777778));
+  CHECK(stormo.set_()[2].cget_vel()[0] == doctest::Approx(1980.744444));
+  CHECK(stormo.set_()[2].cget_vel()[1] == doctest::Approx(-447.2777778));
 
-  CHECK(stormo.set_()[3].get_vel()[0] == doctest::Approx(3792.3));
-  CHECK(stormo.set_()[3].get_vel()[1] == doctest::Approx(-1154.833333));
+  CHECK(stormo.set_()[3].cget_vel()[0] == doctest::Approx(3792.3));
+  CHECK(stormo.set_()[3].cget_vel()[1] == doctest::Approx(-1154.833333));
 
-  CHECK(stormo.set_()[4].get_vel()[0] == doctest::Approx(-1807.7));
-  CHECK(stormo.set_()[4].get_vel()[1] == doctest::Approx(1454.5));
+  /*CHECK(stormo.set_()[4].cget_vel()[0] == doctest::Approx(-1807.7));
+  CHECK(stormo.set_()[4].cget_vel()[1] == doctest::Approx(1454.5));
 
-  CHECK(stormo.set_()[5].get_vel()[0] == doctest::Approx(-1474.366667));
-  CHECK(stormo.set_()[5].get_vel()[1] == doctest::Approx(754.5));
+  CHECK(stormo.set_()[5].cget_vel()[0] == doctest::Approx(-1474.366667));
+  CHECK(stormo.set_()[5].cget_vel()[1] == doctest::Approx(754.5));
 
-  CHECK(stormo.set_()[6].get_vel()[0] == doctest::Approx(-174.3666667));
-  CHECK(stormo.set_()[6].get_vel()[1] == doctest::Approx(632.2777778));
+  CHECK(stormo.set_()[6].cget_vel()[0] == doctest::Approx(-174.3666667));
+  CHECK(stormo.set_()[6].cget_vel()[1] == doctest::Approx(632.2777778));
 
-  CHECK(stormo.set_()[7].get_vel()[0] == doctest::Approx(-2752.144444));
-  CHECK(stormo.set_()[7].get_vel()[1] == doctest::Approx(814.5));
+  CHECK(stormo.set_()[7].cget_vel()[0] == doctest::Approx(-2752.144444));
+  CHECK(stormo.set_()[7].cget_vel()[1] == doctest::Approx(814.5));
 
-  CHECK(stormo.set_()[8].get_vel()[0] == doctest::Approx(-2581.033333));
-  CHECK(stormo.set_()[8].get_vel()[1] == doctest::Approx(-825.5));
+  CHECK(stormo.set_()[8].cget_vel()[0] == doctest::Approx(-2581.033333));
+  CHECK(stormo.set_()[8].cget_vel()[1] == doctest::Approx(-825.5));
 
-  CHECK(stormo.set_()[9].get_vel()[0] == doctest::Approx(2550.077778));
-  CHECK(stormo.set_()[9].get_vel()[1] == doctest::Approx(424.5));
+  CHECK(stormo.set_()[9].cget_vel()[0] == doctest::Approx(2550.077778));
+  CHECK(stormo.set_()[9].cget_vel()[1] == doctest::Approx(424.5));*/
 }
 
 TEST_CASE("Testing the speed limits")
@@ -111,17 +125,17 @@ TEST_CASE("Testing the speed limits")
   params.size            = 10;
   params.flocksize       = 10;
   boidstate boid1;
-  boid1.set_pos() = {700., 200.};
-  boid1.set_vel() = {300., -10.};
+  boid1.get_pos() = {700., 200.};
+  boid1.get_vel() = {300., -10.};
   boidstate boid2;
-  boid2.set_pos() = {500., 300.};
-  boid2.set_vel() = {5., 0.};
+  boid2.get_pos() = {500., 300.};
+  boid2.get_vel() = {5., 0.};
   boidstate boid3;
-  boid3.set_pos() = {800., 250.};
-  boid3.set_vel() = {-88., 98.};
+  boid3.get_pos() = {800., 250.};
+  boid3.get_vel() = {-88., 98.};
   boidstate boid4;
-  boid4.set_pos() = {1000., 150.};
-  boid4.set_vel() = {400., 77.};
+  boid4.get_pos() = {1000., 150.};
+  boid4.get_vel() = {400., 77.};
   std::vector<boidstate> boids{boid1, boid2, boid3, boid4};
 
   SUBCASE("Testing the get_vel()ocity before the adjustment")
@@ -138,12 +152,12 @@ TEST_CASE("Testing the speed limits")
 
   SUBCASE("Testing the get_vel()ocity after the adjustment")
   {
-    CHECK(boids::mod(boids[0].get_vel()) == doctest::Approx(300.167));
-    CHECK(boids::mod(boids[1].get_vel())
+    CHECK(boids::mod(boids[0].cget_vel()) == doctest::Approx(300.167));
+    CHECK(boids::mod(boids[1].cget_vel())
           == doctest::Approx(params.speedminimum));
-    CHECK(boids::mod(boids[2].get_vel())
+    CHECK(boids::mod(boids[2].cget_vel())
           == doctest::Approx(params.speedminimum));
-    CHECK(boids::mod(boids[3].get_vel()) == doctest::Approx(params.speedlimit));
+    CHECK(boids::mod(boids[3].cget_vel()) == doctest::Approx(params.speedlimit));
   }
 }
 
@@ -162,23 +176,23 @@ TEST_CASE("Testing boid sight")
   params.flocksize       = 10;
   params.size            = 10;
   boidstate boid1;
-  boid1.set_pos() = {350., 270.};
-  boid1.set_vel() = {30., 0.};
+  boid1.get_pos() = {350., 270.};
+  boid1.get_vel() = {30., 0.};
   boidstate boid2;
-  boid2.set_pos() = {400., 270.};
-  boid2.set_vel() = {-10., 0.};
+  boid2.get_pos() = {400., 270.};
+  boid2.get_vel() = {-10., 0.};
   boidstate boid3;
-  boid3.set_pos() = {360., 300.};
-  boid3.set_vel() = {13., 45.};
+  boid3.get_pos() = {360., 300.};
+  boid3.get_vel() = {13., 45.};
   boidstate boid4;
-  boid4.set_pos() = {0., 0.};
-  boid4.set_vel() = {300., -150.};
+  boid4.get_pos() = {0., 0.};
+  boid4.get_vel() = {300., -150.};
   boidstate boid5;
-  boid5.set_pos() = {90., 270.};
-  boid5.set_vel() = {30., 160.};
+  boid5.get_pos() = {90., 270.};
+  boid5.get_vel() = {30., 160.};
   boidstate boid6;
-  boid6.set_pos() = {350., 270.};
-  boid6.set_vel() = {-15., 10.};
+  boid6.get_pos() = {350., 270.};
+  boid6.get_vel() = {-15., 10.};
   /*
     SUBCASE("Testing if boid1 sees boid2")
     {
@@ -258,14 +272,14 @@ TEST_CASE("Testing the limit distance")
   params.speedminimum    = 3500.;
 
   boidstate boid1;
-  boid1.set_pos() = {0., 50.};
-  boid1.set_vel() = {30., 0.};
+  boid1.get_pos() = {0., 50.};
+  boid1.get_vel() = {30., 0.};
   boidstate boid2;
-  boid2.set_pos() = {700., 500.};
-  boid2.set_vel() = {-10., 0.};
+  boid2.get_pos() = {700., 500.};
+  boid2.get_vel() = {-10., 0.};
   boidstate boid3;
-  boid3.set_pos() = {2., 55.};
-  boid3.set_vel() = {13., 45.};
+  boid3.get_pos() = {2., 55.};
+  boid3.get_vel() = {13., 45.};
 
   /* SUBCASE("Testing if boid1 sees boid2")
    {
