@@ -129,7 +129,7 @@ void boidstate::update_neighbors(
     }
   });*/
   neighbors.erase(
-      std::remove_if(
+      std::remove_if(std::execution::par_unseq,
           neighbors.begin(), neighbors.end(),
           [&](boid const*& neighbor) {
             auto cosangolo =
@@ -146,7 +146,7 @@ void boidstate::update_close_neighbors(std::vector<boid const*> const& set,
                                        const double repulsion_distance)
 {
   this->close_neighbors.clear();
-  std::for_each(set.begin(), set.end(), [&](auto& neighbor) {
+  std::for_each(std::execution::par_unseq,set.begin(), set.end(), [&](auto& neighbor) {
     auto distanza = distance(this->boid_.pos_, neighbor->pos_);
     if (distanza < pow(repulsion_distance, 2) && distanza != 0) {
       this->close_neighbors.emplace_back(neighbor);
@@ -195,7 +195,7 @@ void boidstate::update_close_neighbors(
       });
   */
   close_neighbors.erase(
-      std::remove_if(
+      std::remove_if(std::execution::par_unseq,
           close_neighbors.begin(), close_neighbors.end(),
           [&](auto& neighbor) {
             auto cosangolo =
