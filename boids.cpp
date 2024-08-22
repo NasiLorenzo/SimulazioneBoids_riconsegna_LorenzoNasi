@@ -252,7 +252,7 @@ void flock::update_HashMap(paramlist const& params)
 
 void flock::update(paramlist const& params)
 {
-  std::for_each(oneapi::dpl::execution::par_unseq, set.begin(), set.end(),
+  std::for_each(std::execution::par_unseq, set.begin(), set.end(),
                 [&](auto& boid) {
                   auto t1 = high_resolution_clock::now();
                   boid.update_allneighbors(HashMap, params.neigh_repulsion,
