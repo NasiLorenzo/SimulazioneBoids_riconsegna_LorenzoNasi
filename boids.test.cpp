@@ -65,6 +65,7 @@ TEST_CASE("Testing rules")
   for (auto& boid : stormo.set_()) {
     std::cout << "Le velocità sono: " << boid.get_vel()[0] << ", "
               << boid.get_vel()[1] << "\n";
+    std::cout<<"Le posizioni sono: "<<boid.cget_pos()[0]<<", "<<boid.cget_pos()[1]<<"\n";
   }
 
   REQUIRE(stormo.size_() == 10);
