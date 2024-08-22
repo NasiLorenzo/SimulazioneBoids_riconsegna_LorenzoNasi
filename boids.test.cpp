@@ -5,6 +5,7 @@ using namespace boids;
 
 TEST_CASE("Testing rules")
 {
+  params::rate=1;
   paramlist params{};
   params.repulsione      = 0.7;
   params.steering        = 0.1;
