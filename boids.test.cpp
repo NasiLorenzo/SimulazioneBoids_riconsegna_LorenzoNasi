@@ -9,21 +9,22 @@ TEST_CASE("Testing rules")
   params.repulsione      = 0.7;
   params.steering        = 0.1;
   params.coesione        = 0.1;
-  params.neigh_repulsion = 10000;
-  params.neigh_align     = 10000;
+  params.neigh_repulsion = 100000;
+  params.neigh_align     = 100000;
   params.alpha           = M_PI;
   params.attraction      = 0;
   params.speedlimit      = 8000;
   params.speedminimum    = 0;
-  params.size            = 10;
+  params.size            = 4;
   params.deltaT          = 1 / 30.f;
-  params.flocksize       = 10;
-  params.rows=1;
-  params.columns=1;
-  params.pixel[0]=static_cast<unsigned int>(params.columns*params.neigh_align);
-  params.pixel[1]=static_cast<unsigned int>(params.rows*params.neigh_align);
-  params.columns*=static_cast<int>(params::rate);
-  params.rows*=static_cast<int>(params::rate);
+  params.flocksize       = 4;
+  params.rows            = 1;
+  params.columns         = 1;
+  params.pixel[0] =
+      static_cast<unsigned int>(params.columns * params.neigh_align);
+  params.pixel[1] = static_cast<unsigned int>(params.rows * params.neigh_align);
+  params.columns *= static_cast<int>(params::rate);
+  params.rows *= static_cast<int>(params::rate);
   boidstate boid1;
   boid1.get_pos() = {700., 200.};
   boid1.get_vel() = {300., -10.};
@@ -36,7 +37,7 @@ TEST_CASE("Testing rules")
   boidstate boid4;
   boid4.get_pos() = {1000., 150.};
   boid4.get_vel() = {400., 77.};
-  /*boidstate boid5;
+  boidstate boid5;
   boid5.get_pos() = {200., 500.};
   boid5.get_vel() = {300., 300.};
   boidstate boid6;
@@ -53,20 +54,16 @@ TEST_CASE("Testing rules")
   boid9.get_vel() = {50., 60.};
   boidstate boid10;
   boid10.get_pos() = {910., 415.};
-  boid10.get_vel() = {-300., -200.};*/
+  boid10.get_vel() = {-300., -200.};
 
-  std::vector<boidstate> set{boid1, boid2, boid3, boid4/*, boid5,
-                             boid6, boid7, boid8, boid9, boid10*/};
+  std::vector<boidstate> set{boid1, boid2, boid3, boid4, boid5,
+                             boid6, boid7, boid8, boid9, boid10};
 
-  flock stormo{set,params};
+  flock stormo{set, params};
 
   stormo.update(params);
-  stormo.update(params);
-  for (auto& boid : stormo.set_()) {
-    std::cout << "Le velocità sono: " << boid.get_vel()[0] << ", "
-              << boid.get_vel()[1] << "\n";
-    std::cout<<"Le posizioni sono: "<<boid.cget_pos()[0]<<", "<<boid.cget_pos()[1]<<"\n";
-  }
+  
+  
 
   REQUIRE(stormo.size_() == 10);
 
@@ -82,24 +79,157 @@ TEST_CASE("Testing rules")
   CHECK(stormo.set_()[3].get_vel()[0] == doctest::Approx(3792.3));
   CHECK(stormo.set_()[3].get_vel()[1] == doctest::Approx(-1154.833333));
 
- /* CHECK(stormo.set_()[4].get_vel()[0] == doctest::Approx(-1807.7));
-  CHECK(stormo.set_()[4].get_vel()[1] == doctest::Approx(1454.5));
+   CHECK(stormo.set_()[4].get_vel()[0] == doctest::Approx(-1807.7));
+   CHECK(stormo.set_()[4].get_vel()[1] == doctest::Approx(1454.5));
 
-  CHECK(stormo.set_()[5].get_vel()[0] == doctest::Approx(-1474.366667));
-  CHECK(stormo.set_()[5].get_vel()[1] == doctest::Approx(754.5));
+   CHECK(stormo.set_()[5].get_vel()[0] == doctest::Approx(-1474.366667));
+   CHECK(stormo.set_()[5].get_vel()[1] == doctest::Approx(754.5));
 
-  CHECK(stormo.set_()[6].get_vel()[0] == doctest::Approx(-174.3666667));
-  CHECK(stormo.set_()[6].get_vel()[1] == doctest::Approx(632.2777778));
+   CHECK(stormo.set_()[6].get_vel()[0] == doctest::Approx(-174.3666667));
+   CHECK(stormo.set_()[6].get_vel()[1] == doctest::Approx(632.2777778));
 
-  CHECK(stormo.set_()[7].get_vel()[0] == doctest::Approx(-2752.144444));
-  CHECK(stormo.set_()[7].get_vel()[1] == doctest::Approx(814.5));
+   CHECK(stormo.set_()[7].get_vel()[0] == doctest::Approx(-2752.144444));
+   CHECK(stormo.set_()[7].get_vel()[1] == doctest::Approx(814.5));
 
-  CHECK(stormo.set_()[8].get_vel()[0] == doctest::Approx(-2581.033333));
-  CHECK(stormo.set_()[8].get_vel()[1] == doctest::Approx(-825.5));
+   CHECK(stormo.set_()[8].get_vel()[0] == doctest::Approx(-2581.033333));
+   CHECK(stormo.set_()[8].get_vel()[1] == doctest::Approx(-825.5));
 
-  CHECK(stormo.set_()[9].get_vel()[0] == doctest::Approx(2550.077778));
-  CHECK(stormo.set_()[9].get_vel()[1] == doctest::Approx(424.5));*/
+   CHECK(stormo.set_()[9].get_vel()[0] == doctest::Approx(2550.077778));
+   CHECK(stormo.set_()[9].get_vel()[1] == doctest::Approx(424.5));
 }
+
+TEST_CASE("Testing multiple iterations of the rules")
+{
+  paramlist params{};
+  params.repulsione      = 0.7;
+  params.steering        = 0.1;
+  params.coesione        = 0.1;
+  params.neigh_repulsion = 100000;
+  params.neigh_align     = 100000;
+  params.alpha           = M_PI;
+  params.attraction      = 0;
+  params.speedlimit      = 8000;
+  params.speedminimum    = 0;
+  params.size            = 4;
+  params.deltaT          = 1 / 30.f;
+  params.flocksize       = 4;
+  params.rows            = 1;
+  params.columns         = 1;
+  params.pixel[0] =
+      static_cast<unsigned int>(params.columns * params.neigh_align);
+  params.pixel[1] = static_cast<unsigned int>(params.rows * params.neigh_align);
+  params.columns *= static_cast<int>(params::rate);
+  params.rows *= static_cast<int>(params::rate);
+  boidstate boid1;
+  boid1.get_pos() = {700., 200.};
+  boid1.get_vel() = {300., -10.};
+  boidstate boid2;
+  boid2.get_pos() = {500., 300.};
+  boid2.get_vel() = {5., 0.};
+  boidstate boid3;
+  boid3.get_pos() = {800., 250.};
+  boid3.get_vel() = {-88., 98.};
+  boidstate boid4;
+  boid4.get_pos() = {1000., 150.};
+  boid4.get_vel() = {400., 77.};
+
+  std::vector<boidstate> set{boid1, boid2, boid3, boid4};
+
+  flock stormo2{set, params};
+
+  stormo2.update(params);
+  stormo2.update(params);
+  stormo2.update(params);
+  stormo2.update(params);
+  for (auto& boid : stormo2.set_()) {
+    std::cout << "Le velocità sono: " << boid.get_vel()[0] << ", "
+              << boid.get_vel()[1] << "\n";
+    }
+  
+  
+
+  REQUIRE(stormo2.size_() == 4);
+
+  CHECK(stormo2.set_()[0].get_vel()[0] == doctest::Approx(-248.02519));
+
+  CHECK(stormo2.set_()[1].get_vel()[0] == doctest::Approx(-2717.9472));
+
+  CHECK(stormo2.set_()[2].get_vel()[0] == doctest::Approx(461.91329));
+
+  CHECK(stormo2.set_()[3].get_vel()[0] == doctest::Approx(3121.0591));
+
+}
+
+/*TEST_CASE("Testing multiple iterations of the rules")
+{
+  paramlist params{};
+  params.repulsione      = 0.7;
+  params.steering        = 0.1;
+  params.coesione        = 0.1;
+  params.neigh_repulsion = 100000;
+  params.neigh_align     = 100000;
+  params.alpha           = M_PI;
+  params.attraction      = 0;
+  params.speedlimit      = 8000;
+  params.speedminimum    = 0;
+  params.size            = 4;
+  params.deltaT          = 1 / 30.f;
+  params.flocksize       = 4;
+  params.rows            = 1;
+  params.columns         = 1;
+  params.pixel[0] =
+      static_cast<unsigned int>(params.columns * params.neigh_align);
+  params.pixel[1] = static_cast<unsigned int>(params.rows * params.neigh_align);
+  params.columns *= static_cast<int>(params::rate);
+  params.rows *= static_cast<int>(params::rate);
+  boidstate boid1;
+  boid1.get_pos() = {700., 200.};
+  boid1.get_vel() = {300., -10.};
+  boidstate boid2;
+  boid2.get_pos() = {500., 300.};
+  boid2.get_vel() = {5., 0.};
+  boidstate boid3;
+  boid3.get_pos() = {800., 250.};
+  boid3.get_vel() = {-88., 98.};
+  boidstate boid4;
+  boid4.get_pos() = {1000., 150.};
+  boid4.get_vel() = {400., 77.};
+
+  std::vector<boidstate> set{boid1, boid2, boid3, boid4};
+
+  flock stormo{set, params};
+
+  stormo.update(params);
+  for(auto& boid : stormo.set_()){
+    std::cout<<"Le posizioni valgolo: "<<boid.cget_pos()[0]<<" e "<<boid.cget_pos()[1]<<"\n";
+  }
+  stormo.update(params);
+  for (auto& boid : stormo.set_()) {
+    std::cout << "Le velocità sono: " << boid.get_vel()[0] << ", "
+              << boid.get_vel()[1] << "\n";
+    //std::cout << "Le posizioni sono: " << boid.cget_pos()[0] << ", "
+             // << boid.cget_pos()[1] << "\n";
+    /*std::cout << "Il numero di vicini e molto vicini è: "
+              << boid.get_neighbors().size() << ", "
+              << boid.get_neighbors().size() << "\n"
+              << "Il GridID vale: "<<boid.set_GridID().columns<<", "<<boid.set_GridID().rows<<"\n";
+
+  }
+
+  REQUIRE(stormo.size_() == 4);
+
+  CHECK(stormo.set_()[0].get_vel()[0] == doctest::Approx(1636.744444));
+  CHECK(stormo.set_()[0].get_vel()[1] == doctest::Approx(-887.7222222));
+
+  CHECK(stormo.set_()[1].get_vel()[0] == doctest::Approx(-3.255555556));
+  CHECK(stormo.set_()[1].get_vel()[1] == doctest::Approx(-189.9444444));
+
+  CHECK(stormo.set_()[2].get_vel()[0] == doctest::Approx(1980.744444));
+  CHECK(stormo.set_()[2].get_vel()[1] == doctest::Approx(-447.2777778));
+
+  CHECK(stormo.set_()[3].get_vel()[0] == doctest::Approx(3792.3));
+  CHECK(stormo.set_()[3].get_vel()[1] == doctest::Approx(-1154.833333));
+}*/
 
 TEST_CASE("Testing the speed limits")
 {

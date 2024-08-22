@@ -46,7 +46,7 @@ double angle(DoubleVec const& vec)
 double mod(DoubleVec const& vec)
 {
   return sqrt(
-      std::accumulate(vec.begin(), vec.end(), 0,
+      std::accumulate(vec.begin(), vec.end(), 0.,
                       [](double sum, double x) { return sum = sum + x * x; }));
 }
 
@@ -61,7 +61,7 @@ void normalize(DoubleVec& vec)
 double distance(DoubleVec const& a, DoubleVec const& b)
 {
   return std::transform_reduce(
-      a.begin(), a.end(), b.begin(), 0, std::plus<>(),
+      a.begin(), a.end(), b.begin(), 0., std::plus<>(),
       [](double c, double d) { return pow(c - d, 2); });
 }
 

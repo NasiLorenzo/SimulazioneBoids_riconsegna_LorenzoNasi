@@ -69,6 +69,10 @@ struct boid
   {
     return this->pos_;
   }
+  auto& cget_flockID() const
+  {
+    return this->flockID;
+  }
 };
 class boidstate
 {
@@ -101,22 +105,34 @@ class boidstate
   {
     return this->boid_.pos_;
   }
-  auto get_ID() const
+  auto& get_ID() const
   {
     return this->boid_.flockID;
   }
+  auto& cget_flockID() const
+  {
+    return boid_.flockID;
+  }
+  auto& cget_GridID() const
+  {
+    return boid_.GridID;
+  }
 
+  auto& cget_boid() const
+  {
+    return this->boid_;
+  }
   auto& get_pos()
   {
-    //std::mutex idmutex;
-    //std::lock_guard<std::mutex> lock(idmutex);
+    // std::mutex idmutex;
+    // std::lock_guard<std::mutex> lock(idmutex);
     return this->boid_.pos_;
   }
 
   auto& get_vel()
   {
-    //std::mutex idmutex;
-    //std::lock_guard<std::mutex> lock(idmutex);
+    // std::mutex idmutex;
+    // std::lock_guard<std::mutex> lock(idmutex);
     return this->boid_.vel_;
   }
 
@@ -151,15 +167,14 @@ class boidstate
 
   void update_neighbors(std::unordered_multimap<int, boid const*> const& map,
                         const double align_distance, const double alpha,
-                        Criterion criterion, const int columns);
+                        Criterion const criterion, const int columns);
 
   void update_close_neighbors(std::vector<boid const*> const& set,
                               const double repulsion_distance);
 
   void
   update_close_neighbors(std::unordered_multimap<int, boid const*> const& map,
-                         const double repulsion_distance,
-                         const double align_distance, const int columns,
+                         const double repulsion_distance, const int columns,
                          const double alpha);
 
   void regola1(const double repulsione);
@@ -185,6 +200,7 @@ class flock
 {
   std::vector<boidstate> set;
   std::unordered_multimap<int, boid const*> HashMap{};
+  std::mutex map_mutex;
 
  public:
   flock()
@@ -197,8 +213,8 @@ class flock
   flock(std::vector<boidstate> const& other, paramlist const& params)
       : set{other}
   {
-    std::for_each(set.begin(),set.end(),[&params](auto& boid){
-      UpdateID(boid.set_boid(),params.neigh_align);
+    std::for_each(set.begin(), set.end(), [&params](auto& boid) {
+      UpdateID(boid.set_boid(), params.neigh_align);
     });
     update_HashMap(params);
     std::for_each(set.begin(), set.end(), [&params](auto& boid) {
@@ -209,6 +225,14 @@ class flock
   std::vector<boidstate>& set_()
   {
     return set;
+  }
+
+  auto& cget_set_() const {
+    return set;
+  }
+
+  auto& cget_Map_() const {
+    return HashMap;
   }
 
   std::size_t size_()
