@@ -45,7 +45,7 @@ struct boid
   unsigned int flockID{0};
   gridID GridID{};
   DoubleVec vel_;
-  DoubleVec deltavel_;
+  DoubleVec deltavel_{};
   boid() = default;
   boid(DoubleVec pos, DoubleVec vel)
       : pos_{pos}
@@ -179,7 +179,7 @@ class boidstate
 
   void regola1(const double repulsione);
   void regola2_3(const double steering, const double cohesion);
-  void posvel_update(const float deltaT, const double view_range);
+  void posvel_update(paramlist const& params);
 
   void update_allneighbors(std::unordered_multimap<int, boid const*> const& map,
                            const double repulsion_distance,

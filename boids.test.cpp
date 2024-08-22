@@ -5,20 +5,20 @@ using namespace boids;
 
 TEST_CASE("Testing rules")
 {
-  params::rate=1.;
+  params::rate = 1.;
   paramlist params{};
   params.repulsione      = 0.7;
   params.steering        = 0.1;
   params.coesione        = 0.1;
-  params.neigh_repulsion = 100000;
-  params.neigh_align     = 100000;
+  params.neigh_repulsion = 10000.;
+  params.neigh_align     = 10000.;
   params.alpha           = M_PI;
-  params.attraction      = 0;
+  params.attraction      = 0.;
   params.speedlimit      = 8000;
-  params.speedminimum    = 0;
-  params.size            = 4;
+  params.speedminimum    = 0.;
+  params.size            = 10;
   params.deltaT          = 1 / 30.f;
-  params.flocksize       = 4;
+  params.flocksize       = 10;
   params.rows            = 1;
   params.columns         = 1;
   params.pixel[0] =
@@ -62,9 +62,13 @@ TEST_CASE("Testing rules")
 
   flock stormo{set, params};
 
+  std::cout << "Initial velocities:\n";
+  for (const auto& boid : stormo.set_()) {
+    std::cout << "Boid velocity: (" << boid.cget_vel()[0] << ", "
+              << boid.cget_vel()[1] << ")\n";
+  }
+
   stormo.update(params);
-  
-  
 
   REQUIRE(stormo.size_() == 10);
 
@@ -80,23 +84,23 @@ TEST_CASE("Testing rules")
   CHECK(stormo.set_()[3].cget_vel()[0] == doctest::Approx(3792.3));
   CHECK(stormo.set_()[3].cget_vel()[1] == doctest::Approx(-1154.833333));
 
-   CHECK(stormo.set_()[4].cget_vel()[0] == doctest::Approx(-1807.7));
-   CHECK(stormo.set_()[4].cget_vel()[1] == doctest::Approx(1454.5));
+  CHECK(stormo.set_()[4].cget_vel()[0] == doctest::Approx(-1807.7));
+  CHECK(stormo.set_()[4].cget_vel()[1] == doctest::Approx(1454.5));
 
-   CHECK(stormo.set_()[5].cget_vel()[0] == doctest::Approx(-1474.366667));
-   CHECK(stormo.set_()[5].cget_vel()[1] == doctest::Approx(754.5));
+  CHECK(stormo.set_()[5].cget_vel()[0] == doctest::Approx(-1474.366667));
+  CHECK(stormo.set_()[5].cget_vel()[1] == doctest::Approx(754.5));
 
-   CHECK(stormo.set_()[6].cget_vel()[0] == doctest::Approx(-174.3666667));
-   CHECK(stormo.set_()[6].cget_vel()[1] == doctest::Approx(632.2777778));
+  CHECK(stormo.set_()[6].cget_vel()[0] == doctest::Approx(-174.3666667));
+  CHECK(stormo.set_()[6].cget_vel()[1] == doctest::Approx(632.2777778));
 
-   CHECK(stormo.set_()[7].cget_vel()[0] == doctest::Approx(-2752.144444));
-   CHECK(stormo.set_()[7].cget_vel()[1] == doctest::Approx(814.5));
+  CHECK(stormo.set_()[7].cget_vel()[0] == doctest::Approx(-2752.144444));
+  CHECK(stormo.set_()[7].cget_vel()[1] == doctest::Approx(814.5));
 
-   CHECK(stormo.set_()[8].cget_vel()[0] == doctest::Approx(-2581.033333));
-   CHECK(stormo.set_()[8].cget_vel()[1] == doctest::Approx(-825.5));
+  CHECK(stormo.set_()[8].cget_vel()[0] == doctest::Approx(-2581.033333));
+  CHECK(stormo.set_()[8].cget_vel()[1] == doctest::Approx(-825.5));
 
-   CHECK(stormo.set_()[9].cget_vel()[0] == doctest::Approx(2550.077778));
-   CHECK(stormo.set_()[9].cget_vel()[1] == doctest::Approx(424.5));
+  CHECK(stormo.set_()[9].cget_vel()[0] == doctest::Approx(2550.077778));
+  CHECK(stormo.set_()[9].cget_vel()[1] == doctest::Approx(424.5));
 }
 
 TEST_CASE("Testing multiple iterations of the rules")
@@ -145,9 +149,7 @@ TEST_CASE("Testing multiple iterations of the rules")
   for (auto& boid : stormo2.set_()) {
     std::cout << "Le velocità sono: " << boid.get_vel()[0] << ", "
               << boid.get_vel()[1] << "\n";
-    }
-  
-  
+  }
 
   REQUIRE(stormo2.size_() == 4);
 
@@ -158,7 +160,6 @@ TEST_CASE("Testing multiple iterations of the rules")
   CHECK(stormo2.set_()[2].cget_vel()[0] == doctest::Approx(461.91329));
 
   CHECK(stormo2.set_()[3].cget_vel()[0] == doctest::Approx(3121.0591));
-
 }
 
 /*TEST_CASE("Testing multiple iterations of the rules")
@@ -202,7 +203,8 @@ TEST_CASE("Testing multiple iterations of the rules")
 
   stormo.update(params);
   for(auto& boid : stormo.set_()){
-    std::cout<<"Le posizioni valgolo: "<<boid.cget_pos()[0]<<" e "<<boid.cget_pos()[1]<<"\n";
+    std::cout<<"Le posizioni valgolo: "<<boid.cget_pos()[0]<<" e
+"<<boid.cget_pos()[1]<<"\n";
   }
   stormo.update(params);
   for (auto& boid : stormo.set_()) {
@@ -213,7 +215,8 @@ TEST_CASE("Testing multiple iterations of the rules")
     /*std::cout << "Il numero di vicini e molto vicini è: "
               << boid.get_neighbors().size() << ", "
               << boid.get_neighbors().size() << "\n"
-              << "Il GridID vale: "<<boid.set_GridID().columns<<", "<<boid.set_GridID().rows<<"\n";
+              << "Il GridID vale: "<<boid.set_GridID().columns<<",
+"<<boid.set_GridID().rows<<"\n";
 
   }
 
@@ -279,7 +282,8 @@ TEST_CASE("Testing the speed limits")
           == doctest::Approx(params.speedminimum));
     CHECK(boids::mod(boids[2].cget_vel())
           == doctest::Approx(params.speedminimum));
-    CHECK(boids::mod(boids[3].cget_vel()) == doctest::Approx(params.speedlimit));
+    CHECK(boids::mod(boids[3].cget_vel())
+          == doctest::Approx(params.speedlimit));
   }
 }
 

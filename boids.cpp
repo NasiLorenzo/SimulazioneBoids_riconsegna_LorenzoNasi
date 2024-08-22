@@ -40,7 +40,6 @@ void boidstate::speedadjust(double speedlimit, double speedminimum)
     normalize(this->boid_.vel_);
     this->boid_.vel_ = speedminimum * this->boid_.vel_;
   }
-  // std::cout<<"La velocità massima è "<<boid_.vel_[0]<<"\n";
 }
 void boidstate::bordercheck(std::vector<unsigned int> const& pixel,
                             const double bordersize, const double attraction)
@@ -145,14 +144,19 @@ void boidstate::update_close_neighbors(
       auto neighrange = map.equal_range(startkey);
       std::for_each(neighrange.first, neighrange.second, [&](auto& neighbor) {
         auto distanza = distance(this->boid_.pos_, neighbor.second->pos_);
-        if (distanza < pow(repulsion_distance, 2) && distanza != 0) {
-          this->close_neighbors.emplace_back(neighbor.second);
+        if (distanza < pow(repulsion_distance, 2) && distanza != 0
+            && this->boid_.flockID == neighbor.second->flockID) {
+          auto cosangolo = cosangleij(neighbor.second->pos_ - this->boid_.pos_,
+                                      this->boid_.vel_);
+          if ((cosangolo) >= std::cos(alpha)) {
+            this->close_neighbors.emplace_back(neighbor.second);
+          }
         }
       });
-      startkey++;
     }
-    startkey += columns - 3;
+    startkey++;
   }
+  startkey += columns - 3;
 }
 
 void boidstate::regola1(const double repulsione)
@@ -177,13 +181,15 @@ void boidstate::regola2_3(const double steering, const double cohesion)
       });
 }
 
-void boidstate::posvel_update(const float deltaT, const double view_range)
+void boidstate::posvel_update(paramlist const& params)
 {
   boid_.vel_ += boid_.deltavel_;
-  boid_.pos_[0] += (this->get_vel()[0]) * deltaT;
-  this->boid_.pos_[1] += (this->get_vel()[1]) * deltaT;
+  speedadjust(params.speedlimit, params.speedminimum);
+  boid_.pos_[0] += (this->get_vel()[0]) * params.deltaT;
+  this->boid_.pos_[1] += (this->get_vel()[1]) * params.deltaT;
+  bordercheck(params.pixel, params.bordersize, params.attraction);
   boid_.deltavel_ = {0., 0.};
-  UpdateID(boid_, view_range);
+  UpdateID(boid_, params.neigh_align);
 }
 
 void boidstate::update_allneighbors(
@@ -205,8 +211,6 @@ void boidstate::update_rules(paramlist const& params)
 {
   regola1(params.repulsione);
   regola2_3(params.steering, params.coesione);
-  speedadjust(params.speedlimit, params.speedminimum);
-  bordercheck(params.pixel, params.bordersize, params.attraction);
 }
 
 std::vector<boidstate> generate_flock(std::default_random_engine& eng,
@@ -261,17 +265,17 @@ void flock::update(paramlist const& params)
                   // "<<ms_double.count()<<" ms"<<"\n";
                   boid.update_rules(params);
                   // std::cout<<"Chiave boid "<<boid.set_GridID().columns<<" e
-                  // "<<boid.set_GridID().rows<<"\n";
-                  // std::cout<<"La chiave vale:
-                  // "<<hash_function(boid.set_GridID(),params.columns)<<"\n";
-                  // std::cout<<"il numero di vicini e molto vicini è
-                  // "<<boid.get_neighbors().size()<<" e
-                  // "<<boid.get_close_neighbors().size()<<"\n";
+                  //"<<boid.set_GridID().rows<<"\n";
+                  /*std::cout << "La chiave vale: "
+                            << hash_function(boid.set_GridID(), params.columns)
+                            << "\n";
+                  std::cout << "il numero di vicini e molto vicini è "
+                            << boid.get_neighbors().size() << " e "
+                            << boid.get_close_neighbors().size() << "\n"
+                            << "----------" << "\n\n";*/
                 });
   std::for_each(std::execution::par_unseq, set.begin(), set.end(),
-                [&](auto& boid) {
-                  boid.posvel_update(params.deltaT, params.neigh_align);
-                });
+                [&](auto& boid) { boid.posvel_update(params); });
   update_HashMap(params);
 }
 
