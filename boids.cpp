@@ -256,12 +256,12 @@ void flock::update_HashMap(paramlist const& params)
 
 void flock::update(paramlist const& params)
 {
-  std::vector<boidstate> new_set=set;
-  auto localmap=HashMap;
-  std::for_each(std::execution::par_unseq, new_set.begin(), new_set.end(),
+  //std::vector<boidstate> new_set=set;
+  //auto localmap=HashMap;
+  std::for_each(oneapi::dpl::execution::par_unseq, get_set_().begin(), get_set_().end(),
                 [&](auto& boid) {
                   auto t1 = high_resolution_clock::now();
-                  boid.update_allneighbors(localmap, params.neigh_repulsion,
+                  boid.update_allneighbors(cget_Map_(), params.neigh_repulsion,
                                            params.neigh_align, params.alpha,
                                            params.size, params.flocksize,
                                            params.columns);
@@ -279,11 +279,11 @@ void flock::update(paramlist const& params)
                   std::cout<<"Il flockID vale: "<<boid.set_ID()<<"\n";
                   std::cout<<"---------------"<<"\n"<<"\n";*/
                 });
-  std::for_each(std::execution::par_unseq, new_set.begin(), new_set.end(),
+  std::for_each(oneapi::dpl::execution::par_unseq, get_set_().begin(), get_set_().end(),
                 [&](auto& boid) {
                   boid.posvel_update(params.deltaT, params.neigh_align);
                 });
-  std::swap(set,new_set);
+  //std::swap(set,new_set);
   update_HashMap(params);
 }
 

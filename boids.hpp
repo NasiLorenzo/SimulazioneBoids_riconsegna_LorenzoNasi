@@ -231,6 +231,10 @@ class flock
     return set;
   }
 
+  auto& get_set_()  {
+    return set;
+  }
+
   auto& cget_Map_() const {
     return HashMap;
   }
