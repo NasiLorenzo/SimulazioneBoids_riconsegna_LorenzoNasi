@@ -54,27 +54,19 @@ struct boid
   {}
   auto& cget_pos() const
   {
-    std::mutex idmutex;
-    std::lock_guard<std::mutex> lock(idmutex);
     return this->pos_;
   }
 
   auto& cget_vel() const
   {
-    std::mutex idmutex;
-    std::lock_guard<std::mutex> lock(idmutex);
     return this->vel_;
   }
   auto get_velcopy() const
   {
-    std::mutex idmutex;
-    std::lock_guard<std::mutex> lock(idmutex);
     return this->vel_;
   }
   auto get_poscopy() const
   {
-    std::mutex idmutex;
-    std::lock_guard<std::mutex> lock(idmutex);
     return this->pos_;
   }
 };
@@ -94,27 +86,19 @@ class boidstate
   {}
   auto& cget_pos() const
   {
-    std::mutex idmutex;
-    std::lock_guard<std::mutex> lock(idmutex);
     return this->boid_.pos_;
   }
 
   auto& cget_vel() const
   {
-    std::mutex idmutex;
-    std::lock_guard<std::mutex> lock(idmutex);
     return this->boid_.vel_;
   }
   auto get_velcopy() const
   {
-    std::mutex idmutex;
-    std::lock_guard<std::mutex> lock(idmutex);
     return this->boid_.vel_;
   }
   auto get_poscopy() const
   {
-    std::mutex idmutex;
-    std::lock_guard<std::mutex> lock(idmutex);
     return this->boid_.pos_;
   }
   auto get_ID() const
@@ -124,15 +108,15 @@ class boidstate
 
   auto& get_pos()
   {
-    std::mutex idmutex;
-    std::lock_guard<std::mutex> lock(idmutex);
+    //std::mutex idmutex;
+    //std::lock_guard<std::mutex> lock(idmutex);
     return this->boid_.pos_;
   }
 
   auto& get_vel()
   {
-    std::mutex idmutex;
-    std::lock_guard<std::mutex> lock(idmutex);
+    //std::mutex idmutex;
+    //std::lock_guard<std::mutex> lock(idmutex);
     return this->boid_.vel_;
   }
 
@@ -151,14 +135,10 @@ class boidstate
   }
   auto& get_neighbors()
   {
-    std::mutex idmutex;
-    std::lock_guard<std::mutex> lock(idmutex);
     return neighbors;
   }
   auto& get_close_neighbors()
   {
-    std::mutex idmutex;
-    std::lock_guard<std::mutex> lock(idmutex);
     return close_neighbors;
   }
 

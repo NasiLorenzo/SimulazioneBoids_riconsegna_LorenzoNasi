@@ -68,10 +68,10 @@ std::vector<RGB> generatecolors(std::default_random_engine& eng,
         params.columns = static_cast<int>(value);
     }
   }
-  params.pixel[0]=params.columns*params.neigh_align;
-  params.pixel[1]=params.rows*params.neigh_align;
-  params.columns*=params::rate;
-  params.rows*=params::rate;
+  params.pixel[0]=static_cast<unsigned int>(params.columns*params.neigh_align);
+  params.pixel[1]=static_cast<unsigned int>(params.rows*params.neigh_align);
+  params.columns*=static_cast<int>(params::rate);
+  params.rows*=static_cast<int>(params::rate);
   return params;
   }
 
