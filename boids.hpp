@@ -200,7 +200,6 @@ class flock
 {
   std::vector<boidstate> set;
   std::unordered_multimap<int, boid const*> HashMap{};
-  std::mutex map_mutex;
 
  public:
   flock()
@@ -228,15 +227,15 @@ class flock
   }
 
   auto& cget_set_() const {
-    return set;
+    return this->set;
   }
 
   auto& get_set_()  {
-    return set;
+    return this->set;
   }
 
   auto& cget_Map_() const {
-    return HashMap;
+    return this->HashMap;
   }
 
   std::size_t size_()
