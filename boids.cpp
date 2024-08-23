@@ -113,6 +113,8 @@ void boidstate::update_close_neighbors(std::vector<boid const*> const& set,
   std::for_each(set.begin(), set.end(), [&](auto& neighbor) {
     auto distanza = distance(this->boid_.pos_, neighbor->pos_);
     if (distanza < pow(repulsion_distance, 2) && distanza != 0) {
+      std::cout<<"Stato angolo: "<<bool{cosangleij(neighbor->pos_ - this->boid_.pos_,
+                                      this->boid_.vel_)>=cos(0.55*M_PI)}<<"\n";
       this->close_neighbors.emplace_back(neighbor);
     }
   });
@@ -123,12 +125,6 @@ void boidstate::update_close_neighbors(
     const double repulsion_distance, const int columns, const double alpha)
 {
   this->close_neighbors.clear();
-  /*std::for_each(set.begin(), set.end(), [&](auto& neighbor) {
-    auto distanza = distance(this->boid_.pos_, neighbor.second.get_pos());
-    if (distanza < pow(repulsion_distance, 2) && distanza != 0) {
-      this->close_neighbors.emplace_back(&(neighbor.second.boid_));
-    }
-  });*/
   gridID startID{};
   if (boid_.GridID.columns == 1)
     startID.columns = 1;
@@ -144,13 +140,14 @@ void boidstate::update_close_neighbors(
       auto neighrange = map.equal_range(startkey);
       std::for_each(neighrange.first, neighrange.second, [&](auto& neighbor) {
         auto distanza = distance(this->boid_.pos_, neighbor.second->pos_);
-        if (distanza < pow(repulsion_distance, 2) && distanza != 0
-            && this->boid_.flockID == neighbor.second->flockID) {
-          auto cosangolo = cosangleij(neighbor.second->pos_ - this->boid_.pos_,
+        std::cout<<"Stato distanza: "<<bool{distanza < pow(repulsion_distance, 2)}<<"\n";
+        std::cout<<"Valore distanza: "<<distanza<<"\n";
+        if (distanza < pow(repulsion_distance, 2) && (distanza != 0)) {
+          /*auto cosangolo = cosangleij(neighbor.second->pos_ - this->boid_.pos_,
                                       this->boid_.vel_);
-          if ((cosangolo) >= std::cos(alpha)) {
+          if ((cosangolo) >= std::cos(alpha)) {*/
             this->close_neighbors.emplace_back(neighbor.second);
-          }
+          //}
         }
       });
     }
@@ -189,7 +186,7 @@ void boidstate::posvel_update(paramlist const& params)
   this->boid_.pos_[1] += (this->get_vel()[1]) * params.deltaT;
   bordercheck(params.pixel, params.bordersize, params.attraction);
   boid_.deltavel_ = {0., 0.};
-  UpdateID(boid_, params.neigh_align);
+  UpdateID(boid_, params.view_range);
 }
 
 void boidstate::update_allneighbors(
@@ -200,7 +197,9 @@ void boidstate::update_allneighbors(
 {
   if (flocksize < size) {
     update_neighbors(map, align_distance, alpha, Criterion::similar, columns);
-    update_close_neighbors(map, align_distance, columns, alpha);
+    update_close_neighbors(map, repulsion_distance, columns, alpha);
+    //update_close_neighbors(this->neighbors, repulsion_distance);
+
   } else {
     update_neighbors(map, align_distance, alpha, Criterion::any, columns);
     update_close_neighbors(this->neighbors, repulsion_distance);
@@ -223,7 +222,8 @@ std::vector<boidstate> generate_flock(std::default_random_engine& eng,
     boidstate boidprova{};
     boidprova.random_boid(eng, params);
     boidprova.set_ID() = i / params.flocksize;
-    UpdateID(boidprova.set_boid(), params.neigh_align);
+    std::cout<<"Il flock id vale: "<<boidprova.cget_boid().flockID<<"\n";
+    UpdateID(boidprova.set_boid(), params.view_range);
     for (auto it = boidprova.get_pos().begin(); it != boidprova.get_pos().end();
          ++it, ++pix) {
       std::uniform_real_distribution<double> dis(
@@ -252,11 +252,11 @@ void flock::update_HashMap(paramlist const& params)
 
 void flock::update(paramlist const& params)
 {
-  std::for_each(std::execution::par_unseq, set.begin(), set.end(),
+  std::for_each(/*std::execution::par_unseq,*/ set.begin(), set.end(),
                 [&](auto& boid) {
                   auto t1 = high_resolution_clock::now();
-                  boid.update_allneighbors(HashMap, params.neigh_repulsion,
-                                           params.neigh_align, params.alpha,
+                  boid.update_allneighbors(HashMap, params.repulsion_range,
+                                           params.view_range, params.alpha,
                                            params.size, params.flocksize,
                                            params.columns);
                   auto t2 = high_resolution_clock::now();
@@ -268,13 +268,13 @@ void flock::update(paramlist const& params)
                   //"<<boid.set_GridID().rows<<"\n";
                   /*std::cout << "La chiave vale: "
                             << hash_function(boid.set_GridID(), params.columns)
-                            << "\n";
+                            << "\n";*/
                   std::cout << "il numero di vicini e molto vicini è "
                             << boid.get_neighbors().size() << " e "
                             << boid.get_close_neighbors().size() << "\n"
-                            << "----------" << "\n\n";*/
+                            << "----------" << "\n\n";
                 });
-  std::for_each(std::execution::par_unseq, set.begin(), set.end(),
+  std::for_each(/*std::execution::par_unseq,*/ set.begin(), set.end(),
                 [&](auto& boid) { boid.posvel_update(params); });
   update_HashMap(params);
 }

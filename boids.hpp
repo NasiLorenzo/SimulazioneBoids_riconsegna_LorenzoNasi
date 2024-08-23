@@ -14,8 +14,8 @@ struct paramlist
   double repulsione;
   double steering;
   double coesione;
-  double neigh_align;
-  double neigh_repulsion;
+  double view_range;
+  double repulsion_range;
   double attraction;
   double alpha;
   double speedlimit;
@@ -153,6 +153,12 @@ class boidstate
   {
     return neighbors;
   }
+
+  auto& cget_neighbors() const
+  {
+    return neighbors;
+  }
+
   auto& get_close_neighbors()
   {
     return close_neighbors;
@@ -213,11 +219,11 @@ class flock
       : set{other}
   {
     std::for_each(set.begin(), set.end(), [&params](auto& boid) {
-      UpdateID(boid.set_boid(), params.neigh_align);
+      UpdateID(boid.set_boid(), params.view_range);
     });
     update_HashMap(params);
     std::for_each(set.begin(), set.end(), [&params](auto& boid) {
-      UpdateID(boid.set_boid(), params.neigh_align);
+      UpdateID(boid.set_boid(), params.view_range);
     });
     update_HashMap(params);
   }

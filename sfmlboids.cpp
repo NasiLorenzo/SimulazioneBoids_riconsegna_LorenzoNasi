@@ -34,10 +34,10 @@ std::vector<RGB> generatecolors(std::default_random_engine& eng,
         params.steering = value;
       else if (name == "coesione")
         params.coesione = value;
-      else if (name == "neigh_align")
-        params.neigh_align = value;
-      else if (name == "neigh_repulsion")
-        params.neigh_repulsion = value;
+      else if (name == "view_range")
+        params.view_range = value;
+      else if (name == "repulsion_range")
+        params.repulsion_range = value;
       else if (name == "attraction")
         params.attraction = value;
       else if (name == "alpha")
@@ -68,8 +68,8 @@ std::vector<RGB> generatecolors(std::default_random_engine& eng,
         params.columns = static_cast<int>(value);
     }
   }
-  params.pixel[0]=static_cast<unsigned int>(params.columns*params.neigh_align);
-  params.pixel[1]=static_cast<unsigned int>(params.rows*params.neigh_align);
+  params.pixel[0]=static_cast<unsigned int>(params.columns*params.view_range);
+  params.pixel[1]=static_cast<unsigned int>(params.rows*params.view_range);
   params.columns*=static_cast<int>(params::rate);
   params.rows*=static_cast<int>(params::rate);
   return params;

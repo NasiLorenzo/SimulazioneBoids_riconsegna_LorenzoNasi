@@ -10,8 +10,8 @@ TEST_CASE("Testing rules")
   params.repulsione      = 0.7;
   params.steering        = 0.1;
   params.coesione        = 0.1;
-  params.neigh_repulsion = 10000.;
-  params.neigh_align     = 10000.;
+  params.repulsion_range = 10000.;
+  params.view_range     = 10000.;
   params.alpha           = M_PI;
   params.attraction      = 0.;
   params.speedlimit      = 8000;
@@ -22,8 +22,8 @@ TEST_CASE("Testing rules")
   params.rows            = 1;
   params.columns         = 1;
   params.pixel[0] =
-      static_cast<unsigned int>(params.columns * params.neigh_align);
-  params.pixel[1] = static_cast<unsigned int>(params.rows * params.neigh_align);
+      static_cast<unsigned int>(params.columns * params.view_range);
+  params.pixel[1] = static_cast<unsigned int>(params.rows * params.view_range);
   params.columns *= static_cast<int>(params::rate);
   params.rows *= static_cast<int>(params::rate);
   boidstate boid1;
@@ -109,8 +109,8 @@ TEST_CASE("Testing multiple iterations of the rules")
   params.repulsione      = 0.7;
   params.steering        = 0.1;
   params.coesione        = 0.1;
-  params.neigh_repulsion = 100000;
-  params.neigh_align     = 100000;
+  params.repulsion_range = 100000;
+  params.view_range     = 100000;
   params.alpha           = M_PI;
   params.attraction      = 0;
   params.speedlimit      = 8000;
@@ -121,8 +121,8 @@ TEST_CASE("Testing multiple iterations of the rules")
   params.rows            = 1;
   params.columns         = 1;
   params.pixel[0] =
-      static_cast<unsigned int>(params.columns * params.neigh_align);
-  params.pixel[1] = static_cast<unsigned int>(params.rows * params.neigh_align);
+      static_cast<unsigned int>(params.columns * params.view_range);
+  params.pixel[1] = static_cast<unsigned int>(params.rows * params.view_range);
   params.columns *= static_cast<int>(params::rate);
   params.rows *= static_cast<int>(params::rate);
   boidstate boid1;
@@ -168,8 +168,8 @@ TEST_CASE("Testing multiple iterations of the rules")
   params.repulsione      = 0.7;
   params.steering        = 0.1;
   params.coesione        = 0.1;
-  params.neigh_repulsion = 100000;
-  params.neigh_align     = 100000;
+  params.repulsion_range = 100000;
+  params.view_range     = 100000;
   params.alpha           = M_PI;
   params.attraction      = 0;
   params.speedlimit      = 8000;
@@ -180,8 +180,8 @@ TEST_CASE("Testing multiple iterations of the rules")
   params.rows            = 1;
   params.columns         = 1;
   params.pixel[0] =
-      static_cast<unsigned int>(params.columns * params.neigh_align);
-  params.pixel[1] = static_cast<unsigned int>(params.rows * params.neigh_align);
+      static_cast<unsigned int>(params.columns * params.view_range);
+  params.pixel[1] = static_cast<unsigned int>(params.rows * params.view_range);
   params.columns *= static_cast<int>(params::rate);
   params.rows *= static_cast<int>(params::rate);
   boidstate boid1;
@@ -241,8 +241,8 @@ TEST_CASE("Testing the speed limits")
   params.repulsione      = 0.7;
   params.steering        = 0.1;
   params.coesione        = 0.1;
-  params.neigh_repulsion = 1000000;
-  params.neigh_align     = 1000000;
+  params.repulsion_range = 1000000;
+  params.view_range     = 1000000;
   params.alpha           = M_PI;
   params.attraction      = 0;
   params.speedlimit      = 350.;
@@ -293,14 +293,23 @@ TEST_CASE("Testing boid sight")
   params.repulsione      = 0.7;
   params.steering        = 0.1;
   params.coesione        = 0.1;
-  params.neigh_repulsion = 1000000;
-  params.neigh_align     = 1000000;
+  params.repulsion_range = 1000000;
+  params.view_range     = 1000000;
   params.alpha           = M_PI / 4;
   params.attraction      = 0;
   params.speedlimit      = 3500.;
   params.speedminimum    = 3200.;
   params.flocksize       = 10;
   params.size            = 10;
+  params.deltaT          = 1 / 30.f;
+  params.flocksize       = 10;
+  params.rows            = 1;
+  params.columns         = 1;
+  params.pixel[0] =
+      static_cast<unsigned int>(params.columns * params.view_range);
+  params.pixel[1] = static_cast<unsigned int>(params.rows * params.view_range);
+  params.columns *= static_cast<int>(params::rate);
+  params.rows *= static_cast<int>(params::rate);
   boidstate boid1;
   boid1.get_pos() = {350., 270.};
   boid1.get_vel() = {30., 0.};
@@ -319,20 +328,20 @@ TEST_CASE("Testing boid sight")
   boidstate boid6;
   boid6.get_pos() = {350., 270.};
   boid6.get_vel() = {-15., 10.};
-  /*
+  
     SUBCASE("Testing if boid1 sees boid2")
     {
+      params.size=2;
+      params.flocksize=2;
       std::vector<boidstate> pair1{boid1, boid2};
-
-      auto result1 =
-          boids::functions<boidstate>::template neighbors<Criterion::any>(
-              pair1, boid1, 10000., params.alpha);
+      boids::flock stormo{pair1,params};
+      stormo.update(params);
       CHECK(boids::cosangleij(boid2.get_pos() - boid1.get_pos(),
     boid1.get_vel())
             == doctest::Approx(cos(0)).epsilon(0.001));
-      CHECK(result1.size() == 1);
+      CHECK(stormo.cget_set_()[0].cget_neighbors().size() == 1);
     }
-
+  /*
     SUBCASE("Testing if boid1 sees boid3")
     {
       std::vector<boidstate> pair2{boid1, boid3};
@@ -390,8 +399,8 @@ TEST_CASE("Testing the limit distance")
   params.repulsione      = 0.7;
   params.steering        = 0.1;
   params.coesione        = 0.1;
-  params.neigh_repulsion = 100;
-  params.neigh_align     = 100;
+  params.repulsion_range = 100;
+  params.view_range     = 100;
   params.alpha           = M_PI;
   params.attraction      = 0;
   params.speedlimit      = 3500.;
@@ -412,7 +421,7 @@ TEST_CASE("Testing the limit distance")
      std::vector<boidstate> pair1{boid1, boid2};
      auto result1 =
          boids::functions<boidstate>::template neighbors<Criterion::any>(
-             pair1, boid1, params.neigh_align, params.alpha);
+             pair1, boid1, params.view_range, params.alpha);
      CHECK(sqrt(distance(boid1.get_pos(), boid2.get_pos()))
            == doctest::Approx(832.165));
      CHECK(result1.size() == 0);
@@ -422,7 +431,7 @@ TEST_CASE("Testing the limit distance")
      std::vector<boidstate> pair2{boid1, boid3};
      auto result2 =
          boids::functions<boidstate>::template neighbors<Criterion::any>(
-             pair2, boid1, params.neigh_align, params.alpha);
+             pair2, boid1, params.view_range, params.alpha);
      CHECK(sqrt(distance(boid1.get_pos(), boid3.get_pos()))
            == doctest::Approx(5.38516));
      CHECK(result2.size() == 1);
