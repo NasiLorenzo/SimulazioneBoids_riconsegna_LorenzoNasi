@@ -43,13 +43,11 @@ struct boid
 {
   DoubleVec pos_;
   DoubleVec vel_;
-  DoubleVec deltavel_{};
   gridID GridID{};
   unsigned int flockID{0};
   boid(DoubleVec pos, DoubleVec vel)
       : pos_{pos}
       , vel_{vel}
-      , deltavel_{}
   {}
   boid()
       : pos_{}
@@ -81,6 +79,7 @@ class boidstate
 {
  private:
   boid boid_;
+  DoubleVec deltavel_{};
   std::vector<boid const*> neighbors{};
   std::vector<boid const*> close_neighbors{};
 
@@ -169,9 +168,13 @@ class boidstate
     return close_neighbors;
   }
 
+  auto& get_boid() {
+    return this->boid_;
+  }
+
   void random_boid(std::default_random_engine&, paramlist const& params);
 
-  void speedadjust(double speedlimit, double speedminimum);
+  /*void speedadjust(double speedlimit, double speedminimum);
 
   void bordercheck(std::vector<unsigned int> const& pixel,
                    const double bordersize, const double attraction);
@@ -186,7 +189,7 @@ class boidstate
   void
   update_close_neighbors(std::unordered_multimap<int, boid const*> const& map,
                          const double repulsion_distance, const int columns,
-                         const double alpha);
+                         const double alpha);*/
 
   void regola1(const double repulsione);
   void regola2_3(const double steering, const double cohesion);
@@ -200,12 +203,35 @@ class boidstate
   void update_rules(paramlist const& params);
 };
 
+void UpdateID(boid& boid, const double view_range);
+
+auto random_boid(std::default_random_engine& eng, paramlist const& params);
+
+void speedadjust(boid& boid, double speedlimit, double speedminimum);
+
+void bordercheck(boid& boid, std::vector<unsigned int> const& pixel,
+                 const double bordersize, const double attraction);
+
+void update_neighbors(boid const& boid_, std::vector<boid const*>& neighbors,
+                      std::unordered_multimap<int, boid const*> const& map,
+                      const double align_distance, const double alpha,
+                      Criterion const criterion, const int columns);
+
+void update_close_neighbors(boid const& boid_,
+                            std::vector<boid const*>& close_neighbors,
+                            std::vector<boid const*> const& set,
+                            const double repulsion_distance);
+
+void update_close_neighbors(
+    boid const& boid_, std::vector<boid const*>& close_neighbors,
+    std::unordered_multimap<int, boid const*> const& map,
+    const double repulsion_distance, const int columns, const double alpha);
+
+int hash_function(gridID const& GridID, const int columns);
+
 std::vector<boidstate> generate_flock(std::default_random_engine& eng,
                                       paramlist const& params);
 
-void UpdateID(boid& boid, const double view_range);
-
-int hash_function(gridID const& GridID, const int columns);
 
 class flock
 {

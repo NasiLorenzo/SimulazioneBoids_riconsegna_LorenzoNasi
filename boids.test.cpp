@@ -272,7 +272,7 @@ TEST_CASE("Testing the speed limits")
   }
 
   std::for_each(boids.begin(), boids.end(), [&params](boidstate& boid) {
-    boid.speedadjust(params.speedlimit, params.speedminimum);
+    speedadjust(boid.get_boid(),params.speedlimit, params.speedminimum);
   });
 
   SUBCASE("Testing the get_vel()ocity after the adjustment")
