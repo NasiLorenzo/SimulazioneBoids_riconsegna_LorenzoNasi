@@ -7,12 +7,14 @@ using std::chrono::duration;
 using std::chrono::duration_cast;
 using std::chrono::high_resolution_clock;
 using std::chrono::milliseconds;
-void boidstate::random_boid(std::default_random_engine& eng,
+auto random_boid(std::default_random_engine& eng,
                             paramlist const& params)
 {
+  boidstate newboid{};
   std::normal_distribution<double> dist(0.0, params.sigma);
-  std::for_each(boid_.vel_.begin(), boid_.vel_.end(),
+  std::for_each(newboid.get_vel().begin(), newboid.get_vel().end(),
                 [&](double& x) { x = dist(eng); });
+  return newboid;
 }
 
 void UpdateID(boid& boid, const double view_range)
@@ -221,8 +223,8 @@ std::vector<boidstate> generate_flock(std::default_random_engine& eng,
   std::unordered_multimap<int, boid const*> HashMap{};
   for (unsigned int i = 0; i < params.size; i++) {
     auto pix = params.pixel.begin();
-    boidstate boidprova{};
-    boidprova.random_boid(eng, params);
+    boidstate boidprova{random_boid(eng,params)};
+    //boidprova.random_boid(eng, params);
     boidprova.set_ID() = i / params.flocksize;
     std::cout<<"Il flock id vale: "<<boidprova.cget_boid().flockID<<"\n";
     UpdateID(boidprova.set_boid(), params.view_range);

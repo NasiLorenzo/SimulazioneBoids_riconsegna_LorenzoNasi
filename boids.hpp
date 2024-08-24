@@ -42,15 +42,18 @@ struct gridID
 struct boid
 {
   DoubleVec pos_;
-  unsigned int flockID{0};
-  gridID GridID{};
   DoubleVec vel_;
   DoubleVec deltavel_{};
-  boid() = default;
+  gridID GridID{};
+  unsigned int flockID{0};
   boid(DoubleVec pos, DoubleVec vel)
       : pos_{pos}
       , vel_{vel}
       , deltavel_{}
+  {}
+  boid()
+      : pos_{}
+      , vel_{}
   {}
   auto& cget_pos() const
   {
@@ -82,11 +85,13 @@ class boidstate
   std::vector<boid const*> close_neighbors{};
 
  public:
-  boidstate() = default;
-  boidstate(boid& other)
+  boidstate(boid const& other)
       : boid_{other}
       , neighbors{}
       , close_neighbors{}
+  {}
+  boidstate()
+      : boid_{}
   {}
   auto& cget_pos() const
   {
@@ -232,15 +237,18 @@ class flock
     return set;
   }
 
-  auto& cget_set_() const {
+  auto& cget_set_() const
+  {
     return this->set;
   }
 
-  auto& get_set_()  {
+  auto& get_set_()
+  {
     return this->set;
   }
 
-  auto& cget_Map_() const {
+  auto& cget_Map_() const
+  {
     return this->HashMap;
   }
 
