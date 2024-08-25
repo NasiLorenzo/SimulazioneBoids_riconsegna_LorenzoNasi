@@ -48,5 +48,4 @@ class SFML_interface
 };
 
 } // namespace boids
-#include "sfmlboids.tpp"
 #endif

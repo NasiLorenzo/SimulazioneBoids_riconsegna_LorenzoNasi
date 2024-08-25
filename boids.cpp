@@ -87,6 +87,7 @@ void update_neighbors(boid const& boid_, std::vector<boid const*>& neighbors,
   auto startkey = hash_function(startID, columns);
   for (int j = 0; j < 3; j++) {
     for (int i = 0; i < 3; i++) {
+      std::cout<<"La startkey vale: "<<startkey<<"\n";
       auto neighrange = map.equal_range(startkey);
       std::for_each(neighrange.first, neighrange.second, [&](auto& neighbor) {
         auto distanza = distance(boid_.pos_, neighbor.second->pos_);
@@ -98,6 +99,7 @@ void update_neighbors(boid const& boid_, std::vector<boid const*>& neighbors,
               cosangleij(neighbor.second->pos_ - boid_.pos_, boid_.vel_);
           if ((cosangolo) >= std::cos(alpha)) {
             neighbors.emplace_back(neighbor.second);
+            std::cout<<"La posizione  vicino vale: "<<neighbor.second->pos_[0]<<" e "<<neighbor.second->pos_[1]<<"\n";
           }
         }
       });
@@ -192,8 +194,8 @@ void regola2_3(boid const& boid_, DoubleVec& deltavel_,
 
 void posvel_update(boidstate& boid, paramlist const& params)
 {
-  boid.get_neighbors().clear();
-  boid.get_close_neighbors().clear();
+  //boid.get_neighbors().clear();
+  //boid.get_close_neighbors().clear();
   boid.get_boid().vel_ += boid.get_deltavel();
   speedadjust(boid.get_boid(), params.speedlimit, params.speedminimum);
   boid.get_boid().pos_[0] += (boid.get_boid().vel_[0]) * params.deltaT;
@@ -274,7 +276,7 @@ void flock::update_HashMap(paramlist const& params)
 
 void flock::update(paramlist const& params)
 {
-  std::for_each(std::execution::par_unseq, set.begin(), set.end(),
+  std::for_each(/*std::execution::par_unseq,*/ set.begin(), set.end(),
                 [&](auto& boid) {
                   auto t1 = high_resolution_clock::now();
                   update_allneighbors(boid.cget_boid(), boid.get_neighbors(),
@@ -294,12 +296,12 @@ void flock::update(paramlist const& params)
                   /*std::cout << "La chiave vale: "
                             << hash_function(boid.set_GridID(), params.columns)
                             << "\n";*/
-                  /*std::cout << "il numero di vicini e molto vicini è "
+                  std::cout << "il numero di vicini e molto vicini è "
                             << boid.get_neighbors().size() << " e "
                             << boid.get_close_neighbors().size() << "\n"
-                            << "----------" << "\n\n";*/
+                            << "----------" << "\n\n";
                 });
-  std::for_each(std::execution::par_unseq, set.begin(), set.end(),
+  std::for_each(/*std::execution::par_unseq,*/ set.begin(), set.end(),
                 [&](auto& boid) { posvel_update(boid, params); });
   update_HashMap(params);
 }

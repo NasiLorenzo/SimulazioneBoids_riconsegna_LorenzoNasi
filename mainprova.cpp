@@ -79,8 +79,8 @@ int main()
                            // grandezza superiore agli altri due
   params.steering        = 0.04;
   params.coesione        = 0.08;
-  params.neigh_align     = 200;
-  params.neigh_repulsion = 15;
+  params.view_range      = 200;
+  params.repulsion_range = 15;
   params.attraction      = 2;
   params.alpha           = 0.55;
   params.speedlimit      = 100;
@@ -94,8 +94,12 @@ int main()
   params.bordersize      = 50;
 
   std::default_random_engine eng;
-  flock stormo{eng,params};
+  flock stormo{eng, params};
   auto t1 = high_resolution_clock::now();
+  stormo.update(params);
+  stormo.update(params);
+  stormo.update(params);
+  stormo.update(params);
   stormo.update(params);
   auto t2 = high_resolution_clock::now();
 
@@ -103,5 +107,4 @@ int main()
   duration<double, std::milli> ms_double = t2 - t1;
   std::cout << "posizione primo boid " << stormo.set_()[0].get_pos()[0] << "\n";
   std::cout << ms_double.count() << "ms\n";
-  
 }

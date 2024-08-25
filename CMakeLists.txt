@@ -17,8 +17,8 @@ string(APPEND CMAKE_CXX_FLAGS
       " -Wshadow -Wimplicit-fallthrough -Wextra-semi -Wold-style-cast")
 
 # abilita asserzioni di debug (in gcc), l'address sanitizer e l'undefined-behaviour sanitizer in debug mode
-string(APPEND CMAKE_CXX_FLAGS_DEBUG " -D_GLIBCXX_ASSERTIONS  -fno-omit-frame-pointer")# -fsanitize=thread -g")
-string(APPEND CMAKE_EXE_LINKER_FLAGS_DEBUG "  -fno-omit-frame-pointer")# -fsanitize=thread")
+string(APPEND CMAKE_CXX_FLAGS_DEBUG " -D_GLIBCXX_ASSERTIONS  -fno-omit-frame-pointer -fsanitize=thread -g")
+string(APPEND CMAKE_EXE_LINKER_FLAGS_DEBUG "  -fno-omit-frame-pointer -fsanitize=thread")
 
 include_directories("/opt/homebrew/Cellar/sfml/2.6.1/include")
 include_directories("/opt/homebrew/Cellar/tbb/2021.13.0/include")
@@ -26,9 +26,12 @@ find_package(TBB REQUIRED)
 find_package(SFML 2.5 COMPONENTS graphics REQUIRED)
 add_executable(boidsfml boids.cpp boidsfml.cpp doublevec.cpp sfmlboids.cpp)
 add_executable(boidss boids.cpp mainprova.cpp doublevec.cpp)
+add_executable(prove prove_varie.cpp doublevec.cpp)
 target_link_libraries(boidsfml PRIVATE sfml-graphics sfml-window sfml-system)
 target_link_libraries(boidsfml PRIVATE TBB::tbb TBB::tbbmalloc)
 target_link_libraries(boidss PRIVATE TBB::tbb TBB::tbbmalloc)
+target_link_libraries(prove PRIVATE TBB::tbb TBB::tbbmalloc)
+
 
 
 if (BUILD_TESTING)

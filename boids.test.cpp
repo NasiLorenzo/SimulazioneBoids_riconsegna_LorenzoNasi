@@ -19,8 +19,8 @@ TEST_CASE("Testing rules")
   params.size            = 10;
   params.deltaT          = 1 / 30.f;
   params.flocksize       = 10;
-  params.rows            = 1;
-  params.columns         = 1;
+  params.rows            = 2;
+  params.columns         = 2;
   params.pixel[0] =
       static_cast<unsigned int>(params.columns * params.view_range);
   params.pixel[1] = static_cast<unsigned int>(params.rows * params.view_range);
