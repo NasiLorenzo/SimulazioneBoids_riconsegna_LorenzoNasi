@@ -19,13 +19,12 @@ TEST_CASE("Testing rules")
   params.size            = 10;
   params.deltaT          = 1 / 30.f;
   params.flocksize       = 10;
-  params.rows            = 2;
-  params.columns         = 2;
-  params.pixel[0] =
-      static_cast<unsigned int>(params.columns * params.view_range);
-  params.pixel[1] = static_cast<unsigned int>(params.rows * params.view_range);
-  params.columns *= static_cast<int>(params::rate);
-  params.rows *= static_cast<int>(params::rate);
+  params.y            = 2;
+  params.x         = 2;
+  //params.pixel[0] =    static_cast<unsigned int>(params.x * params.view_range);
+  //params.pixel[1] = static_cast<unsigned int>(params.y * params.view_range);
+  params.x *= static_cast<int>(params::rate);
+  params.y *= static_cast<int>(params::rate);
   boidstate boid1;
   boid1.get_pos() = {700., 200.};
   boid1.get_vel() = {300., -10.};
@@ -118,13 +117,13 @@ TEST_CASE("Testing multiple iterations of the rules")
   params.size            = 4;
   params.deltaT          = 1 / 30.f;
   params.flocksize       = 4;
-  params.rows            = 1;
-  params.columns         = 1;
+  params.y            = 1;
+  params.x         = 1;
   params.pixel[0] =
-      static_cast<unsigned int>(params.columns * params.view_range);
-  params.pixel[1] = static_cast<unsigned int>(params.rows * params.view_range);
-  params.columns *= static_cast<int>(params::rate);
-  params.rows *= static_cast<int>(params::rate);
+      static_cast<unsigned int>(params.x * params.view_range);
+  params.pixel[1] = static_cast<unsigned int>(params.y * params.view_range);
+  params.x *= static_cast<int>(params::rate);
+  params.y *= static_cast<int>(params::rate);
   boidstate boid1;
   boid1.get_pos() = {700., 200.};
   boid1.get_vel() = {300., -10.};
@@ -177,13 +176,13 @@ TEST_CASE("Testing multiple iterations of the rules")
   params.size            = 4;
   params.deltaT          = 1 / 30.f;
   params.flocksize       = 4;
-  params.rows            = 1;
-  params.columns         = 1;
+  params.y            = 1;
+  params.x         = 1;
   params.pixel[0] =
-      static_cast<unsigned int>(params.columns * params.view_range);
-  params.pixel[1] = static_cast<unsigned int>(params.rows * params.view_range);
-  params.columns *= static_cast<int>(params::rate);
-  params.rows *= static_cast<int>(params::rate);
+      static_cast<unsigned int>(params.x * params.view_range);
+  params.pixel[1] = static_cast<unsigned int>(params.y * params.view_range);
+  params.x *= static_cast<int>(params::rate);
+  params.y *= static_cast<int>(params::rate);
   boidstate boid1;
   boid1.get_pos() = {700., 200.};
   boid1.get_vel() = {300., -10.};
@@ -215,8 +214,8 @@ TEST_CASE("Testing multiple iterations of the rules")
     /*std::cout << "Il numero di vicini e molto vicini è: "
               << boid.get_neighbors().size() << ", "
               << boid.get_neighbors().size() << "\n"
-              << "Il GridID vale: "<<boid.set_GridID().columns<<",
-"<<boid.set_GridID().rows<<"\n";
+              << "Il GridID vale: "<<boid.set_GridID().x<<",
+"<<boid.set_GridID().y<<"\n";
 
   }
 
@@ -303,13 +302,13 @@ TEST_CASE("Testing boid sight")
   params.size            = 10;
   params.deltaT          = 1 / 30.f;
   params.flocksize       = 10;
-  params.rows            = 1;
-  params.columns         = 1;
+  params.y            = 1;
+  params.x         = 1;
   params.pixel[0] =
-      static_cast<unsigned int>(params.columns * params.view_range);
-  params.pixel[1] = static_cast<unsigned int>(params.rows * params.view_range);
-  params.columns *= static_cast<int>(params::rate);
-  params.rows *= static_cast<int>(params::rate);
+      static_cast<unsigned int>(params.x * params.view_range);
+  params.pixel[1] = static_cast<unsigned int>(params.y * params.view_range);
+  params.x *= static_cast<int>(params::rate);
+  params.y *= static_cast<int>(params::rate);
   boidstate boid1;
   boid1.get_pos() = {350., 270.};
   boid1.get_vel() = {30., 0.};

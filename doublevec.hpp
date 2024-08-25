@@ -20,6 +20,12 @@
 #include <vector>
 #include <mutex>
 #include <thread>
+#include <cstddef>
+#include <functional>
+#include <iomanip>
+#include <iostream>
+#include <string>
+#include <unordered_set>
 namespace boids {
 struct params
 {

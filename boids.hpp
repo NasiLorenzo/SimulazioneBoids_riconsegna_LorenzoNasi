@@ -26,8 +26,8 @@ struct paramlist
   std::vector<unsigned int> pixel;
   double bordersize;
   double sigma;
-  int rows;
-  int columns;
+  int y;
+  int x;
   paramlist()
       : pixel(params::dim)
   {}
@@ -35,8 +35,21 @@ struct paramlist
 
 struct gridID
 {
-  int rows;
-  int columns;
+  int y;
+  int x;
+
+  bool operator==(const gridID& other) const
+  {
+    return x == other.x && y == other.y;
+  }
+};
+
+struct gridID_hash
+{
+  std::size_t operator()(gridID const& other) const noexcept
+  {
+    return std::hash<int>{}(other.x) ^ (std::hash<int>{}(other.y) << 1);
+  }
 };
 
 struct boid
@@ -184,27 +197,26 @@ class boidstate
   void bordercheck(std::vector<unsigned int> const& pixel,
                    const double bordersize, const double attraction);
 
-  void update_neighbors(std::unordered_multimap<int, boid const*> const& map,
+  void update_neighbors(std::unordered_multimap<gridID, boid const*, gridID_hash> const& map,
                         const double align_distance, const double alpha,
-                        Criterion const criterion, const int columns);
+                        Criterion const criterion, const int x);
 
   void update_close_neighbors(std::vector<boid const*> const& set,
                               const double repulsion_distance);
 
   void
-  update_close_neighbors(std::unordered_multimap<int, boid const*> const& map,
-                         const double repulsion_distance, const int columns,
-                         const double alpha);*/
+  update_close_neighbors(std::unordered_multimap<gridID, boid const*, gridID_hash> const&
+  map, const double repulsion_distance, const int x, const double alpha);*/
 
   void regola1(const double repulsione);
   void regola2_3(const double steering, const double cohesion);
   void posvel_update(paramlist const& params);
 
-  void update_allneighbors(std::unordered_multimap<int, boid const*> const& map,
-                           const double repulsion_distance,
-                           const double align_distance, const double alpha,
-                           unsigned int size, unsigned int flocksize,
-                           const int columns);
+  void
+  update_allneighbors(std::unordered_multimap<gridID, boid const*, gridID_hash> const& map,
+                      const double repulsion_distance,
+                      const double align_distance, const double alpha,
+                      unsigned int size, unsigned int flocksize, const int x);
   void update_rules(paramlist const& params);
 };
 
@@ -213,7 +225,8 @@ void regola1(boid const& boid_, DoubleVec& deltavel_,
              const double repulsione);
 
 void regola2_3(boid const& boid_, DoubleVec& deltavel_, const double steering,
-               std::vector<boid const*> const& neighbors, const double cohesion);
+               std::vector<boid const*> const& neighbors,
+               const double cohesion);
 
 void UpdateID(boid& boid, const double view_range);
 
@@ -230,9 +243,9 @@ void bordercheck(boid& boid, std::vector<unsigned int> const& pixel,
                  const double bordersize, const double attraction);
 
 void update_neighbors(boid const& boid_, std::vector<boid const*>& neighbors,
-                      std::unordered_multimap<int, boid const*> const& map,
+                      std::unordered_multimap<gridID, boid const*, gridID_hash> const& map,
                       const double align_distance, const double alpha,
-                      Criterion const criterion, const int columns);
+                      Criterion const criterion, const int x);
 
 void update_close_neighbors(boid const& boid_,
                             std::vector<boid const*>& close_neighbors,
@@ -241,26 +254,52 @@ void update_close_neighbors(boid const& boid_,
 
 void update_close_neighbors(
     boid const& boid_, std::vector<boid const*>& close_neighbors,
-    std::unordered_multimap<int, boid const*> const& map,
-    const double repulsion_distance, const int columns, const double alpha);
+    std::unordered_multimap<gridID, boid const*, gridID_hash> const& map,
+    const double repulsion_distance, const int x, const double alpha);
 
-void update_allneighbors(boid const& boid_, std::vector<boid const*>& neighbors,
-                         std::vector<boid const*>& close_neighbors,
-                         std::unordered_multimap<int, boid const*> const& map,
-                         const double repulsion_distance,
-                         const double align_distance, const double alpha,
-                         unsigned int size, unsigned int flocksize,
-                         const int columns);
+void update_allneighbors(
+    boid const& boid_, std::vector<boid const*>& neighbors,
+    std::vector<boid const*>& close_neighbors,
+    std::unordered_multimap<gridID, boid const*, gridID_hash> const& map,
+    const double repulsion_distance, const double align_distance,
+    const double alpha, unsigned int size, unsigned int flocksize, const int x);
 
-int hash_function(gridID const& GridID, const int columns);
+std::size_t hash_function(gridID const& GridID);
 
 std::vector<boidstate> generate_flock(std::default_random_engine& eng,
                                       paramlist const& params);
 
+struct gridID_hasher
+{
+  std::size_t operator()(const gridID& ID) const
+  {
+    return std::hash<int>()(ID.x) ^ std::hash<int>()(ID.y);
+  }
+};
+
+struct gridID_compare
+{
+  bool operator()(const gridID& a, const gridID& b) const
+  {
+    return a.x == b.x && a.y == b.y;
+  }
+};
+
+
+
+/*template<>
+struct std::hash<gridID>
+{
+  std::size_t operator()(gridID const& other) const noexcept
+  {
+    return std::hash<int>{}(other.x) ^ (std::hash<int>{}(other.y) << 1);
+  }
+};*/
+
 class flock
 {
   std::vector<boidstate> set;
-  std::unordered_multimap<int, boid const*> HashMap{};
+  std::unordered_multimap<gridID, boid const*,gridID_hash> HashMap{};
 
  public:
   flock()

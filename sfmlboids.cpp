@@ -52,10 +52,10 @@ std::vector<RGB> generatecolors(std::default_random_engine& eng,
         params.size = static_cast<unsigned int>(value);
       else if (name == "flocksize")
         params.flocksize = static_cast<unsigned int>(value);
-      /*else if (name == "pixel.x")
+      else if (name == "pixel.x")
         params.pixel[0] = static_cast<unsigned int>(value);
       else if (name == "pixel.y")
-        params.pixel[1] = static_cast<unsigned int>(value);*/
+        params.pixel[1] = static_cast<unsigned int>(value);
       else if (name == "rate")
         boids::params::rate = value;
       else if (name == "bordersize")
@@ -63,15 +63,15 @@ std::vector<RGB> generatecolors(std::default_random_engine& eng,
       else if (name == "sigma")
         params.sigma = value;
       else if (name == "rows")
-        params.rows = static_cast<int>(value);
+        params.y = static_cast<int>(value);
       else if (name == "columns")
-        params.columns = static_cast<int>(value);
+        params.x = static_cast<int>(value);
     }
   }
-  params.pixel[0]=static_cast<unsigned int>(params.columns*params.view_range);
-  params.pixel[1]=static_cast<unsigned int>(params.rows*params.view_range);
-  params.columns*=static_cast<int>(params::rate);
-  params.rows*=static_cast<int>(params::rate);
+  //params.pixel[0]=static_cast<unsigned int>(params.x*params.view_range);
+  //params.pixel[1]=static_cast<unsigned int>(params.y*params.view_range);
+  params.x*=static_cast<int>(params::rate);
+  params.y*=static_cast<int>(params::rate);
   return params;
   }
 
