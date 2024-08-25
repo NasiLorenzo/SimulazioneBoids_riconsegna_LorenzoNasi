@@ -11,13 +11,19 @@ DoubleVec& operator-=(DoubleVec& a, DoubleVec const& b)
 DoubleVec operator-(DoubleVec const& a, DoubleVec const& b)
 {
   DoubleVec result{a};
-  return result-=b;
+  return result -= b;
 }
 
-DoubleVec operator*(const double a, DoubleVec& b)
+DoubleVec& operator*=(DoubleVec& a, double const b)
 {
-  std::for_each(b.begin(), b.end(), [a](double& x) { x = a * x; });
-  return b;
+  std::for_each(a.begin(), a.end(), [b](auto& x) { x *= b; });
+  return a;
+}
+
+DoubleVec operator*(DoubleVec const& a, const double b)
+{
+  auto result{a};
+  return result*=b;
 }
 
 DoubleVec operator/(DoubleVec& b, const double a)

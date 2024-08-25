@@ -18,24 +18,32 @@ auto random_boid(std::default_random_engine& eng, paramlist const& params)
 
 void UpdateID(boid& boid, const double view_range)
 {
-  boid.GridID.x = static_cast<int>(std::floor(boid.pos_[0] / view_range) + 1);
-  boid.GridID.y = static_cast<int>(std::floor(boid.pos_[1] / view_range) + 1);
+  auto posit = boid.cget_pos().begin();
+  std::for_each(boid.GridID.gridID_.begin(), boid.GridID.gridID_.end(),
+                [&](auto& ID_comp) {
+                  ID_comp =
+                      static_cast<int>(std::floor(*posit / view_range) + 1);
+                  ++posit;
+                });
+  // boid.GridID.gridID_[0] = static_cast<int>(std::floor(boid.pos_[0] /
+  // view_range) + 1); boid.GridID.gridID_[1] =
+  // static_cast<int>(std::floor(boid.pos_[1] / view_range) + 1);
 }
 
-std::size_t hash_function(gridID const& GridID)
+/*std::size_t hash_function(gridID const& GridID)
 {
   return std::hash<int>()(GridID.x) ^ std::hash<int>()(GridID.y);
-}
+}*/
 void speedadjust(boid& boid, double speedlimit, double speedminimum)
 {
   auto vmod = mod(boid.vel_);
   if (vmod > speedlimit) {
     normalize(boid.vel_);
-    boid.vel_ = speedlimit * boid.vel_;
+    boid.vel_ = boid.vel_ * speedlimit;
   }
   if (vmod < speedminimum) {
     normalize(boid.vel_);
-    boid.vel_ = speedminimum * boid.vel_;
+    boid.vel_ = boid.vel_ * speedminimum;
   };
 }
 void bordercheck(boid& boid, std::vector<unsigned int> const& pixel,
@@ -52,10 +60,11 @@ void bordercheck(boid& boid, std::vector<unsigned int> const& pixel,
   }
 }
 
-void update_neighbors(boid const& boid_, std::vector<boid const*>& neighbors,
-                      std::unordered_multimap<gridID, boid const*, gridID_hash> const& map,
-                      const double align_distance, const double alpha,
-                      Criterion criterion, const int x)
+void update_neighbors(
+    boid const& boid_, std::vector<boid const*>& neighbors,
+    std::unordered_multimap<gridID, boid const*, gridID_hash> const& map,
+    const double align_distance, const double alpha, Criterion criterion,
+    const int x)
 {
   neighbors.clear();
   /*std::for_each(set.begin(), set.end(), [&](auto& neighbor) {
@@ -72,11 +81,11 @@ void update_neighbors(boid const& boid_, std::vector<boid const*>& neighbors,
     }
   });*/
   gridID startID{};
-  startID.x = boid_.GridID.x - 2;
-  startID.y = boid_.GridID.y - 1;
+  startID.gridID_[0] = boid_.GridID.gridID_[0] - 2;
+  startID.gridID_[1] = boid_.GridID.gridID_[1] - 1;
   for (int j = 0; j < 3; j++) {
     for (int i = 0; i < 3; i++) {
-      startID.x++;
+      startID.gridID_[0]++;
       /*std::cout << "Lo startID vale: " << startID.x << " e " << startID.y
                 << "\n";*/
       auto neighrange = map.equal_range(startID);
@@ -97,8 +106,8 @@ void update_neighbors(boid const& boid_, std::vector<boid const*>& neighbors,
         }
       });
     }
-    startID.x += -3;
-    startID.y++;
+    startID.gridID_[0] += -3;
+    startID.gridID_[1]++;
   }
 }
 
@@ -128,11 +137,11 @@ void update_close_neighbors(
 {
   close_neighbors.clear();
   gridID startID{};
-  startID.x = boid_.GridID.x - 2;
-  startID.y = boid_.GridID.y - 1;
+  startID.gridID_[0] = boid_.GridID.gridID_[0] - 2;
+  startID.gridID_[1] = boid_.GridID.gridID_[1] - 1;
   for (int j = 0; j < 3; j++) {
     for (int i = 0; i < 3; i++) {
-      startID.x++;
+      startID.gridID_[0]++;
       /*std::cout << "Lo startID vale: " << startID.x << " e " << startID.ys
                 << "\n";*/
       auto neighrange = map.equal_range(startID);
@@ -150,8 +159,8 @@ void update_close_neighbors(
         }
       });
     }
-    startID.x += -3;
-    startID.y++;
+    startID.gridID_[0] += -3;
+    startID.gridID_[1]++;
   }
 }
 
@@ -162,7 +171,7 @@ void regola1(boid const& boid_, DoubleVec& deltavel_,
   std::for_each(close_neighbors.begin(), close_neighbors.end(),
                 [&](auto& neighbor) {
                   auto x = neighbor->pos_ - boid_.pos_;
-                  deltavel_ += -repulsione * x;
+                  deltavel_ += x * (-repulsione);
                 });
 }
 
@@ -174,9 +183,9 @@ void regola2_3(boid const& boid_, DoubleVec& deltavel_,
   // auto velcopia = this->get_vel();
   std::for_each(neighbors.begin(), neighbors.end(), [&](auto& neighbor) {
     auto x = neighbor->vel_ - boid_.vel_;
-    deltavel_ += steering / static_cast<double>(n) * x;
+    deltavel_ += x * (steering / static_cast<double>(n));
     auto y = neighbor->pos_ - boid_.pos_;
-    deltavel_ += cohesion / static_cast<double>(n) * y;
+    deltavel_ += y * (cohesion / static_cast<double>(n));
   });
 }
 
@@ -186,8 +195,7 @@ void posvel_update(boidstate& boid, paramlist const& params)
   // boid.get_close_neighbors().clear();
   boid.get_boid().vel_ += boid.get_deltavel();
   speedadjust(boid.get_boid(), params.speedlimit, params.speedminimum);
-  boid.get_boid().pos_[0] += (boid.get_boid().vel_[0]) * params.deltaT;
-  boid.get_boid().pos_[1] += (boid.get_boid().vel_[1]) * params.deltaT;
+  boid.get_boid().pos_ += (boid.get_boid().vel_) * params.deltaT;
   bordercheck(boid.get_boid(), params.pixel, params.bordersize,
               params.attraction);
   boid.get_deltavel() = {0., 0.};

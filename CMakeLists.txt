@@ -22,15 +22,25 @@ string(APPEND CMAKE_EXE_LINKER_FLAGS_DEBUG "  -fno-omit-frame-pointer")# -fsanit
 
 include_directories("/opt/homebrew/Cellar/sfml/2.6.1/include")
 include_directories("/opt/homebrew/Cellar/tbb/2021.13.0/include")
+#include_directories("/opt/homebrew/Cellar/boost/1.86.0/include")
 find_package(TBB REQUIRED)
-find_package(SFML 2.5 COMPONENTS graphics REQUIRED)
+find_package(SFML 2.5 COMPONENTS graphics REQUIRED) 
+#find_package(Boost 1.70 COMPONENTS filesystem system REQUIRED)
+
+include_directories(${Boost_INCLUDE_DIRS})
 add_executable(boidsfml boids.cpp boidsfml.cpp doublevec.cpp sfmlboids.cpp)
 add_executable(boidss boids.cpp mainprova.cpp doublevec.cpp)
 add_executable(prove prove_varie.cpp doublevec.cpp)
 target_link_libraries(boidsfml PRIVATE sfml-graphics sfml-window sfml-system)
-target_link_libraries(boidsfml PRIVATE TBB::tbb TBB::tbbmalloc)
-target_link_libraries(boidss PRIVATE TBB::tbb TBB::tbbmalloc)
-target_link_libraries(prove PRIVATE TBB::tbb TBB::tbbmalloc)
+target_link_libraries(boidsfml PRIVATE TBB::tbb TBB::tbbmalloc )
+#target_link_libraries(boidsfml PRIVATE Boost::fileystem Boost::system)
+target_link_libraries(boidss PRIVATE TBB::tbb TBB::tbbmalloc )
+#target_link_libraries(boidss PRIVATE Boost::fileystem Boost::system)
+target_link_libraries(prove PRIVATE TBB::tbb TBB::tbbmalloc )
+#target_link_libraries(prove PRIVATE Boost::fileystem Boost::system)
+
+
+
 
 
 
@@ -39,7 +49,7 @@ if (BUILD_TESTING)
   # aggiungi l'eseguibile all.t
   add_executable(boids.t boids.cpp boids.test.cpp doublevec.cpp)
   target_link_libraries(boids.t PRIVATE TBB::tbb TBB::tbbmalloc)
-
+  #target_link_libraries(boids.t PRIVATE Boost::filesystem Boost::system)
   # aggiungi l'eseguibile all.t alla lista dei test
    add_test(NAME boids.t COMMAND boids.t)
 

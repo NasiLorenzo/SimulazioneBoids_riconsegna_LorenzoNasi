@@ -75,32 +75,31 @@ int main()
   using std::chrono::high_resolution_clock;
   using std::chrono::milliseconds;
   paramlist params;
-  params.repulsione = 0.6; // tenere il parametro di repulsione un ordine di
+  params.repulsione = 0.9; // tenere il parametro di repulsione un ordine di
                            // grandezza superiore agli altri due
-  params.steering        = 0.04;
+  params.steering        = 0.06;
   params.coesione        = 0.08;
-  params.view_range      = 200;
+  params.view_range      = 120;
   params.repulsion_range = 15;
-  params.attraction      = 2;
+  params.attraction      = 200;
   params.alpha           = 0.55;
-  params.speedlimit      = 100;
+  params.speedlimit      = 200;
   params.speedminimum    = 80;
   params.deltaT          = static_cast<float>(0.0333);
-  params.size            = 400;
-  params.flocksize       = 100;
+  params.size            = 2000;
+  params.flocksize       = 2000;
   params.pixel[0]        = 1510;
   params.pixel[1]        = 910;
   params::rate           = 1;
   params.bordersize      = 50;
+  params.sigma=100;
 
-  std::default_random_engine eng;
+  std::default_random_engine eng{1};
   flock stormo{eng, params};
   auto t1 = high_resolution_clock::now();
-  stormo.update(params);
-  stormo.update(params);
-  stormo.update(params);
-  stormo.update(params);
-  stormo.update(params);
+  for(int i=0; i<100; i++){
+    stormo.update(params);
+  }
   auto t2 = high_resolution_clock::now();
 
   /* Getting number of milliseconds as a double. */
