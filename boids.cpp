@@ -78,16 +78,16 @@ bool is_neighbor(boid const& boid_, boid const& neighbor,
   }
 }
 
-void add_neighbor(
-    gridID const& neighborID, boid const& boid_, boid const& neighbor,
-    const double view_range, const double alpha, Criterion criterion,
-    std::unordered_multimap<gridID, boid const*, gridID_hash> const& map,std::vector<boid const*>& neighbors)
+void add_neighbors(
+    gridID const& neighborID, boid const& boid_, const double view_range,
+    const double alpha, Criterion criterion,
+    std::unordered_multimap<gridID, boid const*, gridID_hash> const& map,
+    std::vector<boid const*>& neighbors)
 {
-  auto neigh_range=map.equal_range(neighborID);
-  std::for_each(neigh_range.first,neigh_range.second,[&](auto& neighbor){
-    if (is_neighbor(boid_, *(neighbor.second), view_range, alpha,
-                      criterion))
-        neighbors.push_back(neighbor.second);
+  auto neigh_range = map.equal_range(neighborID);
+  std::for_each(neigh_range.first, neigh_range.second, [&](auto& neighbor) {
+    if (is_neighbor(boid_, *(neighbor.second), view_range, alpha, criterion))
+      neighbors.push_back(neighbor.second);
   });
 }
 
@@ -160,7 +160,7 @@ void update_neighbors(
       startID[0] += -3;
       startID[1]++;
     }*/
-  auto combinations{generate_combinations(boid_.GridID)};
+  /*auto combinations{generate_combinations(boid_.GridID)};
   std::for_each(combinations.begin(), combinations.end(), [&](auto& ID) {
     auto neigh_range = map.equal_range(ID);
     std::for_each(neigh_range.first, neigh_range.second, [&](auto& neighbor) {
@@ -168,7 +168,23 @@ void update_neighbors(
                       criterion))
         neighbors.push_back(neighbor.second);
     });
-  });
+  });*/
+  std::array<int, 3> grid_range       = {-1, 0, 1};
+  const std::size_t combinations_size = std::pow(3, params::dim);
+
+  for (std::size_t i = 0; i < combinations_size; ++i) {
+    std::array<int, params::dim> combination;
+    std::size_t index = i;
+
+    for (std::size_t j = 0; j < params::dim; ++j) {
+      combination[j] = grid_range[index % 3] + boid_.GridID[j];
+      index /= 3;
+    }
+    std::cout << "controllo vicini in: (" << combination[0] << ", "
+              << combination[1] <<" e "<<combination[2]<< ")\n";
+    add_neighbors(combination, boid_, align_distance, alpha, criterion, map,
+                  neighbors);
+  }
 }
 
 void update_close_neighbors(boid const& boid_,
@@ -197,7 +213,7 @@ void update_close_neighbors(
 {
   close_neighbors.clear();
 
-  gridID startID{};
+  /*gridID startID{};
   startID[0] = boid_.GridID[0] - 2;
   startID[1] = boid_.GridID[1] - 1;
   for (int j = 0; j < 3; j++) {
@@ -217,7 +233,25 @@ void update_close_neighbors(
     }
     startID[0] += -3;
     startID[1]++;
+  }*/
+  std::array<int, 3> grid_range       = {-1, 0, 1};
+  const std::size_t combinations_size = std::pow(3, params::dim);
+
+  for (std::size_t i = 0; i < combinations_size; ++i) {
+    std::array<int, params::dim> combination;
+    std::size_t index = i;
+
+    for (std::size_t j = 0; j < params::dim; ++j) {
+      combination[j] = grid_range[index % 3] + boid_.GridID[j];
+      index /= 3;
+    }
+    std::cout << "controllo vicini in: (" << combination[0] << ", "
+              << combination[1] <<", "<<combination[2]<<")\n";
+    add_neighbors(combination, boid_, repulsion_distance, alpha, criterion, map,
+                  close_neighbors);
   }
+
+
 }
 
 void regola1(boid const& boid_, DoubleVec& deltavel_,
@@ -327,7 +361,7 @@ void flock::update_HashMap(paramlist const& params)
 void flock::update(paramlist const& params)
 {
   std::for_each(
-      std::execution::par_unseq, set.begin(), set.end(), [&](auto& boid) {
+      /*std::execution::par_unseq,*/ set.begin(), set.end(), [&](auto& boid) {
         auto t1 = high_resolution_clock::now();
         update_allneighbors(
             boid.cget_boid(), boid.get_neighbors(), boid.get_close_neighbors(),
@@ -340,12 +374,14 @@ void flock::update(paramlist const& params)
         update_rules(boid.cget_boid(), boid.get_deltavel(),
                      boid.get_neighbors(), boid.get_close_neighbors(), params);
 
-        /*std::cout << "il numero di vicini e molto vicini è "
+        std::cout << "Il grid ID è: " << boid.cget_GridID()[0] << " e "<<boid.cget_GridID()[1]<<" e "<<boid.cget_GridID()[2]
+                  << "\n"
+                  << "il numero di vicini e molto vicini è "
                   << boid.get_neighbors().size() << " e "
                   << boid.get_close_neighbors().size() << "\n"
-                  << "----------" << "\n\n";*/
+                  << "----------" << "\n\n";
       });
-  std::for_each(std::execution::par_unseq, set.begin(), set.end(),
+  std::for_each(/*std::execution::par_unseq,*/ set.begin(), set.end(),
                 [&](auto& boid) { posvel_update(boid, params); });
   update_HashMap(params);
 }

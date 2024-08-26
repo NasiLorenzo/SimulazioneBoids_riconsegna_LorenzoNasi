@@ -1,5 +1,8 @@
 #ifndef DOUBLEVEC_HPP
 #define DOUBLEVEC_HPP
+#ifndef DIM
+#define DIM 2
+#endif
 #include <SFML/Graphics.hpp>
 #include <oneapi/dpl/algorithm>
 #include <algorithm>
@@ -29,11 +32,12 @@
 namespace boids {
 struct params
 {
-  static constexpr unsigned int dim{2}; // dimensione
+  static unsigned constexpr int dim=DIM; // dimensione
   static double
       rate; // rapporto tra la dimensione dello schermo e della generazione
 };
-typedef std::array<double, params::dim> DoubleVec;
+
+using DoubleVec=std::array<double, params::dim>;
 
 DoubleVec& operator-=(DoubleVec& a, DoubleVec const& b);
 

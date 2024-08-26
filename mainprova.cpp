@@ -86,18 +86,19 @@ int main()
   params.speedlimit      = 200;
   params.speedminimum    = 80;
   params.deltaT          = static_cast<float>(0.0333);
-  params.size            = 2000;
-  params.flocksize       = 2000;
-  params.pixel[0]        = 1510;
-  params.pixel[1]        = 910;
+  params.size            = 20;
+  params.flocksize       = 20;
+  params.pixel[0]        = 800;
+  params.pixel[1]        = 800;
+  params.pixel[2]        = 800;
   params::rate           = 1;
   params.bordersize      = 50;
-  params.sigma=100;
+  params.sigma           = 100;
 
   std::default_random_engine eng{1};
   flock stormo{eng, params};
   auto t1 = high_resolution_clock::now();
-  for(int i=0; i<100; i++){
+  for (int i = 0; i < 10; i++) {
     stormo.update(params);
   }
   auto t2 = high_resolution_clock::now();

@@ -1,7 +1,6 @@
 #include "doublevec.hpp"
 
 namespace boids {
-
 DoubleVec& operator-=(DoubleVec& a, DoubleVec const& b)
 {
   std::transform(a.begin(), a.end(), b.begin(), a.begin(), std::minus<>());
