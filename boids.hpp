@@ -9,41 +9,79 @@ enum class Criterion : bool
   similar = 0,
 };
 
-struct paramlist
+struct ParamList
 {
-  double repulsione;
-  double steering;
-  double coesione;
+  double repulsion_factor;
+  double steering_factor;
+  double cohesion_factor;
   double view_range;
   double repulsion_range;
-  double attraction;
+  double border_repulsion;
   double alpha;
   double speedlimit;
   double speedminimum;
   float deltaT;
   unsigned int size;
   unsigned int flocksize;
-  std::vector<unsigned int> pixel;
+  std::array<unsigned int, params::dim> pixel;
   double bordersize;
   double sigma;
-  int y;
-  int x;
-  paramlist()
-      : pixel(params::dim)
-  {}
+  std::variant<std::execution::sequenced_policy, std::execution::parallel_unsequenced_policy> ExecPolicy=std::execution::par_unseq;
+  ParamList() = default;
+  ParamList(std::string const& inputfile)
+  {
+    std::ifstream input{inputfile};
+    if (!input) {
+      std::cerr << "File di input non trovato!\n";
+      // return 1;
+    }
+    std::string line{};
+    while (std::getline(input, line)) {
+      std::istringstream inputline(line);
+      double value{};
+      std::string name{};
+      if (inputline >> name >> value) {
+        if (name == "repulsion_factor")
+          repulsion_factor = value;
+        else if (name == "steering_factor")
+          steering_factor = value;
+        else if (name == "cohesion_factor")
+          cohesion_factor = value;
+        else if (name == "view_range")
+          view_range = value;
+        else if (name == "repulsion_range")
+          repulsion_range = value;
+        else if (name == "border_repulsion")
+          border_repulsion = value;
+        else if (name == "alpha")
+          alpha = value * M_PI;
+        else if (name == "speedlimit")
+          speedlimit = value;
+        else if (name == "speedminimum")
+          speedminimum = value;
+        else if (name == "deltaT")
+          deltaT = static_cast<float>(value);
+        else if (name == "size")
+          size = static_cast<unsigned int>(value);
+        else if (name == "flocksize")
+          flocksize = static_cast<unsigned int>(value);
+        else if (name == "pixel.x")
+          pixel[0] = static_cast<unsigned int>(value);
+        else if (name == "pixel.y")
+          pixel[1] = static_cast<unsigned int>(value);
+        else if (name == "rate")
+          boids::params::rate = value;
+        else if (name == "bordersize")
+          bordersize = value;
+        else if (name == "sigma")
+          sigma = value;
+      }
+    }
+  }
 };
 
-/*struct gridID
-{
-  std::array<int, params::dim> gridID_;
+using gridID = std::array<int, params::dim>;
 
-  inline bool operator==(const gridID& other) const
-  {
-    return gridID_==other.gridID_;
-  }
-};*/
-
-typedef std::array<int, params::dim> gridID;
 inline bool operator==(gridID const& lhs, gridID const& rhs)
 {
   bool result{1};
@@ -102,7 +140,7 @@ struct boid
     return this->flockID;
   }
 };
-class boidstate
+class BoidState
 {
  private:
   boid boid_;
@@ -111,12 +149,12 @@ class boidstate
   std::vector<boid const*> close_neighbors{};
 
  public:
-  boidstate(boid const& other)
+  BoidState(boid const& other)
       : boid_{other}
       , neighbors{}
       , close_neighbors{}
   {}
-  boidstate()
+  BoidState()
       : boid_{}
   {}
   auto& cget_pos() const
@@ -204,12 +242,12 @@ class boidstate
   {
     return this->deltavel_;
   }
-  void random_boid(std::default_random_engine&, paramlist const& params);
+  void random_boid(std::default_random_engine&, ParamList const& params);
 
   /*void speedadjust(double speedlimit, double speedminimum);
 
   void bordercheck(std::vector<unsigned int> const& pixel,
-                   const double bordersize, const double attraction);
+                   const double bordersize, const double border_repulsion);
 
   void update_neighbors(std::unordered_multimap<gridID, boid const*,
   gridID_hash> const& map, const double align_distance, const double alpha,
@@ -223,23 +261,24 @@ class boidstate
   gridID_hash> const& map, const double repulsion_distance, const int x, const
   double alpha);*/
 
-  /*void regola1(const double repulsione);
-  void regola2_3(const double steering, const double cohesion);
-  void posvel_update(paramlist const& params);
+  /*void regola1(const double repulsion_factor);
+  void regola2_3(const double steering_factor, const double cohesion);
+  void posvel_update(ParamList const& params);
 
   void
   update_allneighbors(std::unordered_multimap<gridID, boid const*> const& map,
                       const double repulsion_distance,
                       const double align_distance, const double alpha,
                       unsigned int size, unsigned int flocksize, const int x);
-  void update_rules(paramlist const& params);*/
+  void update_rules(ParamList const& params);*/
 };
 
 void regola1(boid const& boid_, DoubleVec& deltavel_,
              std::vector<boid const*> const& close_neighbors,
-             const double repulsione);
+             const double repulsion_factor);
 
-void regola2_3(boid const& boid_, DoubleVec& deltavel_, const double steering,
+void regola2_3(boid const& boid_, DoubleVec& deltavel_,
+               const double steering_factor,
                std::vector<boid const*> const& neighbors,
                const double cohesion);
 
@@ -248,14 +287,14 @@ void UpdateID(boid& boid, const double view_range);
 void update_rules(boid const& boid_, DoubleVec& deltavel_,
                   std::vector<boid const*>& neighbors,
                   std::vector<boid const*>& close_neighbors,
-                  paramlist const& params);
+                  ParamList const& params);
 
-auto random_boid(std::default_random_engine& eng, paramlist const& params);
+auto random_boid(std::default_random_engine& eng, ParamList const& params);
 
 void speedadjust(boid& boid, double speedlimit, double speedminimum);
 
 void bordercheck(boid& boid, std::vector<unsigned int> const& pixel,
-                 const double bordersize, const double attraction);
+                 const double bordersize, const double border_repulsion);
 void update_neighbors(
     boid const& boid_, std::vector<boid const*>& neighbors,
     std::unordered_multimap<gridID, boid const*, gridID_hash> const& map,
@@ -268,19 +307,20 @@ void update_close_neighbors(boid const& boid_,
 void update_close_neighbors(
     boid const& boid_, std::vector<boid const*>& close_neighbors,
     std::unordered_multimap<gridID, boid const*, gridID_hash> const& map,
-    const double repulsion_distance, const double alpha, Criterion const criterion);
+    const double repulsion_distance, const double alpha,
+    Criterion const criterion);
 
 void update_allneighbors(
     boid const& boid_, std::vector<boid const*>& neighbors,
     std::vector<boid const*>& close_neighbors,
     std::unordered_multimap<gridID, boid const*, gridID_hash> const& map,
     const double repulsion_distance, const double align_distance,
-    const double alpha, unsigned int size, unsigned int flocksize, const int x);
+    const double alpha, unsigned int size, unsigned int flocksize);
 
 std::size_t hash_function(gridID const& GridID);
 
-std::vector<boidstate> generate_flock(std::default_random_engine& eng,
-                                      paramlist const& params);
+std::vector<BoidState> generate_flock(std::default_random_engine& eng,
+                                      ParamList const& params);
 
 /*struct gridID_hasher
 {
@@ -309,7 +349,7 @@ struct std::hash<gridID>
 
 class flock
 {
-  std::vector<boidstate> set;
+  std::vector<BoidState> set;
   std::unordered_multimap<gridID, boid const*, gridID_hash> HashMap{};
 
  public:
@@ -317,10 +357,10 @@ class flock
       : set{}
   {}
 
-  flock(std::default_random_engine& eng, paramlist const& params)
+  flock(std::default_random_engine& eng, ParamList const& params)
       : set{generate_flock(eng, params)}
   {}
-  flock(std::vector<boidstate> const& other, paramlist const& params)
+  flock(std::vector<BoidState> const& other, ParamList const& params)
       : set{other}
   {
     std::for_each(set.begin(), set.end(), [&params](auto& boid) {
@@ -332,7 +372,7 @@ class flock
     });
     update_HashMap(params);
   }
-  std::vector<boidstate>& set_()
+  std::vector<BoidState>& set_()
   {
     return set;
   }
@@ -356,8 +396,8 @@ class flock
   {
     return set.size();
   }
-  void update_HashMap(paramlist const& params);
-  void update(paramlist const& params);
+  void update_HashMap(ParamList const& params);
+  void update(ParamList const& params);
 };
 } // namespace boids
 #include "boids.tpp" // namespace boids

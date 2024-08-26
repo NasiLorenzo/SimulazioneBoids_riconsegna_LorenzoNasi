@@ -68,37 +68,42 @@ double distance2(boidstate const& a, boidstate const& b)
   return pow(a.pos[0] - b.pos[0], 2) + pow(a.pos[1] - b.pos[1], 2);
 }*/
 
-int main()
+int main(int argc, char* argv[])
 {
   using std::chrono::duration;
   using std::chrono::duration_cast;
   using std::chrono::high_resolution_clock;
   using std::chrono::milliseconds;
-  paramlist params;
-  params.repulsione = 0.9; // tenere il parametro di repulsione un ordine di
+  ParamList params;
+  auto it = std::find(argv, argv + argc, "--parallel");
+
+    if (it != argv + argc) {
+        std::cout << "Found parallel" << "!" << std::endl;
+        params.ExecPolicy=std::execution::par_unseq;
+    } 
+  params.repulsion_factor = 0.9; // tenere il parametro di repulsione un ordine di
                            // grandezza superiore agli altri due
-  params.steering        = 0.06;
-  params.coesione        = 0.08;
+  params.steering_factor        = 0.06;
+  params.cohesion_factor        = 0.08;
   params.view_range      = 120;
   params.repulsion_range = 15;
-  params.attraction      = 200;
+  params.border_repulsion      = 200;
   params.alpha           = 0.55;
   params.speedlimit      = 200;
   params.speedminimum    = 80;
   params.deltaT          = static_cast<float>(0.0333);
-  params.size            = 20;
-  params.flocksize       = 20;
-  params.pixel[0]        = 800;
-  params.pixel[1]        = 800;
-  params.pixel[2]        = 800;
+  params.size            = 2000;
+  params.flocksize       = 2000;
+  params.pixel[0]        = 1510;
+  params.pixel[1]        = 910;
   params::rate           = 1;
   params.bordersize      = 50;
-  params.sigma           = 100;
+  params.sigma=100;
 
   std::default_random_engine eng{1};
   flock stormo{eng, params};
   auto t1 = high_resolution_clock::now();
-  for (int i = 0; i < 10; i++) {
+  for(int i=0; i<100; i++){
     stormo.update(params);
   }
   auto t2 = high_resolution_clock::now();

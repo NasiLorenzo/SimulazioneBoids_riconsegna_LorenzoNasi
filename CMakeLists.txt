@@ -38,7 +38,7 @@ target_link_libraries(boidss PRIVATE TBB::tbb TBB::tbbmalloc )
 #target_link_libraries(boidss PRIVATE Boost::fileystem Boost::system)
 target_link_libraries(prove PRIVATE TBB::tbb TBB::tbbmalloc )
 #target_link_libraries(prove PRIVATE Boost::fileystem Boost::system)
-target_compile_options(boidss PRIVATE -DDIM=3)
+target_compile_options(boidss PRIVATE -DDIM=2)
 
 
 

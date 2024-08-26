@@ -7,9 +7,9 @@ using std::chrono::duration;
 using std::chrono::duration_cast;
 using std::chrono::high_resolution_clock;
 using std::chrono::milliseconds;
-auto random_boid(std::default_random_engine& eng, paramlist const& params)
+auto random_boid(std::default_random_engine& eng, ParamList const& params)
 {
-  boidstate newboid{};
+  BoidState newboid{};
   std::normal_distribution<double> dist(0.0, params.sigma);
   std::for_each(newboid.get_vel().begin(), newboid.get_vel().end(),
                 [&](double& x) { x = dist(eng); });
@@ -44,16 +44,16 @@ void speedadjust(boid& boid, double speedlimit, double speedminimum)
     boid.vel_ = boid.vel_ * speedminimum;
   };
 }
-void bordercheck(boid& boid, std::vector<unsigned int> const& pixel,
-                 const double bordersize, const double attraction)
+void bordercheck(boid& boid, std::array<unsigned int, params::dim> const& pixel,
+                 const double bordersize, const double border_repulsion)
 {
   auto pix = pixel.begin();
   for (auto index = boid.pos_.begin(), velind = boid.vel_.begin();
        index != boid.pos_.end(); ++index, ++velind, ++pix) {
     if (*index > params::rate * (*pix - bordersize)) {
-      *velind -= attraction;
+      *velind -= border_repulsion;
     } else if (*index < params::rate * bordersize) {
-      *velind += attraction;
+      *velind += border_repulsion;
     }
   }
 }
@@ -180,8 +180,9 @@ void update_neighbors(
       combination[j] = grid_range[index % 3] + boid_.GridID[j];
       index /= 3;
     }
-    std::cout << "controllo vicini in: (" << combination[0] << ", "
-              << combination[1] <<" e "<<combination[2]<< ")\n";
+    // std::cout<<"la dimensione di comb è "<<combination.size()<<"\n";
+    // std::cout << "controllo vicini in: (" << combination[0] << ", "
+    //         << combination[1] <<" e "<<combination[2]<< ")\n";
     add_neighbors(combination, boid_, align_distance, alpha, criterion, map,
                   neighbors);
   }
@@ -196,11 +197,6 @@ void update_close_neighbors(boid const& boid_,
   std::for_each(set.begin(), set.end(), [&](auto& neighbor) {
     auto distanza = distance(boid_.pos_, neighbor->pos_);
     if (distanza < pow(repulsion_distance, 2) && distanza != 0) {
-      // std::cout<<"Stato angolo: "<<bool{cosangleij(neighbor->pos_ -
-      // this->boid_.pos_,
-      //                               this->boid_.vel_)>=cos(0.55*M_PI)}<<"\n";
-      // std::cout<<"Stato distanza: "<<bool{distanza < pow(repulsion_distance,
-      // 2)}<<"\n"; std::cout<<"Valore distanza: "<<distanza<<"\n";
       close_neighbors.emplace_back(neighbor);
     }
   });
@@ -245,41 +241,40 @@ void update_close_neighbors(
       combination[j] = grid_range[index % 3] + boid_.GridID[j];
       index /= 3;
     }
-    std::cout << "controllo vicini in: (" << combination[0] << ", "
-              << combination[1] <<", "<<combination[2]<<")\n";
     add_neighbors(combination, boid_, repulsion_distance, alpha, criterion, map,
                   close_neighbors);
   }
-
-
 }
 
 void regola1(boid const& boid_, DoubleVec& deltavel_,
              std::vector<boid const*> const& close_neighbors,
-             const double repulsione)
+             const double repulsion_factor)
 {
   std::for_each(close_neighbors.begin(), close_neighbors.end(),
                 [&](auto& neighbor) {
                   auto x = neighbor->pos_ - boid_.pos_;
-                  deltavel_ += x * (-repulsione);
+                  deltavel_ += x * (-repulsion_factor);
                 });
+  // deltavel_+=boid_.pos_*(repulsion_factor);
 }
 
 void regola2_3(boid const& boid_, DoubleVec& deltavel_,
-               std::vector<boid const*> const& neighbors, const double steering,
-               const double cohesion)
+               std::vector<boid const*> const& neighbors,
+               const double steering_factor, const double cohesion)
 {
   auto n = neighbors.size();
   // auto velcopia = this->get_vel();
   std::for_each(neighbors.begin(), neighbors.end(), [&](auto& neighbor) {
     auto x = neighbor->vel_ - boid_.vel_;
-    deltavel_ += x * (steering / static_cast<double>(n));
+    deltavel_ += x * (steering_factor / static_cast<double>(n));
     auto y = neighbor->pos_ - boid_.pos_;
     deltavel_ += y * (cohesion / static_cast<double>(n));
   });
+  // deltavel_+=(boid_.pos_)*(-cohesion);
+  // deltavel_+=boid_.vel_*(-steering_factor);
 }
 
-void posvel_update(boidstate& boid, paramlist const& params)
+void posvel_update(BoidState& boid, ParamList const& params)
 {
   // boid.get_neighbors().clear();
   // boid.get_close_neighbors().clear();
@@ -287,7 +282,7 @@ void posvel_update(boidstate& boid, paramlist const& params)
   speedadjust(boid.get_boid(), params.speedlimit, params.speedminimum);
   boid.get_boid().pos_ += (boid.get_boid().vel_) * params.deltaT;
   bordercheck(boid.get_boid(), params.pixel, params.bordersize,
-              params.attraction);
+              params.border_repulsion);
   boid.get_deltavel() = {0., 0.};
   UpdateID(boid.get_boid(), params.view_range);
 }
@@ -297,7 +292,7 @@ void update_allneighbors(
     std::vector<boid const*>& close_neighbors,
     std::unordered_multimap<gridID, boid const*, gridID_hash> const& map,
     const double repulsion_distance, const double align_distance,
-    const double alpha, unsigned int size, unsigned int flocksize, const int x)
+    const double alpha, unsigned int size, unsigned int flocksize)
 {
   if (flocksize < size) {
     update_neighbors(boid_, neighbors, map, align_distance, alpha,
@@ -315,20 +310,21 @@ void update_allneighbors(
 void update_rules(boid const& boid_, DoubleVec& deltavel_,
                   std::vector<boid const*>& neighbors,
                   std::vector<boid const*>& close_neighbors,
-                  paramlist const& params)
+                  ParamList const& params)
 {
-  regola1(boid_, deltavel_, close_neighbors, params.repulsione);
-  regola2_3(boid_, deltavel_, neighbors, params.steering, params.coesione);
+  regola1(boid_, deltavel_, close_neighbors, params.repulsion_factor);
+  regola2_3(boid_, deltavel_, neighbors, params.steering_factor,
+            params.cohesion_factor);
 }
 
-std::vector<boidstate> generate_flock(std::default_random_engine& eng,
-                                      paramlist const& params)
+std::vector<BoidState> generate_flock(std::default_random_engine& eng,
+                                      ParamList const& params)
 {
-  std::vector<boidstate> set{};
+  std::vector<BoidState> set{};
   std::unordered_multimap<gridID, boid const*, gridID_hash> HashMap{};
   for (unsigned int i = 0; i < params.size; i++) {
     auto pix = params.pixel.begin();
-    boidstate boidprova{random_boid(eng, params)};
+    BoidState boidprova{random_boid(eng, params)};
     // boidprova.random_boid(eng, params);
     boidprova.set_ID() = i / params.flocksize;
     std::cout << "Il flock id vale: " << boidprova.cget_boid().flockID << "\n";
@@ -346,7 +342,7 @@ std::vector<boidstate> generate_flock(std::default_random_engine& eng,
   return set;
 }
 
-void flock::update_HashMap(paramlist const& params)
+void flock::update_HashMap(ParamList const& params)
 {
   // auto t1=high_resolution_clock::now();
   HashMap.clear();
@@ -358,32 +354,23 @@ void flock::update_HashMap(paramlist const& params)
   std::cout<<"Tempo creazione mappa: "<<ms_double.count()<<" ms"<<"\n";*/
 }
 
-void flock::update(paramlist const& params)
+void flock::update(ParamList const& params)
 {
-  std::for_each(
-      /*std::execution::par_unseq,*/ set.begin(), set.end(), [&](auto& boid) {
-        auto t1 = high_resolution_clock::now();
-        update_allneighbors(
-            boid.cget_boid(), boid.get_neighbors(), boid.get_close_neighbors(),
-            HashMap, params.repulsion_range, params.view_range, params.alpha,
-            params.size, params.flocksize, params.x);
-        auto t2                                = high_resolution_clock::now();
-        duration<double, std::milli> ms_double = t2 - t1;
-        // std::cout<<"Tempo creazione vicini e operazioni:
-        // "<<ms_double.count()<<" ms"<<"\n";
-        update_rules(boid.cget_boid(), boid.get_deltavel(),
-                     boid.get_neighbors(), boid.get_close_neighbors(), params);
-
-        std::cout << "Il grid ID è: " << boid.cget_GridID()[0] << " e "<<boid.cget_GridID()[1]<<" e "<<boid.cget_GridID()[2]
-                  << "\n"
-                  << "il numero di vicini e molto vicini è "
-                  << boid.get_neighbors().size() << " e "
-                  << boid.get_close_neighbors().size() << "\n"
-                  << "----------" << "\n\n";
-      });
-  std::for_each(/*std::execution::par_unseq,*/ set.begin(), set.end(),
-                [&](auto& boid) { posvel_update(boid, params); });
+  auto update_neighbors_rules = [&](auto&& policy) {
+    std::for_each(policy, set.begin(), set.end(), [&](auto& boid) {
+      update_allneighbors(boid.cget_boid(), boid.get_neighbors(),
+                          boid.get_close_neighbors(), HashMap,
+                          params.repulsion_range, params.view_range,
+                          params.alpha, params.size, params.flocksize);
+      update_rules(boid.cget_boid(), boid.get_deltavel(), boid.get_neighbors(),
+                   boid.get_close_neighbors(), params);
+    });
+    std::for_each(policy, set.begin(), set.end(),
+                  [&](auto& boid) { posvel_update(boid, params); });
+  };
+  std::visit(update_neighbors_rules, params.ExecPolicy);
   update_HashMap(params);
+  
 }
 
 } // namespace boids

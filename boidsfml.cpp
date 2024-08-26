@@ -5,12 +5,16 @@ using std::chrono::duration;
 using std::chrono::duration_cast;
 using std::chrono::high_resolution_clock;
 using std::chrono::milliseconds;
-int main()
+int main(int argc, char* argv[])
 {
-  
-
+    
   boids::SFML_interface interface("parametrisfml.txt");
+  auto it = std::find(argv, argv + argc, "--parallel");
 
+    if (it != argv + argc) {
+        std::cout << "Found parallel" << "!" << std::endl;
+        //interface.get_params().ExecPolicy="std::execution::par_unseq";
+    } 
   sf::VideoMode desktop = sf::VideoMode::getDesktopMode();  
   sf::RenderWindow window(sf::VideoMode(interface.get_params().pixel[0], interface.get_params().pixel[1],desktop.bitsPerPixel),
                           "boids simulation");

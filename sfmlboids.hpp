@@ -10,16 +10,16 @@ struct RGB
 };
 
 std::vector<RGB> generatecolors(std::default_random_engine& eng,
-                                paramlist const& params);
+                                ParamList const& params);
 
 void assigncolors(flock& ensemble, std::vector<RGB> const& colorvec);
 
-paramlist parse_input(std::string const& inputfile);
+ParamList parse_input(std::string const& inputfile);
 
 sf::ConvexShape buildArrow(unsigned int i, std::vector<RGB> colorvec);
 class SFML_interface
 {
-  paramlist params{};
+  ParamList params{};
   std::vector<sf::ConvexShape> Arrowset{};
   std::vector<RGB> colorvec;
   std::random_device r;

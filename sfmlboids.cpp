@@ -1,7 +1,7 @@
 #include "sfmlboids.hpp"
 namespace boids {
 std::vector<RGB> generatecolors(std::default_random_engine& eng,
-                                paramlist const& params)
+                                ParamList const& params)
 {
   std::vector<RGB> colorvec{};
   for (unsigned i = 0; i < params.size / params.flocksize + 1; i++) {
@@ -15,8 +15,8 @@ std::vector<RGB> generatecolors(std::default_random_engine& eng,
   return colorvec;
 }
 
-  paramlist parse_input(std::string const& inputfile){
-    paramlist params{};
+  ParamList parse_input(std::string const& inputfile){
+    ParamList params{};
     std::ifstream input{inputfile};
   if (!input) {
     std::cerr << "File di input non trovato!\n";
@@ -28,18 +28,18 @@ std::vector<RGB> generatecolors(std::default_random_engine& eng,
     double value{};
     std::string name{};
     if (inputline >> name >> value) {
-      if (name == "repulsione")
-        params.repulsione = value;
-      else if (name == "steering")
-        params.steering = value;
-      else if (name == "coesione")
-        params.coesione = value;
+      if (name == "repulsion_factor")
+        params.repulsion_factor = value;
+      else if (name == "steering_factor")
+        params.steering_factor = value;
+      else if (name == "cohesion_factor")
+        params.cohesion_factor = value;
       else if (name == "view_range")
         params.view_range = value;
       else if (name == "repulsion_range")
         params.repulsion_range = value;
-      else if (name == "attraction")
-        params.attraction = value;
+      else if (name == "border_repulsion")
+        params.border_repulsion = value;
       else if (name == "alpha")
         params.alpha = value * M_PI;
       else if (name == "speedlimit")
@@ -62,16 +62,8 @@ std::vector<RGB> generatecolors(std::default_random_engine& eng,
         params.bordersize = value;
       else if (name == "sigma")
         params.sigma = value;
-      else if (name == "rows")
-        params.y = static_cast<int>(value);
-      else if (name == "columns")
-        params.x = static_cast<int>(value);
     }
   }
-  //params.pixel[0]=static_cast<unsigned int>(params.x*params.view_range);
-  //params.pixel[1]=static_cast<unsigned int>(params.y*params.view_range);
-  params.x*=static_cast<int>(params::rate);
-  params.y*=static_cast<int>(params::rate);
   return params;
   }
 
