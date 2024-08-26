@@ -75,12 +75,9 @@ int main(int argc, char* argv[])
   using std::chrono::high_resolution_clock;
   using std::chrono::milliseconds;
   ParamList params;
-  auto it = std::find(argv, argv + argc, "--parallel");
+  
+  check_parallelism(argc,argv,params);
 
-    if (it != argv + argc) {
-        std::cout << "Found parallel" << "!" << std::endl;
-        params.ExecPolicy=std::execution::par_unseq;
-    } 
   params.repulsion_factor = 0.9; // tenere il parametro di repulsione un ordine di
                            // grandezza superiore agli altri due
   params.steering_factor        = 0.06;

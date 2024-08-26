@@ -7,6 +7,17 @@ using std::chrono::duration;
 using std::chrono::duration_cast;
 using std::chrono::high_resolution_clock;
 using std::chrono::milliseconds;
+
+void check_parallelism(int argc, char** argv,ParamList& params){
+  auto argument="--parallel";
+  auto it = std::find(argv, argv + argc, argument);
+
+    if (it != argv + argc) {
+        std::cout << "Found parallel" << "!" << std::endl;
+        params.ExecPolicy=std::execution::par_unseq;
+    } 
+}
+
 auto random_boid(std::default_random_engine& eng, ParamList const& params)
 {
   BoidState newboid{};

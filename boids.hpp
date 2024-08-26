@@ -26,8 +26,10 @@ struct ParamList
   std::array<unsigned int, params::dim> pixel;
   double bordersize;
   double sigma;
-  std::variant<std::execution::sequenced_policy, std::execution::parallel_unsequenced_policy> ExecPolicy=std::execution::par_unseq;
-  ParamList() = default;
+  std::variant<std::execution::sequenced_policy,
+               std::execution::parallel_unsequenced_policy>
+      ExecPolicy = std::execution::par_unseq;
+  ParamList()    = default;
   ParamList(std::string const& inputfile)
   {
     std::ifstream input{inputfile};
@@ -80,6 +82,8 @@ struct ParamList
   }
 };
 
+void check_parallelism(int argc, char** argv, ParamList& params);
+
 using gridID = std::array<int, params::dim>;
 
 inline bool operator==(gridID const& lhs, gridID const& rhs)
@@ -98,7 +102,7 @@ struct gridID_hash
     int i       = 1;
     auto result = std::hash<int>{}(other[0]);
     std::for_each(other.begin() + 1, other.end(), [&](auto& ID_comp) {
-      result ^= (std::hash<int>{}(ID_comp) << 1);
+      result ^= std::hash<int>{}(ID_comp) + 0x9e3779b9 + (result << 6) + (result >> 2);
     });
     return result;
   }
