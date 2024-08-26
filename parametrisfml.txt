@@ -12,6 +12,6 @@ size             2000  //numero totale di boids
 flocksize        2000  //dimensione di ogni stormo
 pixel.x          1510   //dimensioni della finestra in pixel
 pixel.y          910
-rate             2     //rapporto tra l'area di generazione e la dimensione in pixel della finestra
+rate             3     //rapporto tra l'area di generazione e la dimensione in pixel della finestra
 bordersize       50     //distanza dal bordo da cui si inizia ad applicare la repulsione ai bordi, in pixel
 sigma            100    //sigma della distribuzione binomiale delle velocità

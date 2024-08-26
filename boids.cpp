@@ -10,14 +10,19 @@ using std::chrono::milliseconds;
 
 void check_parallelism(int argc, char* argv[], ParamList& params)
 {
-  const char* argument = "--parallel";
-  auto it              = std::find(argv, argv + argc, argument);
-  std::for_each(argv, argv + argc,
-                [](auto& opt) { std::cout << "Opzione: " << opt << "\n"; });
-  if (it != argv + argc + 1) {
+  std::string argument = "--parallel";
+  std::for_each(argv, argv + argc, [&](auto& opt) {
+    auto new_opt=std::string(opt);
+    std::cout<<"opzione: ["<<new_opt<<"]\n";
+    if (new_opt==argument) {
+      params.ExecPolicy = std::execution::par_unseq;
+      std::cout << "parallel found! " << "\n";
+    }
+  });
+  /*if (it != argv + argc) {
     std::cout << "Found parallel" << "!" << std::endl;
     params.ExecPolicy = std::execution::par_unseq;
-  }
+  }*/
 }
 
 auto random_boid(std::default_random_engine& eng, ParamList const& params)
@@ -84,11 +89,10 @@ bool is_neighbor(boid const& boid_, boid const& neighbor,
   }
 }
 
-void add_neighbors(
-    gridID const& neighborID, boid const& boid_, const double view_range,
-    const double alpha, Criterion criterion,
-    std::unordered_multimap<gridID, boid const*, gridID_hash> const& map,
-    std::vector<boid const*>& neighbors)
+void add_neighbors(gridID const& neighborID, boid const& boid_,
+                   const double view_range, const double alpha,
+                   Criterion criterion, MyHashMap const& map,
+                   std::vector<boid const*>& neighbors)
 {
   auto neigh_range = map.equal_range(neighborID);
   std::for_each(neigh_range.first, neigh_range.second, [&](auto& neighbor) {
@@ -97,10 +101,9 @@ void add_neighbors(
   });
 }
 
-void update_neighbors(
-    boid const& boid_, std::vector<boid const*>& neighbors,
-    std::unordered_multimap<gridID, boid const*, gridID_hash> const& map,
-    const double align_distance, const double alpha, Criterion const criterion)
+void update_neighbors(boid const& boid_, std::vector<boid const*>& neighbors,
+                      MyHashMap const& map, const double align_distance,
+                      const double alpha, Criterion const criterion)
 {
   neighbors.clear();
   std::array<int, 3> grid_range       = {-1, 0, 1};
@@ -124,11 +127,11 @@ void update_neighbors(
 
 void update_close_neighbors(boid const& boid_,
                             std::vector<boid const*>& close_neighbors,
-                            std::vector<boid const*> const& set,
+                            std::vector<boid const*> const& neighbors,
                             const double repulsion_distance)
 {
   close_neighbors.clear();
-  std::for_each(set.begin(), set.end(), [&](auto& neighbor) {
+  std::for_each(neighbors.begin(), neighbors.end(), [&](auto& neighbor) {
     auto distanza = distance(boid_.pos_, neighbor->pos_);
     if (distanza < pow(repulsion_distance, 2) && distanza != 0) {
       close_neighbors.emplace_back(neighbor);
@@ -148,9 +151,9 @@ void regola1(boid const& boid_, DoubleVec& deltavel_,
   // deltavel_+=boid_.pos_*(repulsion_factor);
 }
 
-void regola2_3(boid const& boid_, DoubleVec& deltavel_,
-               std::vector<boid const*> const& neighbors,
-               const double steering_factor, const double cohesion)
+void regola2_3_old(boid const& boid_, DoubleVec& deltavel_,
+                   std::vector<boid const*> const& neighbors,
+                   const double steering_factor, const double cohesion)
 {
   auto n = neighbors.size();
   // auto velcopia = this->get_vel();
@@ -162,6 +165,33 @@ void regola2_3(boid const& boid_, DoubleVec& deltavel_,
   });
   // deltavel_+=(boid_.pos_)*(-cohesion);
   // deltavel_+=boid_.vel_*(-steering_factor);
+}
+
+void regola2_3(boid const& boid_, DoubleVec& deltavel_,
+               std::vector<boid const*> const& neighbors,
+               const double steering_factor, const double cohesion)
+{
+  DoubleVec deltavel1{};
+  DoubleVec deltavel2{};
+  auto n = neighbors.size();
+  // auto velcopia = this->get_vel();
+  std::for_each(neighbors.begin(), neighbors.end(), [&](auto& neighbor) {
+    deltavel_ += neighbor->vel_ * (steering_factor / static_cast<double>(n));
+    deltavel_ += neighbor->pos_ * (cohesion / static_cast<double>(n));
+  });
+  if (neighbors.size() != 0) {
+    deltavel_ -= boid_.pos_ * cohesion;
+    deltavel_ -= boid_.vel_ * steering_factor;
+  }
+  /*std::for_each(neighbors.begin(), neighbors.end(), [&](auto& neighbor) {
+    auto x = neighbor->vel_ - boid_.vel_;
+    deltavel2 += x * (steering_factor / static_cast<double>(n));
+    auto y = neighbor->pos_ - boid_.pos_;
+    deltavel2 += y * (cohesion / static_cast<double>(n));
+  });
+  std::cout << "deltavel1 (" << deltavel1[0] << ", " << deltavel1[1] << ") \n"
+            << " deltavel2: (" << deltavel2[0] << ", " << deltavel2[1] <<
+  ")\n";*/
 }
 
 void posvel_update(BoidState& boid, ParamList const& params)
@@ -177,18 +207,17 @@ void posvel_update(BoidState& boid, ParamList const& params)
   UpdateID(boid.get_boid(), params.view_range);
 }
 
-void update_allneighbors(
-    boid const& boid_, std::vector<boid const*>& neighbors,
-    std::vector<boid const*>& close_neighbors,
-    std::unordered_multimap<gridID, boid const*, gridID_hash> const& map,
-    const double repulsion_distance, const double align_distance,
-    const double alpha, unsigned int size, unsigned int flocksize)
+void update_allneighbors(boid const& boid_, std::vector<boid const*>& neighbors,
+                         std::vector<boid const*>& close_neighbors,
+                         MyHashMap const& map, const double repulsion_distance,
+                         const double align_distance, const double alpha,
+                         unsigned int size, unsigned int flocksize)
 {
   if (flocksize < size) {
     update_neighbors(boid_, neighbors, map, align_distance, alpha,
                      Criterion::similar);
-    update_neighbors(boid_, close_neighbors, map, align_distance,
-                           alpha, Criterion::similar);
+    update_neighbors(boid_, close_neighbors, map, repulsion_distance, alpha,
+                     Criterion::similar);
   } else {
     update_neighbors(boid_, neighbors, map, align_distance, alpha,
                      Criterion::any);
@@ -211,7 +240,7 @@ std::vector<BoidState> generate_flock(std::default_random_engine& eng,
                                       ParamList const& params)
 {
   std::vector<BoidState> set{};
-  std::unordered_multimap<gridID, boid const*, gridID_hash> HashMap{};
+  MyHashMap HashMap{};
   for (unsigned int i = 0; i < params.size; i++) {
     auto pix = params.pixel.begin();
     BoidState boidprova{random_boid(eng, params)};
@@ -255,6 +284,9 @@ void flock::update(ParamList const& params)
                           params.alpha, params.size, params.flocksize);
       update_rules(boid.cget_boid(), boid.get_deltavel(), boid.get_neighbors(),
                    boid.get_close_neighbors(), params);
+      /*std::cout << "Numero vicini e molto " << boid.get_neighbors().size()
+                << " e " << boid.get_close_neighbors().size() << "\n"
+                << "___________\n\n";*/
     });
     std::for_each(policy, set.begin(), set.end(),
                   [&](auto& boid) { posvel_update(boid, params); });

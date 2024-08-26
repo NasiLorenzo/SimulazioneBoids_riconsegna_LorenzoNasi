@@ -7,20 +7,18 @@ TEST_CASE("Testing rules")
 {
   params::rate = 1.;
   ParamList params{};
-  params.repulsion_factor      = 0.7;
-  params.steering_factor        = 0.1;
-  params.cohesion_factor        = 0.1;
-  params.repulsion_range = 10000.;
-  params.view_range     = 10000.;
-  params.alpha           = M_PI;
-  params.border_repulsion      = 0.;
-  params.speedlimit      = 8000;
-  params.speedminimum    = 0.;
-  params.size            = 10;
-  params.deltaT          = 1 / 30.f;
-  params.flocksize       = 10;
-  //params.pixel[0] =    static_cast<unsigned int>(params.x * params.view_range);
-  //params.pixel[1] = static_cast<unsigned int>(params.y * params.view_range);
+  params.repulsion_factor = 0.7;
+  params.steering_factor  = 0.1;
+  params.cohesion_factor  = 0.1;
+  params.repulsion_range  = 10000.;
+  params.view_range       = 10000.;
+  params.alpha            = M_PI;
+  params.border_repulsion = 0.;
+  params.speedlimit       = 8000;
+  params.speedminimum     = 0.;
+  params.size             = 10;
+  params.deltaT           = 1 / 30.f;
+  params.flocksize        = 10;
   BoidState boid1;
   boid1.get_pos() = {700., 200.};
   boid1.get_vel() = {300., -10.};
@@ -52,7 +50,7 @@ TEST_CASE("Testing rules")
   boid10.get_pos() = {910., 415.};
   boid10.get_vel() = {-300., -200.};
 
-  std::cout<<"dim vale: "<<params::dim<<"\n";
+  std::cout << "dim vale: " << params::dim << "\n";
   std::vector<BoidState> set{boid1, boid2, boid3, boid4, boid5,
                              boid6, boid7, boid8, boid9, boid10};
 
@@ -102,20 +100,20 @@ TEST_CASE("Testing rules")
 TEST_CASE("Testing multiple iterations of the rules")
 {
   ParamList params{};
-  params.repulsion_factor      = 0.7;
-  params.steering_factor        = 0.1;
-  params.cohesion_factor        = 0.1;
-  params.repulsion_range = 100000;
-  params.view_range     = 100000;
-  params.alpha           = M_PI;
-  params.border_repulsion      = 0;
-  params.speedlimit      = 8000;
-  params.speedminimum    = 0;
-  params.size            = 4;
-  params.deltaT          = 1 / 30.f;
-  params.flocksize       = 4;
-  params.pixel[0] =1000;
-  params.pixel[1] = 1000;
+  params.repulsion_factor = 0.7;
+  params.steering_factor  = 0.1;
+  params.cohesion_factor  = 0.1;
+  params.repulsion_range  = 100000;
+  params.view_range       = 100000;
+  params.alpha            = M_PI;
+  params.border_repulsion = 0;
+  params.speedlimit       = 8000;
+  params.speedminimum     = 0;
+  params.size             = 4;
+  params.deltaT           = 1 / 30.f;
+  params.flocksize        = 4;
+  params.pixel[0]         = 1000;
+  params.pixel[1]         = 1000;
   BoidState boid1;
   boid1.get_pos() = {700., 200.};
   boid1.get_vel() = {300., -10.};
@@ -153,93 +151,20 @@ TEST_CASE("Testing multiple iterations of the rules")
   CHECK(stormo2.set_()[3].cget_vel()[0] == doctest::Approx(3121.0591));
 }
 
-/*TEST_CASE("Testing multiple iterations of the rules")
-{
-  ParamList params{};
-  params.repulsion_factor      = 0.7;
-  params.steering_factor        = 0.1;
-  params.cohesion_factor        = 0.1;
-  params.repulsion_range = 100000;
-  params.view_range     = 100000;
-  params.alpha           = M_PI;
-  params.border_repulsion      = 0;
-  params.speedlimit      = 8000;
-  params.speedminimum    = 0;
-  params.size            = 4;
-  params.deltaT          = 1 / 30.f;
-  params.flocksize       = 4;
-  params.y            = 1;
-  params.x         = 1;
-  params.pixel[0] =
-      static_cast<unsigned int>(params.x * params.view_range);
-  params.pixel[1] = static_cast<unsigned int>(params.y * params.view_range);
-  params.x *= static_cast<int>(params::rate);
-  params.y *= static_cast<int>(params::rate);
-  BoidState boid1;
-  boid1.get_pos() = {700., 200.};
-  boid1.get_vel() = {300., -10.};
-  BoidState boid2;
-  boid2.get_pos() = {500., 300.};
-  boid2.get_vel() = {5., 0.};
-  BoidState boid3;
-  boid3.get_pos() = {800., 250.};
-  boid3.get_vel() = {-88., 98.};
-  BoidState boid4;
-  boid4.get_pos() = {1000., 150.};
-  boid4.get_vel() = {400., 77.};
-
-  std::vector<BoidState> set{boid1, boid2, boid3, boid4};
-
-  flock stormo{set, params};
-
-  stormo.update(params);
-  for(auto& boid : stormo.set_()){
-    std::cout<<"Le posizioni valgolo: "<<boid.cget_pos()[0]<<" e
-"<<boid.cget_pos()[1]<<"\n";
-  }
-  stormo.update(params);
-  for (auto& boid : stormo.set_()) {
-    std::cout << "Le velocità sono: " << boid.get_vel()[0] << ", "
-              << boid.get_vel()[1] << "\n";
-    //std::cout << "Le posizioni sono: " << boid.cget_pos()[0] << ", "
-             // << boid.cget_pos()[1] << "\n";
-    /*std::cout << "Il numero di vicini e molto vicini è: "
-              << boid.get_neighbors().size() << ", "
-              << boid.get_neighbors().size() << "\n"
-              << "Il GridID vale: "<<boid.set_GridID().x<<",
-"<<boid.set_GridID().y<<"\n";
-
-  }
-
-  REQUIRE(stormo.size_() == 4);
-
-  CHECK(stormo.set_()[0].cget_vel()[0] == doctest::Approx(1636.744444));
-  CHECK(stormo.set_()[0].cget_vel()[1] == doctest::Approx(-887.7222222));
-
-  CHECK(stormo.set_()[1].cget_vel()[0] == doctest::Approx(-3.255555556));
-  CHECK(stormo.set_()[1].cget_vel()[1] == doctest::Approx(-189.9444444));
-
-  CHECK(stormo.set_()[2].cget_vel()[0] == doctest::Approx(1980.744444));
-  CHECK(stormo.set_()[2].cget_vel()[1] == doctest::Approx(-447.2777778));
-
-  CHECK(stormo.set_()[3].cget_vel()[0] == doctest::Approx(3792.3));
-  CHECK(stormo.set_()[3].cget_vel()[1] == doctest::Approx(-1154.833333));
-}*/
-
 TEST_CASE("Testing the speed limits")
 {
   ParamList params{};
-  params.repulsion_factor      = 0.7;
-  params.steering_factor        = 0.1;
-  params.cohesion_factor        = 0.1;
-  params.repulsion_range = 1000000;
-  params.view_range     = 1000000;
-  params.alpha           = M_PI;
-  params.border_repulsion      = 0;
-  params.speedlimit      = 350.;
-  params.speedminimum    = 300.;
-  params.size            = 10;
-  params.flocksize       = 10;
+  params.repulsion_factor = 0.7;
+  params.steering_factor  = 0.1;
+  params.cohesion_factor  = 0.1;
+  params.repulsion_range  = 1000000;
+  params.view_range       = 1000000;
+  params.alpha            = M_PI;
+  params.border_repulsion = 0;
+  params.speedlimit       = 350.;
+  params.speedminimum     = 300.;
+  params.size             = 10;
+  params.flocksize        = 10;
   BoidState boid1;
   boid1.get_pos() = {700., 200.};
   boid1.get_vel() = {300., -10.};
@@ -263,7 +188,7 @@ TEST_CASE("Testing the speed limits")
   }
 
   std::for_each(boids.begin(), boids.end(), [&params](BoidState& boid) {
-    speedadjust(boid.get_boid(),params.speedlimit, params.speedminimum);
+    speedadjust(boid.get_boid(), params.speedlimit, params.speedminimum);
   });
 
   SUBCASE("Testing the get_vel()ocity after the adjustment")
@@ -281,21 +206,21 @@ TEST_CASE("Testing the speed limits")
 TEST_CASE("Testing boid sight")
 {
   ParamList params{};
-  params.repulsion_factor      = 0.7;
-  params.steering_factor        = 0.1;
-  params.cohesion_factor        = 0.1;
-  params.repulsion_range = 1000000;
-  params.view_range     = 1000000;
-  params.alpha           = M_PI / 4;
-  params.border_repulsion      = 0;
-  params.speedlimit      = 3500.;
-  params.speedminimum    = 3200.;
-  params.flocksize       = 10;
-  params.size            = 10;
-  params.deltaT          = 1 / 30.f;
-  params.flocksize       = 10;
-  
-  params.pixel[0] =1000;
+  params.repulsion_factor = 0.7;
+  params.steering_factor  = 0.1;
+  params.cohesion_factor  = 0.1;
+  params.repulsion_range  = 1000000;
+  params.view_range       = 1000000;
+  params.alpha            = M_PI / 4;
+  params.border_repulsion = 0;
+  params.speedlimit       = 3500.;
+  params.speedminimum     = 3200.;
+  params.flocksize        = 10;
+  params.size             = 10;
+  params.deltaT           = 1 / 30.f;
+  params.flocksize        = 10;
+
+  params.pixel[0] = 1000;
   params.pixel[1] = 1000;
   BoidState boid1;
   boid1.get_pos() = {350., 270.};
@@ -315,83 +240,70 @@ TEST_CASE("Testing boid sight")
   BoidState boid6;
   boid6.get_pos() = {350., 270.};
   boid6.get_vel() = {-15., 10.};
-  
-    SUBCASE("Testing if boid1 sees boid2")
-    {
-      params.size=2;
-      params.flocksize=2;
-      std::vector<BoidState> pair1{boid1, boid2};
-      boids::flock stormo{pair1,params};
-      stormo.update(params);
-      CHECK(boids::cosangleij(boid2.get_pos() - boid1.get_pos(),
-    boid1.get_vel())
-            == doctest::Approx(cos(0)).epsilon(0.001));
-      CHECK(stormo.cget_set_()[0].cget_neighbors().size() == 1);
-    }
-  /*
-    SUBCASE("Testing if boid1 sees boid3")
-    {
-      std::vector<BoidState> pair2{boid1, boid3};
 
-      auto result2 =
-          boids::functions<BoidState>::template neighbors<Criterion::any>(
-              pair2, boid1, 10000., params.alpha);
+  SUBCASE("Testing if boid1 sees boid2")
+  {
+    params.size      = 2;
+    params.flocksize = 2;
+    std::vector<BoidState> pair1{boid1, boid2};
+    boids::flock stormo_1{pair1, params};
+    stormo_1.update(params);
+    CHECK(boids::cosangleij(boid2.get_pos() - boid1.get_pos(), boid1.get_vel())
+          == doctest::Approx(cos(0)).epsilon(0.001));
+    CHECK(stormo_1.cget_set_()[0].cget_neighbors().size() == 1);
+  }
 
-      CHECK(boids::cosangleij(boid3.get_pos() - boid1.get_pos(),
-    boid1.get_vel())
-            == doctest::Approx(cos(1.2490)).epsilon(0.001));
-      CHECK(result2.size() == 0);
-    }
+  SUBCASE("Testing if boid1 sees boid3")
+  {
+    std::vector<BoidState> pair2{boid1, boid3};
+    flock stormo_2{pair2, params};
+    stormo_2.update(params);
+    CHECK(boids::cosangleij(boid3.get_pos() - boid1.get_pos(), boid1.get_vel())
+          == doctest::Approx(cos(1.2490)).epsilon(0.001));
+    CHECK(stormo_2.cget_set_()[0].cget_neighbors().size() == 0);
+  }
 
-    SUBCASE("Testing if boid1 sees boid4")
-    {
-      std::vector<BoidState> pair3{boid1, boid4};
+  SUBCASE("Testing if boid1 sees boid4")
+  {
+    std::vector<BoidState> pair3{boid1, boid4};
+    flock stormo_3{pair3, params};
+    stormo_3.update(params);
+    CHECK(boids::cosangleij(boid4.get_pos() - boid1.get_pos(), boid1.get_vel())
+          == doctest::Approx(cos(3.798)).epsilon(0.001));
+    CHECK(stormo_3.cget_set_()[0].cget_neighbors().size() == 0);
+  }
 
-      auto result3 =
-          boids::functions<BoidState>::template neighbors<Criterion::any>(
-              pair3, boid1, 10000., params.alpha);
-      CHECK(boids::cosangleij(boid4.get_pos() - boid1.get_pos(),
-    boid1.get_vel())
-            == doctest::Approx(cos(3.798)).epsilon(0.001));
-      CHECK(result3.size() == 0);
-    }
+  SUBCASE("Testing if boid1 sees boid5")
+  {
+    std::vector<BoidState> pair4{boid1, boid5};
+    flock stormo_4{pair4, params};
+    stormo_4.update(params);
+    CHECK(boids::cosangleij(boid5.get_pos() - boid1.get_pos(), boid1.get_vel())
+          == doctest::Approx(cos(M_PI)).epsilon(0.001));
+    CHECK(stormo_4.cget_set_()[0].cget_neighbors().size() == 0);
+  }
 
-    SUBCASE("Testing if boid1 sees boid5")
-    {
-      std::vector<BoidState> pair4{boid1, boid5};
-
-      auto result4 =
-          boids::functions<BoidState>::template neighbors<Criterion::any>(
-              pair4, boid1, 10000., params.alpha);
-      CHECK(boids::cosangleij(boid5.get_pos() - boid1.get_pos(),
-    boid1.get_vel())
-            == doctest::Approx(cos(M_PI)).epsilon(0.001));
-      CHECK(result4.size() == 0);
-    }
-
-    SUBCASE("Testing if boid1 sees boid6")
-    {
-      std::vector<BoidState> pair5{boid1, boid6};
-
-      auto result5 =
-          boids::functions<BoidState>::template neighbors<Criterion::any>(
-              pair5, boid1, 10000., params.alpha);
-      CHECK(result5.size() == 0);
-    }*/
+  SUBCASE("Testing if boid1 sees boid6")
+  {
+    std::vector<BoidState> pair5{boid1, boid6};
+    flock stormo_5{pair5, params};
+    stormo_5.update(params);
+    CHECK(stormo_5.cget_set_()[0].cget_neighbors().size() == 0);
+  }
 }
 
 TEST_CASE("Testing the limit distance")
 {
   ParamList params{};
-  params.repulsion_factor      = 0.7;
-  params.steering_factor        = 0.1;
-  params.cohesion_factor        = 0.1;
-  params.repulsion_range = 100;
-  params.view_range     = 100;
-  params.alpha           = M_PI;
-  params.border_repulsion      = 0;
-  params.speedlimit      = 3500.;
-  params.speedminimum    = 3500.;
+  params.repulsion_factor = 0.7;
+  params.steering_factor  = 0.1;
+  params.cohesion_factor  = 0.1;
+  params.repulsion_range  = 100;
+  params.view_range       = 800;
+  params.alpha            = M_PI;
+  params.border_repulsion = 0;
+  params.speedlimit       = 3500.;
+  params.speedminimum     = 3500.;
 
   BoidState boid1;
   boid1.get_pos() = {0., 50.};
@@ -403,25 +315,29 @@ TEST_CASE("Testing the limit distance")
   boid3.get_pos() = {2., 55.};
   boid3.get_vel() = {13., 45.};
 
-  /* SUBCASE("Testing if boid1 sees boid2")
-   {
-     std::vector<BoidState> pair1{boid1, boid2};
-     auto result1 =
-         boids::functions<BoidState>::template neighbors<Criterion::any>(
-             pair1, boid1, params.view_range, params.alpha);
-     CHECK(sqrt(distance(boid1.get_pos(), boid2.get_pos()))
-           == doctest::Approx(832.165));
-     CHECK(result1.size() == 0);
-   }
-   SUBCASE("Testing if boid1 sees boid3")
-   {
-     std::vector<BoidState> pair2{boid1, boid3};
-     auto result2 =
-         boids::functions<BoidState>::template neighbors<Criterion::any>(
-             pair2, boid1, params.view_range, params.alpha);
-     CHECK(sqrt(distance(boid1.get_pos(), boid3.get_pos()))
-           == doctest::Approx(5.38516));
-     CHECK(result2.size() == 1);
-   }*/
+  SUBCASE("Testing if boid1 sees boid2")
+  {
+    std::vector<BoidState> pair1{boid1, boid2};
+    flock stormo_1{pair1, params};
+    stormo_1.update(params);
+    CHECK(sqrt(distance(boid1.get_pos(), boid2.get_pos()))
+          == doctest::Approx(832.165));
+    CHECK(stormo_1.cget_set_()[0].cget_neighbors().size() == 0);
+  }
+  SUBCASE("Testing if boid1 sees boid3")
+  {
+    std::vector<BoidState> pair2{boid1, boid3};
+    flock stormo_2{pair2,params};
+    stormo_2.update(params);
+    CHECK(sqrt(distance(boid1.get_pos(), boid3.get_pos()))
+          == doctest::Approx(5.38516));
+    CHECK(stormo_2.cget_set_()[0].cget_neighbors().size() == 1);
+  }
 }
+
+TEST_CASE("Testing the hashing"){
+  boids::MyHashMap map{};
+  boids::gridID test_id{};
+}
+
 // namespace boids
