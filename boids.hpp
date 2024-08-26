@@ -28,7 +28,7 @@ struct ParamList
   double sigma;
   std::variant<std::execution::sequenced_policy,
                std::execution::parallel_unsequenced_policy>
-      ExecPolicy = std::execution::par_unseq;
+      ExecPolicy = std::execution::seq;
   ParamList()    = default;
   ParamList(std::string const& inputfile)
   {
@@ -82,7 +82,7 @@ struct ParamList
   }
 };
 
-void check_parallelism(int argc, char** argv, ParamList& params);
+void check_parallelism(int argc, char* argv[], ParamList& params);
 
 using gridID = std::array<int, params::dim>;
 

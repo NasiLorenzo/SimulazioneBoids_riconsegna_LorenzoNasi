@@ -8,14 +8,16 @@ using std::chrono::duration_cast;
 using std::chrono::high_resolution_clock;
 using std::chrono::milliseconds;
 
-void check_parallelism(int argc, char** argv,ParamList& params){
-  auto argument="--parallel";
-  auto it = std::find(argv, argv + argc, argument);
-
-    if (it != argv + argc) {
-        std::cout << "Found parallel" << "!" << std::endl;
-        params.ExecPolicy=std::execution::par_unseq;
-    } 
+void check_parallelism(int argc, char* argv[], ParamList& params)
+{
+  const char* argument = "--parallel";
+  auto it              = std::find(argv, argv + argc, argument);
+  std::for_each(argv, argv + argc,
+                [](auto& opt) { std::cout << "Opzione: " << opt << "\n"; });
+  if (it != argv + argc + 1) {
+    std::cout << "Found parallel" << "!" << std::endl;
+    params.ExecPolicy = std::execution::par_unseq;
+  }
 }
 
 auto random_boid(std::default_random_engine& eng, ParamList const& params)
@@ -338,7 +340,8 @@ std::vector<BoidState> generate_flock(std::default_random_engine& eng,
     BoidState boidprova{random_boid(eng, params)};
     // boidprova.random_boid(eng, params);
     boidprova.set_ID() = i / params.flocksize;
-    std::cout << "Il flock id vale: " << boidprova.cget_boid().flockID << "\n";
+    // std::cout << "Il flock id vale: " << boidprova.cget_boid().flockID <<
+    // "\n";
     UpdateID(boidprova.set_boid(), params.view_range);
     for (auto it = boidprova.get_pos().begin(); it != boidprova.get_pos().end();
          ++it, ++pix) {
@@ -381,7 +384,6 @@ void flock::update(ParamList const& params)
   };
   std::visit(update_neighbors_rules, params.ExecPolicy);
   update_HashMap(params);
-  
 }
 
 } // namespace boids

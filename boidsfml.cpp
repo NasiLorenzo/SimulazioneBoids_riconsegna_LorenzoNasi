@@ -9,12 +9,7 @@ int main(int argc, char* argv[])
 {
     
   boids::SFML_interface interface("parametrisfml.txt");
-  auto it = std::find(argv, argv + argc, "--parallel");
-
-    if (it != argv + argc) {
-        std::cout << "Found parallel" << "!" << std::endl;
-        //interface.get_params().ExecPolicy="std::execution::par_unseq";
-    } 
+  boids::check_parallelism(argc,argv,interface.get_params());
   sf::VideoMode desktop = sf::VideoMode::getDesktopMode();  
   sf::RenderWindow window(sf::VideoMode(interface.get_params().pixel[0], interface.get_params().pixel[1],desktop.bitsPerPixel),
                           "boids simulation");

@@ -35,6 +35,7 @@ class SFML_interface
     for(unsigned int i=0;i<params.size;i++ ) {
       Arrowset.push_back(buildArrow(set.set_()[i].get_ID(), colorvec));
     }
+
   }
   auto& set_Arrowset() {
     return Arrowset;
