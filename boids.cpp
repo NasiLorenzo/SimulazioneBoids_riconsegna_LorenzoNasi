@@ -36,15 +36,8 @@ void UpdateID(boid& boid, const double view_range)
     ID_comp = static_cast<int>(std::floor(*posit / view_range) + 1);
     ++posit;
   });
-  // boid.GridID.gridID_[0] = static_cast<int>(std::floor(boid.pos_[0] /
-  // view_range) + 1); boid.GridID.gridID_[1] =
-  // static_cast<int>(std::floor(boid.pos_[1] / view_range) + 1);
 }
 
-/*std::size_t hash_function(gridID const& GridID)
-{
-  return std::hash<int>()(GridID.x) ^ std::hash<int>()(GridID.y);
-}*/
 void speedadjust(boid& boid, double speedlimit, double speedminimum)
 {
   auto vmod = mod(boid.vel_);
@@ -104,99 +97,27 @@ void add_neighbors(
   });
 }
 
-auto generate_combinations(gridID const& boidID)
-{
-  std::vector<gridID> combinations{};
-
-  // There are 3 possible values (-1, 0, 1) for each element
-  std::array<int, 3> grid_range       = {-1, 0, 1};
-  const std::size_t combinations_size = std::pow(3, params::dim);
-
-  for (std::size_t i = 0; i < combinations_size; ++i) {
-    std::array<int, params::dim> combination;
-    std::size_t index = i;
-
-    for (std::size_t j = 0; j < params::dim; ++j) {
-      combination[j] = grid_range[index % 3] + boidID[j];
-      index /= 3;
-    }
-
-    combinations.push_back(combination);
-  }
-
-  return combinations;
-}
-
 void update_neighbors(
     boid const& boid_, std::vector<boid const*>& neighbors,
     std::unordered_multimap<gridID, boid const*, gridID_hash> const& map,
     const double align_distance, const double alpha, Criterion const criterion)
 {
   neighbors.clear();
-  /*std::for_each(set.begin(), set.end(), [&](auto& neighbor) {
-    auto distanza = distance(this->boid_.pos_, neighbor.get_pos());
-    if (distanza < pow(align_distance, 2) && distanza != 0
-        && (criterion == Criterion::any
-            || (criterion == Criterion::similar
-                && this->boid_.flockID == neighbor.get_ID()))) {
-      auto cosangolo =
-          cosangleij(neighbor.get_pos() - this->boid_.pos_, this->boid_.vel_);
-      if ((cosangolo) >= std::cos(alpha)) {
-        this->neighbors.emplace_back(&(neighbor.boid_));
-      }
-    }
-  });*/
-  /*
-  gridID startID{};
-  startID[0] = boid_.GridID[0] - 2;
-  startID[1] = boid_.GridID[1] - 1;
-    for (int j = 0; j < 3; j++) {
-      for (int i = 0; i < 3; i++) {
-        startID[0]++;
-        auto neighrange = map.equal_range(startID);
-        std::for_each(neighrange.first, neighrange.second, [&](auto& neighbor) {
-          auto distanza = distance(boid_.pos_, neighbor.second->pos_);
-          if (distanza < pow(align_distance, 2) && distanza != 0
-              && (criterion == Criterion::any
-                  || (criterion == Criterion::similar
-                      && boid_.flockID == neighbor.second->flockID))) {
-            auto cosangolo =
-                cosangleij(neighbor.second->pos_ - boid_.pos_, boid_.vel_);
-            if ((cosangolo) >= std::cos(alpha)) {
-              neighbors.emplace_back(neighbor.second);
-            }
-          }
-        });
-        //std::cout<<"L'ID in uscita vale: ("<<startID[0]<<",
-  "<<startID[1]<<")"<<"\n";
-      }
-      startID[0] += -3;
-      startID[1]++;
-    }*/
-  /*auto combinations{generate_combinations(boid_.GridID)};
-  std::for_each(combinations.begin(), combinations.end(), [&](auto& ID) {
-    auto neigh_range = map.equal_range(ID);
-    std::for_each(neigh_range.first, neigh_range.second, [&](auto& neighbor) {
-      if (is_neighbor(boid_, *(neighbor.second), align_distance, alpha,
-                      criterion))
-        neighbors.push_back(neighbor.second);
-    });
-  });*/
   std::array<int, 3> grid_range       = {-1, 0, 1};
   const std::size_t combinations_size = std::pow(3, params::dim);
 
   for (std::size_t i = 0; i < combinations_size; ++i) {
-    std::array<int, params::dim> combination;
+    gridID neighbor_ID;
     std::size_t index = i;
 
     for (std::size_t j = 0; j < params::dim; ++j) {
-      combination[j] = grid_range[index % 3] + boid_.GridID[j];
+      neighbor_ID[j] = grid_range[index % 3] + boid_.GridID[j];
       index /= 3;
     }
     // std::cout<<"la dimensione di comb è "<<combination.size()<<"\n";
     // std::cout << "controllo vicini in: (" << combination[0] << ", "
     //         << combination[1] <<" e "<<combination[2]<< ")\n";
-    add_neighbors(combination, boid_, align_distance, alpha, criterion, map,
+    add_neighbors(neighbor_ID, boid_, align_distance, alpha, criterion, map,
                   neighbors);
   }
 }
@@ -213,50 +134,6 @@ void update_close_neighbors(boid const& boid_,
       close_neighbors.emplace_back(neighbor);
     }
   });
-}
-void update_close_neighbors(
-    boid const& boid_, std::vector<boid const*>& close_neighbors,
-    std::unordered_multimap<gridID, boid const*, gridID_hash> const& map,
-    const double repulsion_distance, const double alpha,
-    Criterion const criterion)
-{
-  close_neighbors.clear();
-
-  /*gridID startID{};
-  startID[0] = boid_.GridID[0] - 2;
-  startID[1] = boid_.GridID[1] - 1;
-  for (int j = 0; j < 3; j++) {
-    for (int i = 0; i < 3; i++) {
-      startID[0]++;
-      auto neighrange = map.equal_range(startID);
-      std::for_each(neighrange.first, neighrange.second, [&](auto& neighbor) {
-        auto distanza = distance(boid_.pos_, neighbor.second->pos_);
-        if (distanza < pow(repulsion_distance, 2) && (distanza != 0)) {
-          auto cosangolo =
-              cosangleij(neighbor.second->pos_ - boid_.pos_, boid_.vel_);
-          if ((cosangolo) >= std::cos(alpha)) {
-            close_neighbors.emplace_back(neighbor.second);
-          }
-        }
-      });
-    }
-    startID[0] += -3;
-    startID[1]++;
-  }*/
-  std::array<int, 3> grid_range       = {-1, 0, 1};
-  const std::size_t combinations_size = std::pow(3, params::dim);
-
-  for (std::size_t i = 0; i < combinations_size; ++i) {
-    std::array<int, params::dim> combination;
-    std::size_t index = i;
-
-    for (std::size_t j = 0; j < params::dim; ++j) {
-      combination[j] = grid_range[index % 3] + boid_.GridID[j];
-      index /= 3;
-    }
-    add_neighbors(combination, boid_, repulsion_distance, alpha, criterion, map,
-                  close_neighbors);
-  }
 }
 
 void regola1(boid const& boid_, DoubleVec& deltavel_,
@@ -310,7 +187,7 @@ void update_allneighbors(
   if (flocksize < size) {
     update_neighbors(boid_, neighbors, map, align_distance, alpha,
                      Criterion::similar);
-    update_close_neighbors(boid_, close_neighbors, map, repulsion_distance,
+    update_neighbors(boid_, close_neighbors, map, align_distance,
                            alpha, Criterion::similar);
   } else {
     update_neighbors(boid_, neighbors, map, align_distance, alpha,
