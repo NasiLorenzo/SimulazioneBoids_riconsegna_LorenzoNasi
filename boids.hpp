@@ -33,26 +33,34 @@ struct paramlist
   {}
 };
 
-struct gridID
+/*struct gridID
 {
   std::array<int, params::dim> gridID_;
 
   inline bool operator==(const gridID& other) const
-  { 
+  {
     return gridID_==other.gridID_;
   }
-};
+};*/
 
-//typedef std::array<int,params::dim> gridID;
+typedef std::array<int, params::dim> gridID;
+inline bool operator==(gridID const& lhs, gridID const& rhs)
+{
+  bool result{1};
+  auto rhs_it = rhs.begin();
+  std::for_each(lhs.begin(), lhs.end(),
+                [&](auto& x) { result = result && (x == *rhs_it); });
+  return result;
+}
 
 struct gridID_hash
 {
   inline std::size_t operator()(gridID const& other) const noexcept
-  { 
-    int i=1;
-    auto result=std::hash<int>{}(other.gridID_[0]);
-    std::for_each(other.gridID_.begin()+1,other.gridID_.end(),[&](auto& ID_comp){
-      result^=(std::hash<int>{}(ID_comp)<<1);
+  {
+    int i       = 1;
+    auto result = std::hash<int>{}(other[0]);
+    std::for_each(other.begin() + 1, other.end(), [&](auto& ID_comp) {
+      result ^= (std::hash<int>{}(ID_comp) << 1);
     });
     return result;
   }
@@ -215,16 +223,16 @@ class boidstate
   gridID_hash> const& map, const double repulsion_distance, const int x, const
   double alpha);*/
 
-  void regola1(const double repulsione);
+  /*void regola1(const double repulsione);
   void regola2_3(const double steering, const double cohesion);
   void posvel_update(paramlist const& params);
 
-  void update_allneighbors(
-      std::unordered_multimap<gridID, boid const*> const& map,
-      const double repulsion_distance, const double align_distance,
-      const double alpha, unsigned int size, unsigned int flocksize,
-      const int x);
-  void update_rules(paramlist const& params);
+  void
+  update_allneighbors(std::unordered_multimap<gridID, boid const*> const& map,
+                      const double repulsion_distance,
+                      const double align_distance, const double alpha,
+                      unsigned int size, unsigned int flocksize, const int x);
+  void update_rules(paramlist const& params);*/
 };
 
 void regola1(boid const& boid_, DoubleVec& deltavel_,
@@ -248,27 +256,24 @@ void speedadjust(boid& boid, double speedlimit, double speedminimum);
 
 void bordercheck(boid& boid, std::vector<unsigned int> const& pixel,
                  const double bordersize, const double attraction);
-
 void update_neighbors(
     boid const& boid_, std::vector<boid const*>& neighbors,
-    std::unordered_multimap<gridID, boid const*,gridID_hash> const& map,
-    const double align_distance, const double alpha, Criterion const criterion,
-    const int x);
+    std::unordered_multimap<gridID, boid const*, gridID_hash> const& map,
+    const double align_distance, const double alpha, Criterion const criterion);
 
 void update_close_neighbors(boid const& boid_,
                             std::vector<boid const*>& close_neighbors,
                             std::vector<boid const*> const& set,
                             const double repulsion_distance);
-
 void update_close_neighbors(
     boid const& boid_, std::vector<boid const*>& close_neighbors,
-    std::unordered_multimap<gridID, boid const*,gridID_hash> const& map,
-    const double repulsion_distance, const int x, const double alpha);
+    std::unordered_multimap<gridID, boid const*, gridID_hash> const& map,
+    const double repulsion_distance, const double alpha, Criterion const criterion);
 
 void update_allneighbors(
     boid const& boid_, std::vector<boid const*>& neighbors,
     std::vector<boid const*>& close_neighbors,
-    std::unordered_multimap<gridID, boid const*,gridID_hash> const& map,
+    std::unordered_multimap<gridID, boid const*, gridID_hash> const& map,
     const double repulsion_distance, const double align_distance,
     const double alpha, unsigned int size, unsigned int flocksize, const int x);
 
@@ -305,7 +310,7 @@ struct std::hash<gridID>
 class flock
 {
   std::vector<boidstate> set;
-  std::unordered_multimap<gridID, boid const*,gridID_hash> HashMap{};
+  std::unordered_multimap<gridID, boid const*, gridID_hash> HashMap{};
 
  public:
   flock()
