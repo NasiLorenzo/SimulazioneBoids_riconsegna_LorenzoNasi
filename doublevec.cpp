@@ -70,7 +70,7 @@ double distance(DoubleVec const& a, DoubleVec const& b)
       [](double c, double d) { return pow(c - d, 2); });
 }
 
-double cosangleij(DoubleVec const& a, DoubleVec const& b)
+double cos_angle_between(DoubleVec const& a, DoubleVec const& b)
 {
   auto c = a;
   auto d = b;

@@ -73,7 +73,7 @@ bool is_neighbor(boid const& boid_, boid const& neighbor,
       && (criterion == Criterion::any
           || (criterion == Criterion::similar
               && boid_.flockID == neighbor.flockID))) {
-    auto cosangolo = cosangleij(neighbor.pos_ - boid_.pos_, boid_.vel_);
+    auto cosangolo = cos_angle_between(neighbor.pos_ - boid_.pos_, boid_.vel_);
     if ((cosangolo) >= std::cos(alpha)) {
       return 1;
     } else {
