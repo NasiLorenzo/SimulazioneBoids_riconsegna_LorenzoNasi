@@ -48,7 +48,7 @@ if (BUILD_TESTING)
   add_executable(boids3d.t boids.test3d.cpp boids.cpp doublevec.cpp)
   target_link_libraries(boids.t PRIVATE TBB::tbb TBB::tbbmalloc)
   target_link_libraries(boids3d.t PRIVATE TBB::tbb TBB::tbbmalloc)
-  target_compile_options(boid3d.t PRIVATE -DDIM=2)
+  target_compile_options(boids3d.t PRIVATE -DDIM=3)
   #target_link_libraries(boids.t PRIVATE Boost::filesystem Boost::system)
   # aggiungi l'eseguibile all.t alla lista dei test
    add_test(NAME boids.t COMMAND boids.t)
