@@ -12,7 +12,7 @@ struct RGB
 std::vector<RGB> generatecolors(std::default_random_engine& eng,
                                 ParamList const& params);
 
-void assigncolors(flock& ensemble, std::vector<RGB> const& colorvec);
+void assigncolors(Flock& ensemble, std::vector<RGB> const& colorvec);
 
 ParamList parse_input(std::string const& inputfile);
 
@@ -24,7 +24,7 @@ class SFML_interface
   std::vector<RGB> colorvec;
   std::random_device r;
   std::default_random_engine eng{1};
-  flock set;
+  Flock set;
 
  public:
   SFML_interface(std::string const& inputfile)

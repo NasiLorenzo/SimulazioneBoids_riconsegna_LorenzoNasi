@@ -98,7 +98,7 @@ int main(int argc, char* argv[])
   params.sigma            = 100;
 
   std::default_random_engine eng{1};
-  flock stormo{eng, params};
+  Flock stormo{eng, params};
   auto t1 = high_resolution_clock::now();
   for (int i = 0; i < 100; i++) {
     stormo.update(params);

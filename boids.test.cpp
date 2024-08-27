@@ -6,7 +6,7 @@ using namespace boids;
 TEST_CASE("Testing rules")
 {
   ParamList params{};
-  params.rate = 1.;
+  params.rate             = 1.;
   params.repulsion_factor = 0.7;
   params.steering_factor  = 0.1;
   params.cohesion_factor  = 0.1;
@@ -54,7 +54,7 @@ TEST_CASE("Testing rules")
   std::vector<BoidState> set{boid1, boid2, boid3, boid4, boid5,
                              boid6, boid7, boid8, boid9, boid10};
 
-  flock stormo{set, params};
+  Flock stormo{set, params};
 
   std::cout << "Initial velocities:\n";
   for (const auto& boid : stormo.set_()) {
@@ -114,7 +114,7 @@ TEST_CASE("Testing multiple iterations of the rules")
   params.flocksize        = 4;
   params.pixel[0]         = 1000;
   params.pixel[1]         = 1000;
-  params.rate =1;
+  params.rate             = 1;
   BoidState boid1;
   boid1.get_pos() = {700., 200.};
   boid1.get_vel() = {300., -10.};
@@ -130,7 +130,7 @@ TEST_CASE("Testing multiple iterations of the rules")
 
   std::vector<BoidState> set{boid1, boid2, boid3, boid4};
 
-  flock stormo2{set, params};
+  Flock stormo2{set, params};
 
   stormo2.update(params);
   stormo2.update(params);
@@ -166,7 +166,7 @@ TEST_CASE("Testing the speed limits")
   params.speedminimum     = 300.;
   params.size             = 10;
   params.flocksize        = 10;
-  params.rate=1;
+  params.rate             = 1;
   BoidState boid1;
   boid1.get_pos() = {700., 200.};
   boid1.get_vel() = {300., -10.};
@@ -205,7 +205,8 @@ TEST_CASE("Testing the speed limits")
   }
 }
 
-TEST_CASE("Testing boid sight") //each boid contains itself in the vector of its neighbors
+TEST_CASE("Testing boid sight") // each boid contains itself in the vector of
+                                // its neighbors
 {
   ParamList params{};
   params.repulsion_factor = 0.7;
@@ -248,7 +249,7 @@ TEST_CASE("Testing boid sight") //each boid contains itself in the vector of its
     params.size      = 2;
     params.flocksize = 2;
     std::vector<BoidState> pair1{boid1, boid2};
-    boids::flock stormo_1{pair1, params};
+    boids::Flock stormo_1{pair1, params};
     stormo_1.update(params);
     CHECK(boids::cosangleij(boid2.get_pos() - boid1.get_pos(), boid1.get_vel())
           == doctest::Approx(cos(0)).epsilon(0.001));
@@ -258,7 +259,7 @@ TEST_CASE("Testing boid sight") //each boid contains itself in the vector of its
   SUBCASE("Testing if boid1 sees boid3")
   {
     std::vector<BoidState> pair2{boid1, boid3};
-    flock stormo_2{pair2, params};
+    Flock stormo_2{pair2, params};
     stormo_2.update(params);
     CHECK(boids::cosangleij(boid3.get_pos() - boid1.get_pos(), boid1.get_vel())
           == doctest::Approx(cos(1.2490)).epsilon(0.001));
@@ -268,7 +269,7 @@ TEST_CASE("Testing boid sight") //each boid contains itself in the vector of its
   SUBCASE("Testing if boid1 sees boid4")
   {
     std::vector<BoidState> pair3{boid1, boid4};
-    flock stormo_3{pair3, params};
+    Flock stormo_3{pair3, params};
     stormo_3.update(params);
     CHECK(boids::cosangleij(boid4.get_pos() - boid1.get_pos(), boid1.get_vel())
           == doctest::Approx(cos(3.798)).epsilon(0.001));
@@ -278,7 +279,7 @@ TEST_CASE("Testing boid sight") //each boid contains itself in the vector of its
   SUBCASE("Testing if boid1 sees boid5")
   {
     std::vector<BoidState> pair4{boid1, boid5};
-    flock stormo_4{pair4, params};
+    Flock stormo_4{pair4, params};
     stormo_4.update(params);
     CHECK(boids::cosangleij(boid5.get_pos() - boid1.get_pos(), boid1.get_vel())
           == doctest::Approx(cos(M_PI)).epsilon(0.001));
@@ -288,7 +289,7 @@ TEST_CASE("Testing boid sight") //each boid contains itself in the vector of its
   SUBCASE("Testing if boid1 sees boid6")
   {
     std::vector<BoidState> pair5{boid1, boid6};
-    flock stormo_5{pair5, params};
+    Flock stormo_5{pair5, params};
     stormo_5.update(params);
     CHECK(stormo_5.cget_set_()[0].cget_neighbors().size() == 0);
   }
@@ -320,7 +321,7 @@ TEST_CASE("Testing the limit distance")
   SUBCASE("Testing if boid1 sees boid2")
   {
     std::vector<BoidState> pair1{boid1, boid2};
-    flock stormo_1{pair1, params};
+    Flock stormo_1{pair1, params};
     stormo_1.update(params);
     CHECK(sqrt(distance(boid1.get_pos(), boid2.get_pos()))
           == doctest::Approx(832.165));
@@ -329,7 +330,7 @@ TEST_CASE("Testing the limit distance")
   SUBCASE("Testing if boid1 sees boid3")
   {
     std::vector<BoidState> pair2{boid1, boid3};
-    flock stormo_2{pair2,params};
+    Flock stormo_2{pair2, params};
     stormo_2.update(params);
     CHECK(sqrt(distance(boid1.get_pos(), boid3.get_pos()))
           == doctest::Approx(5.38516));
@@ -337,9 +338,17 @@ TEST_CASE("Testing the limit distance")
   }
 }
 
-TEST_CASE("Testing the hashing"){
+TEST_CASE("Testing the hashing")
+{
   boids::MyHashMap map{};
   boids::gridID test_id{};
 }
-
+TEST_CASE("Testing boids in limit cases")
+{
+  SUBCASE("Testing if boids on the same spot see each others")
+  {
+    BoidState boid1{{100., 100.}, {-100., 100.}};
+    BoidState boid2{{100., 100.}, {100., 100}};
+  }
+}
 // namespace boids

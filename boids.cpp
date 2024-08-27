@@ -231,7 +231,7 @@ std::vector<BoidState> generate_flock(std::default_random_engine& eng,
     auto pix = params.pixel.begin();
     BoidState boidprova{random_boid(eng, params)};
     boidprova.set_ID() = i / params.flocksize;
-    // std::cout << "Il flock id vale: " << boidprova.cget_boid().flockID <<
+    // std::cout << "Il Flock id vale: " << boidprova.cget_boid().flockID <<
     // "\n";
     update_id(boidprova.set_boid(), params.view_range);
     for (auto it = boidprova.get_pos().begin(); it != boidprova.get_pos().end();
@@ -247,7 +247,7 @@ std::vector<BoidState> generate_flock(std::default_random_engine& eng,
   return set;
 }
 
-void flock::update_HashMap(ParamList const& params)
+void Flock::update_HashMap(ParamList const& params)
 {
   // auto t1=high_resolution_clock::now();
   HashMap.clear();
@@ -259,7 +259,7 @@ void flock::update_HashMap(ParamList const& params)
   std::cout<<"Tempo creazione mappa: "<<ms_double.count()<<" ms"<<"\n";*/
 }
 
-void flock::update(ParamList const& params)
+void Flock::update(ParamList const& params)
 {
   auto update_neighbors_rules = [&](auto&& policy) {
     std::for_each(policy, set.begin(), set.end(), [&](auto& boid) {

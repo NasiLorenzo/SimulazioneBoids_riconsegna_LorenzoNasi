@@ -30,7 +30,7 @@ struct ParamList
                std::execution::parallel_unsequenced_policy>
       ExecPolicy = std::execution::seq;
   double rate;
-  ParamList()    = default;
+  ParamList() = default;
   ParamList(std::string const& inputfile)
   {
     std::ifstream input{inputfile};
@@ -103,7 +103,8 @@ struct gridID_hash
     int i       = 1;
     auto result = std::hash<int>{}(other[0]);
     std::for_each(other.begin() + 1, other.end(), [&](auto& ID_comp) {
-      result ^= std::hash<int>{}(ID_comp) /*+ 0x9e3779b9*/ + (result << 6) + (result >> 2);
+      result ^= std::hash<int>{}(ID_comp) /*+ 0x9e3779b9*/ + (result << 6)
+              + (result >> 2);
     });
     return result;
   }
@@ -161,6 +162,9 @@ class BoidState
   {}
   BoidState()
       : boid_{}
+  {}
+  BoidState(DoubleVec&& pos, DoubleVec&& vel)
+      : boid_{std::move(pos), std::move(vel)}
   {}
   auto& cget_pos() const
   {
@@ -248,10 +252,9 @@ class BoidState
     return this->deltavel_;
   }
   void random_boid(std::default_random_engine&, ParamList const& params);
-
 };
 
-using MyHashMap=std::unordered_multimap<gridID, boid const*, gridID_hash>;
+using MyHashMap = std::unordered_multimap<gridID, boid const*, gridID_hash>;
 
 void regola1(boid const& boid_, DoubleVec& deltavel_,
              std::vector<boid const*> const& close_neighbors,
@@ -274,48 +277,47 @@ auto random_boid(std::default_random_engine& eng, ParamList const& params);
 void speed_adjust(boid& boid, double speedlimit, double speedminimum);
 
 void bordercheck(boid& boid, std::vector<unsigned int> const& pixel,
-                 const double bordersize, const double border_repulsion, const double rate);
-void update_neighbors(
-    boid const& boid_, std::vector<boid const*>& neighbors,
-    MyHashMap const& map,
-    const double align_distance, const double alpha, Criterion const criterion);
+                 const double bordersize, const double border_repulsion,
+                 const double rate);
+void update_neighbors(boid const& boid_, std::vector<boid const*>& neighbors,
+                      MyHashMap const& map, const double align_distance,
+                      const double alpha, Criterion const criterion);
 
 void update_close_neighbors(boid const& boid_,
                             std::vector<boid const*>& close_neighbors,
                             std::vector<boid const*> const& set,
                             const double repulsion_distance);
-void update_close_neighbors(
-    boid const& boid_, std::vector<boid const*>& close_neighbors,
-    MyHashMap const& map,
-    const double repulsion_distance, const double alpha,
-    Criterion const criterion);
+void update_close_neighbors(boid const& boid_,
+                            std::vector<boid const*>& close_neighbors,
+                            MyHashMap const& map,
+                            const double repulsion_distance, const double alpha,
+                            Criterion const criterion);
 
-void update_allneighbors(
-    boid const& boid_, std::vector<boid const*>& neighbors,
-    std::vector<boid const*>& close_neighbors,
-    MyHashMap const& map,
-    const double repulsion_distance, const double align_distance,
-    const double alpha, unsigned int size, unsigned int flocksize);
+void update_allneighbors(boid const& boid_, std::vector<boid const*>& neighbors,
+                         std::vector<boid const*>& close_neighbors,
+                         MyHashMap const& map, const double repulsion_distance,
+                         const double align_distance, const double alpha,
+                         unsigned int size, unsigned int flocksize);
 
 std::size_t hash_function(gridID const& GridID);
 
 std::vector<BoidState> generate_flock(std::default_random_engine& eng,
                                       ParamList const& params);
 
-class flock
+class Flock
 {
   std::vector<BoidState> set;
   MyHashMap HashMap{};
 
  public:
-  flock()
+  Flock()
       : set{}
   {}
 
-  flock(std::default_random_engine& eng, ParamList const& params)
+  Flock(std::default_random_engine& eng, ParamList const& params)
       : set{generate_flock(eng, params)}
   {}
-  flock(std::vector<BoidState> const& other, ParamList const& params)
+  Flock(std::vector<BoidState> const& other, ParamList const& params)
       : set{other}
   {
     std::for_each(set.begin(), set.end(), [&params](auto& boid) {

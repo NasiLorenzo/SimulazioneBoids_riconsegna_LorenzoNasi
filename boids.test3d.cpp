@@ -53,7 +53,7 @@ TEST_CASE("Testing rules in 3 dimensions,just repeating the old test"){
   std::vector<BoidState> set{boid1, boid2, boid3, boid4, boid5,
                              boid6, boid7, boid8, boid9, boid10};
 
-  flock stormo{set, params};
+  Flock stormo{set, params};
   std::cout << "Initial velocities:\n";
   for (const auto& boid : stormo.set_()) {
     std::cout << "Boid velocity: (" << boid.cget_vel()[0] << ", "
@@ -133,7 +133,7 @@ TEST_CASE("Testing multiple iterations of the rules, just repeating the old test
 
   std::vector<BoidState> set{boid1, boid2, boid3, boid4};
 
-  flock stormo2{set, params};
+  Flock stormo2{set, params};
 
   stormo2.update(params);
   stormo2.update(params);
