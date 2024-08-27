@@ -32,10 +32,11 @@ struct ParamList
   double rate;
   ParamList() = default;
   ParamList(std::string const& inputfile)
+      : ParamList{}
   {
     std::ifstream input{inputfile};
     if (!input) {
-      std::cerr << "File di input non trovato!\n";
+      throw std::runtime_error{"Input file not found"};
       // return 1;
     }
     std::string line{};
@@ -85,20 +86,16 @@ struct ParamList
 
 void check_parallelism(int argc, char* argv[], ParamList& params);
 
-using gridID = std::array<int, params::dim>;
+using GridID = std::array<int, params::dim>;
 
-inline bool operator==(gridID const& lhs, gridID const& rhs)
+inline bool operator==(GridID const& lhs, GridID const& rhs)
 {
-  bool result{1};
-  auto rhs_it = rhs.begin();
-  std::for_each(lhs.begin(), lhs.end(),
-                [&](auto& x) { result = result && (x == *rhs_it); });
-  return result;
+  return std::equal(lhs.begin(), lhs.end(), rhs.begin());
 }
 
 struct gridID_hash
 {
-  inline std::size_t operator()(gridID const& other) const noexcept
+  inline std::size_t operator()(GridID const& other) const noexcept
   {
     int i       = 1;
     auto result = std::hash<int>{}(other[0]);
@@ -114,8 +111,9 @@ struct boid
 {
   DoubleVec pos_;
   DoubleVec vel_;
-  gridID GridID{};
-  unsigned int flockID{0};
+  GridID GridID_{};
+  unsigned int flockID_{0};
+
   boid(DoubleVec pos, DoubleVec vel)
       : pos_{pos}
       , vel_{vel}
@@ -124,26 +122,40 @@ struct boid
       : pos_{}
       , vel_{}
   {}
-  auto& cget_pos() const
+  auto& pos() const
   {
     return this->pos_;
   }
 
-  auto& cget_vel() const
+  auto& vel()
   {
     return this->vel_;
   }
-  auto get_velcopy() const
-  {
-    return this->vel_;
-  }
-  auto get_poscopy() const
+
+  auto& pos()
   {
     return this->pos_;
   }
-  auto& cget_flockID() const
+
+  auto& vel() const
   {
-    return this->flockID;
+    return this->vel_;
+  }
+  auto& flockID() const
+  {
+    return this->flockID_;
+  }
+  auto& flockID()
+  {
+    return this->flockID_;
+  }
+  auto& GridID() const
+  {
+    return this->GridID_;
+  }
+  auto& GridID()
+  {
+    return this->GridID_;
   }
 };
 class BoidState
@@ -151,14 +163,14 @@ class BoidState
  private:
   boid boid_;
   DoubleVec deltavel_{};
-  std::vector<boid const*> neighbors{};
-  std::vector<boid const*> close_neighbors{};
+  std::vector<boid const*> neighbors_{};
+  std::vector<boid const*> close_neighbors_{};
 
  public:
   BoidState(boid const& other)
       : boid_{other}
-      , neighbors{}
-      , close_neighbors{}
+      , neighbors_{}
+      , close_neighbors_{}
   {}
   BoidState()
       : boid_{}
@@ -166,100 +178,81 @@ class BoidState
   BoidState(DoubleVec&& pos, DoubleVec&& vel)
       : boid_{std::move(pos), std::move(vel)}
   {}
-  auto& cget_pos() const
+  auto& pos() const
+  {
+    return this->boid_.pos_;
+  }
+  auto& pos()
   {
     return this->boid_.pos_;
   }
 
-  auto& cget_vel() const
+  auto& vel() const
   {
     return this->boid_.vel_;
   }
-  auto get_velcopy() const
+  auto& vel()
   {
     return this->boid_.vel_;
   }
-  auto get_poscopy() const
+  auto& flockID() const
   {
-    return this->boid_.pos_;
+    return this->boid_.flockID_;
   }
-  auto& get_ID() const
+  auto& flockID()
   {
-    return this->boid_.flockID;
+    return boid_.flockID_;
   }
-  auto& cget_flockID() const
+  auto& GridID() const
   {
-    return boid_.flockID;
+    return boid_.GridID_;
   }
-  auto& cget_GridID() const
+  auto& GridID()
   {
-    return boid_.GridID;
+    return boid_.GridID_;
   }
 
-  auto& cget_boid() const
+  auto& boid() const
   {
     return this->boid_;
   }
-  auto& get_pos()
-  {
-    // std::mutex idmutex;
-    // std::lock_guard<std::mutex> lock(idmutex);
-    return this->boid_.pos_;
-  }
-
-  auto& get_vel()
-  {
-    // std::mutex idmutex;
-    // std::lock_guard<std::mutex> lock(idmutex);
-    return this->boid_.vel_;
-  }
-
-  auto& set_ID()
-  {
-    return this->boid_.flockID;
-  }
-
-  auto& set_GridID()
-  {
-    return boid_.GridID;
-  }
-  auto& set_boid()
-  {
-    return boid_;
-  }
-  auto& get_neighbors()
-  {
-    return neighbors;
-  }
-
-  auto& cget_neighbors() const
-  {
-    return neighbors;
-  }
-
-  auto& cget_close_neighbors() const
-  {
-    return close_neighbors;
-  }
-
-  auto& get_close_neighbors()
-  {
-    return close_neighbors;
-  }
-
-  auto& get_boid()
+  auto& boid()
   {
     return this->boid_;
   }
 
-  auto& get_deltavel()
+  auto& neighbors() const
+  {
+    return neighbors_;
+  }
+
+  auto& neighbors()
+  {
+    return neighbors_;
+  }
+
+  auto& close_neighbors() const
+  {
+    return close_neighbors_;
+  }
+
+  auto& close_neighbors()
+  {
+    return close_neighbors_;
+  }
+  auto& deltavel() const
   {
     return this->deltavel_;
   }
+  auto& deltavel()
+  {
+    return this->deltavel_;
+  }
+
   void random_boid(std::default_random_engine&, ParamList const& params);
 };
 
-using MyHashMap = std::unordered_multimap<gridID, boid const*, gridID_hash>;
+using MyHashMap = std::unordered_multimap<GridID, boid const*, gridID_hash>;
 
 void regola1(boid const& boid_, DoubleVec& deltavel_,
              std::vector<boid const*> const& close_neighbors,
@@ -304,61 +297,60 @@ void update_allneighbors(boid const& boid_, std::vector<boid const*>& neighbors,
                          const double align_distance, const double alpha,
                          unsigned int size, unsigned int flocksize);
 
-std::size_t hash_function(gridID const& GridID);
+std::size_t hash_function(GridID const& gridID);
 
 std::vector<BoidState> generate_flock(std::default_random_engine& eng,
                                       ParamList const& params);
 
 class Flock
 {
-  std::vector<BoidState> set;
-  MyHashMap HashMap{};
+  std::vector<BoidState> set_;
+  MyHashMap hashMap_{};
 
  public:
   Flock()
-      : set{}
+      : set_{}
   {}
 
   Flock(std::default_random_engine& eng, ParamList const& params)
-      : set{generate_flock(eng, params)}
+      : set_{generate_flock(eng, params)}
   {}
   Flock(std::vector<BoidState> const& other, ParamList const& params)
-      : set{other}
+      : set_{other}
   {
-    std::for_each(set.begin(), set.end(), [&params](auto& boid) {
-      update_id(boid.set_boid(), params.view_range);
+    std::for_each(set_.begin(), set_.end(), [&params](auto& boid) {
+      update_id(boid.boid(), params.view_range);
     });
-    update_HashMap(params);
-    std::for_each(set.begin(), set.end(), [&params](auto& boid) {
-      update_id(boid.set_boid(), params.view_range);
+    update_hashMap(params);
+    std::for_each(set_.begin(), set_.end(), [&params](auto& boid) {
+      update_id(boid.boid(), params.view_range);
     });
-    update_HashMap(params);
+    update_hashMap(params);
   }
-  std::vector<BoidState>& set_()
+  auto& set() const
   {
-    return set;
+    return set_;
   }
 
-  auto& cget_set_() const
+  auto& set() 
   {
-    return this->set;
+    return set_;
   }
 
-  auto& get_set_()
+  auto& hashMap() 
   {
-    return this->set;
+    return this->hashMap_;
+  }
+  auto& hashMap() const
+  {
+    return this->hashMap_;
   }
 
-  auto& cget_Map_() const
+  std::size_t size()
   {
-    return this->HashMap;
+    return set_.size();
   }
-
-  std::size_t size_()
-  {
-    return set.size();
-  }
-  void update_HashMap(ParamList const& params);
+  void update_hashMap(ParamList const& params);
   void update(ParamList const& params);
 };
 } // namespace boids

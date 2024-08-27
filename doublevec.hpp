@@ -26,9 +26,7 @@
 #include <cstddef>
 #include <functional>
 #include <iomanip>
-#include <iostream>
-#include <string>
-#include <unordered_set>
+#include <stdexcept>
 namespace boids {
 struct params
 {

@@ -28,12 +28,12 @@ int main(int argc, char* argv[])
     interface.get_flock().update(interface.get_params());
     window.clear(sf::Color::White);
 
-    auto boidit=interface.get_flock().set_().begin();
+    auto boidit=interface.get_flock().set().begin();
     for (auto& arrow : interface.set_Arrowset()) {
-      float angle       = static_cast<float>(boids::angle(boidit->get_vel()));      
+      float angle       = static_cast<float>(boids::angle(boidit->vel()));      
       arrow.setPosition(
-          static_cast<float>(boidit->get_pos()[0] / interface.get_params().rate),
-          static_cast<float>(boidit->get_pos()[1] / interface.get_params().rate));
+          static_cast<float>(boidit->pos()[0] / interface.get_params().rate),
+          static_cast<float>(boidit->pos()[1] / interface.get_params().rate));
       arrow.setRotation(angle * 180 / static_cast<float>(M_PI));
       window.draw(arrow);
       boidit++;
@@ -43,7 +43,7 @@ int main(int argc, char* argv[])
     i++;
     auto t2 = high_resolution_clock::now();
     duration<double, std::milli> ms_double = t2 - t1;
-    std::cout << "posizione primo boid " << interface.get_flock().set_()[0].get_pos()[0] <<" "<<i<< "\n";
+    std::cout << "posizione primo boid " << interface.get_flock().set()[0].pos()[0] <<" "<<i<< "\n";
     std::cout << ms_double.count() << "ms\n";
     if (frameTime < clock.getElapsedTime())
       std::cout << "Lag" << "\n";

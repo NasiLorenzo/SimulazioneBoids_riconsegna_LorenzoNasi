@@ -33,7 +33,7 @@ class SFML_interface
       , set{eng, params}
   {
     for(unsigned int i=0;i<params.size;i++ ) {
-      Arrowset.push_back(buildArrow(set.set_()[i].get_ID(), colorvec,params.rate));
+      Arrowset.push_back(buildArrow(set.set()[i].flockID(), colorvec,params.rate));
     }
 
   }

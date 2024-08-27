@@ -106,7 +106,7 @@ int main(int argc, char* argv[])
   auto t2 = high_resolution_clock::now();
 
   duration<double, std::milli> ms_double = t2 - t1;
-  std::cout << "posizione primo boid " << stormo.set_()[0].get_pos()[0] << "\n";
+  std::cout << "posizione primo boid " << stormo.set()[0].pos()[0] << "\n";
   std::cout << ms_double.count() << "ms\n";
   /*boids::MyHashMap map{};
   gridID test_id{1,3};
