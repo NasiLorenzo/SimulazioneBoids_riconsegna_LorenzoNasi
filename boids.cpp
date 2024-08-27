@@ -11,8 +11,8 @@ void check_parallelism(int argc, char* argv[], ParamList& params)
 {
   std::string argument = "--parallel";
   std::for_each(argv, argv + argc, [&](auto& opt) {
-    auto new_opt=std::string(opt);
-        if (new_opt==argument) {
+    auto new_opt = std::string(opt);
+    if (new_opt == argument) {
       params.ExecPolicy = std::execution::par_unseq;
       std::cout << "parallel found! " << "\n";
     }
@@ -37,7 +37,7 @@ void update_id(boid& boid, const double view_range)
   });
 }
 
-void speedadjust(boid& boid, double speedlimit, double speedminimum)
+void speed_adjust(boid& boid, double speedlimit, double speedminimum)
 {
   auto vmod = mod(boid.vel_);
   if (vmod > speedlimit) {
@@ -50,14 +50,15 @@ void speedadjust(boid& boid, double speedlimit, double speedminimum)
   };
 }
 void bordercheck(boid& boid, std::array<unsigned int, params::dim> const& pixel,
-                 const double bordersize, const double border_repulsion, const double rate)
+                 const double bordersize, const double border_repulsion,
+                 const double rate)
 {
   auto pix = pixel.begin();
   for (auto index = boid.pos_.begin(), velind = boid.vel_.begin();
        index != boid.pos_.end(); ++index, ++velind, ++pix) {
     if (*index > rate * (*pix - bordersize)) {
       *velind -= border_repulsion;
-    } else if (*index <rate * bordersize) {
+    } else if (*index < rate * bordersize) {
       *velind += border_repulsion;
     }
   }
@@ -68,7 +69,7 @@ bool is_neighbor(boid const& boid_, boid const& neighbor,
                  Criterion criterion)
 {
   auto distanza = distance(boid_.pos_, neighbor.pos_);
-  if (distanza < pow(view_range, 2) && distanza != 0
+  if (distanza < pow(view_range, 2) && /*distanza != 0*/ &neighbor != &boid_
       && (criterion == Criterion::any
           || (criterion == Criterion::similar
               && boid_.flockID == neighbor.flockID))) {
@@ -127,7 +128,7 @@ void update_close_neighbors(boid const& boid_,
   close_neighbors.clear();
   std::for_each(neighbors.begin(), neighbors.end(), [&](auto& neighbor) {
     auto distanza = distance(boid_.pos_, neighbor->pos_);
-    if (distanza < pow(repulsion_distance, 2) && distanza != 0) {
+    if (distanza < pow(repulsion_distance, 2) && neighbor != &boid_) {
       close_neighbors.emplace_back(neighbor);
     }
   });
@@ -142,7 +143,6 @@ void regola1(boid const& boid_, DoubleVec& deltavel_,
                   auto x = neighbor->pos_ - boid_.pos_;
                   deltavel_ += x * (-repulsion_factor);
                 });
-  // deltavel_+=boid_.pos_*(repulsion_factor);
 }
 
 void regola2_3_old(boid const& boid_, DoubleVec& deltavel_,
@@ -170,7 +170,8 @@ void regola2_3(boid const& boid_, DoubleVec& deltavel_,
   auto n = neighbors.size();
   // auto velcopia = this->get_vel();
   std::for_each(neighbors.begin(), neighbors.end(), [&](auto& neighbor) {
-    deltavel_ += neighbor->vel_ * (steering_factor / static_cast<double>(n));
+    deltavel_ +=
+        neighbor->vel_ * (steering_factor / static_cast<double>(n));
     deltavel_ += neighbor->pos_ * (cohesion / static_cast<double>(n));
   });
   if (neighbors.size() != 0) {
@@ -184,10 +185,10 @@ void posvel_update(BoidState& boid, ParamList const& params)
   // boid.get_neighbors().clear();
   // boid.get_close_neighbors().clear();
   boid.get_boid().vel_ += boid.get_deltavel();
-  speedadjust(boid.get_boid(), params.speedlimit, params.speedminimum);
+  speed_adjust(boid.get_boid(), params.speedlimit, params.speedminimum);
   boid.get_boid().pos_ += (boid.get_boid().vel_) * params.deltaT;
   bordercheck(boid.get_boid(), params.pixel, params.bordersize,
-              params.border_repulsion,params.rate);
+              params.border_repulsion, params.rate);
   boid.get_deltavel() = {0., 0.};
   update_id(boid.get_boid(), params.view_range);
 }

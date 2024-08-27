@@ -190,7 +190,7 @@ TEST_CASE("Testing the speed limits")
   }
 
   std::for_each(boids.begin(), boids.end(), [&params](BoidState& boid) {
-    speedadjust(boid.get_boid(), params.speedlimit, params.speedminimum);
+    speed_adjust(boid.get_boid(), params.speedlimit, params.speedminimum);
   });
 
   SUBCASE("Testing the get_vel()ocity after the adjustment")
@@ -205,7 +205,7 @@ TEST_CASE("Testing the speed limits")
   }
 }
 
-TEST_CASE("Testing boid sight")
+TEST_CASE("Testing boid sight") //each boid contains itself in the vector of its neighbors
 {
   ParamList params{};
   params.repulsion_factor = 0.7;

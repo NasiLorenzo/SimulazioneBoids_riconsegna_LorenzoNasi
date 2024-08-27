@@ -17,8 +17,8 @@ string(APPEND CMAKE_CXX_FLAGS
       " -Wshadow -Wimplicit-fallthrough -Wextra-semi -Wold-style-cast")
 
 # abilita asserzioni di debug (in gcc), l'address sanitizer e l'undefined-behaviour sanitizer in debug mode
-string(APPEND CMAKE_CXX_FLAGS_DEBUG " -D_GLIBCXX_ASSERTIONS -fsanitize=address,undefined -fno-omit-frame-pointer")# -fsanitize=thread -g")
-string(APPEND CMAKE_EXE_LINKER_FLAGS_DEBUG " -fsanitize=address,undefined -fno-omit-frame-pointer")# -fsanitize=thread")
+string(APPEND CMAKE_CXX_FLAGS_DEBUG " -D_GLIBCXX_ASSERTIONS  -fno-omit-frame-pointer")# -fsanitize=address,undefined")
+string(APPEND CMAKE_EXE_LINKER_FLAGS_DEBUG "  -fno-omit-frame-pointer")# -fsanitize=address,undefined")
 
 include_directories("/opt/homebrew/Cellar/sfml/2.6.1/include")
 include_directories("/opt/homebrew/Cellar/tbb/2021.13.0/include")

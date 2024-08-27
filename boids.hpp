@@ -271,7 +271,7 @@ void update_rules(boid const& boid_, DoubleVec& deltavel_,
 
 auto random_boid(std::default_random_engine& eng, ParamList const& params);
 
-void speedadjust(boid& boid, double speedlimit, double speedminimum);
+void speed_adjust(boid& boid, double speedlimit, double speedminimum);
 
 void bordercheck(boid& boid, std::vector<unsigned int> const& pixel,
                  const double bordersize, const double border_repulsion, const double rate);
