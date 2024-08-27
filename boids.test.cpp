@@ -251,7 +251,8 @@ TEST_CASE("Testing boid sight") // each boid contains itself in the vector of
     std::vector<BoidState> pair1{boid1, boid2};
     boids::Flock stormo_1{pair1, params};
     stormo_1.update(params);
-    CHECK(boids::cos_angle_between(boid2.get_pos() - boid1.get_pos(), boid1.get_vel())
+    CHECK(boids::cos_angle_between(boid2.get_pos() - boid1.get_pos(),
+                                   boid1.get_vel())
           == doctest::Approx(cos(0)).epsilon(0.001));
     CHECK(stormo_1.cget_set_()[0].cget_neighbors().size() == 1);
   }
@@ -261,7 +262,8 @@ TEST_CASE("Testing boid sight") // each boid contains itself in the vector of
     std::vector<BoidState> pair2{boid1, boid3};
     Flock stormo_2{pair2, params};
     stormo_2.update(params);
-    CHECK(boids::cos_angle_between(boid3.get_pos() - boid1.get_pos(), boid1.get_vel())
+    CHECK(boids::cos_angle_between(boid3.get_pos() - boid1.get_pos(),
+                                   boid1.get_vel())
           == doctest::Approx(cos(1.2490)).epsilon(0.001));
     CHECK(stormo_2.cget_set_()[0].cget_neighbors().size() == 0);
   }
@@ -271,7 +273,8 @@ TEST_CASE("Testing boid sight") // each boid contains itself in the vector of
     std::vector<BoidState> pair3{boid1, boid4};
     Flock stormo_3{pair3, params};
     stormo_3.update(params);
-    CHECK(boids::cos_angle_between(boid4.get_pos() - boid1.get_pos(), boid1.get_vel())
+    CHECK(boids::cos_angle_between(boid4.get_pos() - boid1.get_pos(),
+                                   boid1.get_vel())
           == doctest::Approx(cos(3.798)).epsilon(0.001));
     CHECK(stormo_3.cget_set_()[0].cget_neighbors().size() == 0);
   }
@@ -281,7 +284,8 @@ TEST_CASE("Testing boid sight") // each boid contains itself in the vector of
     std::vector<BoidState> pair4{boid1, boid5};
     Flock stormo_4{pair4, params};
     stormo_4.update(params);
-    CHECK(boids::cos_angle_between(boid5.get_pos() - boid1.get_pos(), boid1.get_vel())
+    CHECK(boids::cos_angle_between(boid5.get_pos() - boid1.get_pos(),
+                                   boid1.get_vel())
           == doctest::Approx(cos(M_PI)).epsilon(0.001));
     CHECK(stormo_4.cget_set_()[0].cget_neighbors().size() == 0);
   }
@@ -347,9 +351,30 @@ TEST_CASE("Testing boids in limit cases")
 {
   SUBCASE("Testing if boids on the same spot see each others")
   {
+    ParamList params{};
+    params.repulsion_factor = 0.7;
+    params.steering_factor  = 0.1;
+    params.cohesion_factor  = 0.1;
+    params.repulsion_range  = 100000;
+    params.view_range       = 100000;
+    params.alpha            = M_PI;
+    params.border_repulsion = 0;
+    params.speedlimit       = 8000;
+    params.speedminimum     = 0;
+    params.size             = 4;
+    params.deltaT           = 1 / 30.f;
+    params.flocksize        = 4;
+    params.pixel[0]         = 1000;
+    params.pixel[1]         = 1000;
+    params.rate             = 1;
     BoidState boid1{{100., 100.}, {-100., 100.}};
     BoidState boid2{{100., 100.}, {100., 100}};
-    
+    Flock flock_1{std::vector{boid1, boid2}, params};
+    flock_1.update(params);
+    CHECK(flock_1.cget_set_()[0].cget_close_neighbors().size() == 1);
+    CHECK(flock_1.cget_set_()[0].cget_neighbors().size() == 1);
+    CHECK(flock_1.cget_set_()[1].cget_close_neighbors().size() == 1);
+    CHECK(flock_1.cget_set_()[1].cget_neighbors().size() == 1);
   }
 }
 // namespace boids

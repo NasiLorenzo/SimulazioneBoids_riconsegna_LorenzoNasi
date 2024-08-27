@@ -237,6 +237,11 @@ class BoidState
     return neighbors;
   }
 
+  auto& cget_close_neighbors() const
+  {
+    return close_neighbors;
+  }
+
   auto& get_close_neighbors()
   {
     return close_neighbors;

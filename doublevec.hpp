@@ -61,7 +61,7 @@ void normalize(DoubleVec& vec);
 
 double distance(DoubleVec const& a, DoubleVec const& b);
 
-double cosangleij(DoubleVec const& a, DoubleVec const& b);
+double cos_angle_between(DoubleVec const& a, DoubleVec const& b);
 } // namespace boids
 
 #endif
