@@ -32,8 +32,8 @@ int main(int argc, char* argv[])
     for (auto& arrow : interface.set_Arrowset()) {
       float angle       = static_cast<float>(boids::angle(boidit->get_vel()));      
       arrow.setPosition(
-          static_cast<float>(boidit->get_pos()[0] / boids::params::rate),
-          static_cast<float>(boidit->get_pos()[1] / boids::params::rate));
+          static_cast<float>(boidit->get_pos()[0] / interface.get_params().rate),
+          static_cast<float>(boidit->get_pos()[1] / interface.get_params().rate));
       arrow.setRotation(angle * 180 / static_cast<float>(M_PI));
       window.draw(arrow);
       boidit++;

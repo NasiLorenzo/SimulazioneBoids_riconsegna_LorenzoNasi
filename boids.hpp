@@ -29,6 +29,7 @@ struct ParamList
   std::variant<std::execution::sequenced_policy,
                std::execution::parallel_unsequenced_policy>
       ExecPolicy = std::execution::seq;
+  double rate;
   ParamList()    = default;
   ParamList(std::string const& inputfile)
   {
@@ -72,7 +73,7 @@ struct ParamList
         else if (name == "pixel.y")
           pixel[1] = static_cast<unsigned int>(value);
         else if (name == "rate")
-          boids::params::rate = value;
+          rate = value;
         else if (name == "bordersize")
           bordersize = value;
         else if (name == "sigma")
@@ -261,7 +262,7 @@ void regola2_3(boid const& boid_, DoubleVec& deltavel_,
                std::vector<boid const*> const& neighbors,
                const double cohesion);
 
-void UpdateID(boid& boid, const double view_range);
+void update_id(boid& boid, const double view_range);
 
 void update_rules(boid const& boid_, DoubleVec& deltavel_,
                   std::vector<boid const*>& neighbors,
@@ -273,7 +274,7 @@ auto random_boid(std::default_random_engine& eng, ParamList const& params);
 void speedadjust(boid& boid, double speedlimit, double speedminimum);
 
 void bordercheck(boid& boid, std::vector<unsigned int> const& pixel,
-                 const double bordersize, const double border_repulsion);
+                 const double bordersize, const double border_repulsion, const double rate);
 void update_neighbors(
     boid const& boid_, std::vector<boid const*>& neighbors,
     MyHashMap const& map,
@@ -318,11 +319,11 @@ class flock
       : set{other}
   {
     std::for_each(set.begin(), set.end(), [&params](auto& boid) {
-      UpdateID(boid.set_boid(), params.view_range);
+      update_id(boid.set_boid(), params.view_range);
     });
     update_HashMap(params);
     std::for_each(set.begin(), set.end(), [&params](auto& boid) {
-      UpdateID(boid.set_boid(), params.view_range);
+      update_id(boid.set_boid(), params.view_range);
     });
     update_HashMap(params);
   }

@@ -16,7 +16,7 @@ void assigncolors(flock& ensemble, std::vector<RGB> const& colorvec);
 
 ParamList parse_input(std::string const& inputfile);
 
-sf::ConvexShape buildArrow(unsigned int i, std::vector<RGB> colorvec);
+sf::ConvexShape buildArrow(unsigned int i, std::vector<RGB> colorvec, const double rate);
 class SFML_interface
 {
   ParamList params{};
@@ -33,7 +33,7 @@ class SFML_interface
       , set{eng, params}
   {
     for(unsigned int i=0;i<params.size;i++ ) {
-      Arrowset.push_back(buildArrow(set.set_()[i].get_ID(), colorvec));
+      Arrowset.push_back(buildArrow(set.set_()[i].get_ID(), colorvec,params.rate));
     }
 
   }

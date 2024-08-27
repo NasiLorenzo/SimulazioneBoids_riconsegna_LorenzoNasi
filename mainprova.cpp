@@ -93,7 +93,7 @@ int main(int argc, char* argv[])
   params.flocksize        = 2000;
   params.pixel[0]         = 1510;
   params.pixel[1]         = 910;
-  params::rate            = 1;
+  params.rate            = 1;
   params.bordersize       = 50;
   params.sigma            = 100;
 

@@ -1,7 +1,6 @@
 #include "boids.hpp"
 namespace boids {
 
-double params::rate{1};
 using namespace std::chrono_literals;
 using std::chrono::duration;
 using std::chrono::duration_cast;
@@ -13,16 +12,11 @@ void check_parallelism(int argc, char* argv[], ParamList& params)
   std::string argument = "--parallel";
   std::for_each(argv, argv + argc, [&](auto& opt) {
     auto new_opt=std::string(opt);
-    std::cout<<"opzione: ["<<new_opt<<"]\n";
-    if (new_opt==argument) {
+        if (new_opt==argument) {
       params.ExecPolicy = std::execution::par_unseq;
       std::cout << "parallel found! " << "\n";
     }
   });
-  /*if (it != argv + argc) {
-    std::cout << "Found parallel" << "!" << std::endl;
-    params.ExecPolicy = std::execution::par_unseq;
-  }*/
 }
 
 auto random_boid(std::default_random_engine& eng, ParamList const& params)
@@ -34,7 +28,7 @@ auto random_boid(std::default_random_engine& eng, ParamList const& params)
   return newboid;
 }
 
-void UpdateID(boid& boid, const double view_range)
+void update_id(boid& boid, const double view_range)
 {
   auto posit = boid.cget_pos().begin();
   std::for_each(boid.GridID.begin(), boid.GridID.end(), [&](auto& ID_comp) {
@@ -56,14 +50,14 @@ void speedadjust(boid& boid, double speedlimit, double speedminimum)
   };
 }
 void bordercheck(boid& boid, std::array<unsigned int, params::dim> const& pixel,
-                 const double bordersize, const double border_repulsion)
+                 const double bordersize, const double border_repulsion, const double rate)
 {
   auto pix = pixel.begin();
   for (auto index = boid.pos_.begin(), velind = boid.vel_.begin();
        index != boid.pos_.end(); ++index, ++velind, ++pix) {
-    if (*index > params::rate * (*pix - bordersize)) {
+    if (*index > rate * (*pix - bordersize)) {
       *velind -= border_repulsion;
-    } else if (*index < params::rate * bordersize) {
+    } else if (*index <rate * bordersize) {
       *velind += border_repulsion;
     }
   }
@@ -183,15 +177,6 @@ void regola2_3(boid const& boid_, DoubleVec& deltavel_,
     deltavel_ -= boid_.pos_ * cohesion;
     deltavel_ -= boid_.vel_ * steering_factor;
   }
-  /*std::for_each(neighbors.begin(), neighbors.end(), [&](auto& neighbor) {
-    auto x = neighbor->vel_ - boid_.vel_;
-    deltavel2 += x * (steering_factor / static_cast<double>(n));
-    auto y = neighbor->pos_ - boid_.pos_;
-    deltavel2 += y * (cohesion / static_cast<double>(n));
-  });
-  std::cout << "deltavel1 (" << deltavel1[0] << ", " << deltavel1[1] << ") \n"
-            << " deltavel2: (" << deltavel2[0] << ", " << deltavel2[1] <<
-  ")\n";*/
 }
 
 void posvel_update(BoidState& boid, ParamList const& params)
@@ -202,9 +187,9 @@ void posvel_update(BoidState& boid, ParamList const& params)
   speedadjust(boid.get_boid(), params.speedlimit, params.speedminimum);
   boid.get_boid().pos_ += (boid.get_boid().vel_) * params.deltaT;
   bordercheck(boid.get_boid(), params.pixel, params.bordersize,
-              params.border_repulsion);
+              params.border_repulsion,params.rate);
   boid.get_deltavel() = {0., 0.};
-  UpdateID(boid.get_boid(), params.view_range);
+  update_id(boid.get_boid(), params.view_range);
 }
 
 void update_allneighbors(boid const& boid_, std::vector<boid const*>& neighbors,
@@ -244,16 +229,15 @@ std::vector<BoidState> generate_flock(std::default_random_engine& eng,
   for (unsigned int i = 0; i < params.size; i++) {
     auto pix = params.pixel.begin();
     BoidState boidprova{random_boid(eng, params)};
-    // boidprova.random_boid(eng, params);
     boidprova.set_ID() = i / params.flocksize;
     // std::cout << "Il flock id vale: " << boidprova.cget_boid().flockID <<
     // "\n";
-    UpdateID(boidprova.set_boid(), params.view_range);
+    update_id(boidprova.set_boid(), params.view_range);
     for (auto it = boidprova.get_pos().begin(); it != boidprova.get_pos().end();
          ++it, ++pix) {
       std::uniform_real_distribution<double> dis(
-          params.bordersize * params::rate,
-          static_cast<double>((*pix - params.bordersize) * params::rate));
+          params.bordersize * params.rate,
+          static_cast<double>((*pix - params.bordersize) * params.rate));
       *it += dis(eng);
     }
     set.push_back(boidprova);

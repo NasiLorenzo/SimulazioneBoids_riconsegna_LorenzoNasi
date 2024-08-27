@@ -57,7 +57,7 @@ std::vector<RGB> generatecolors(std::default_random_engine& eng,
       else if (name == "pixel.y")
         params.pixel[1] = static_cast<unsigned int>(value);
       else if (name == "rate")
-        boids::params::rate = value;
+        params.rate = value;
       else if (name == "bordersize")
         params.bordersize = value;
       else if (name == "sigma")
@@ -67,10 +67,10 @@ std::vector<RGB> generatecolors(std::default_random_engine& eng,
   return params;
   }
 
-sf::ConvexShape buildArrow(unsigned int i, std::vector<RGB> colorvec){
+sf::ConvexShape buildArrow(unsigned int i, std::vector<RGB> colorvec, const double rate){
   sf::ConvexShape arrow;
-      float arrowlength = 10 / static_cast<float>(boids::params::rate);
-      float arrowidth   = 5 / static_cast<float>(boids::params::rate);
+      float arrowlength = 10 / static_cast<float>(rate);
+      float arrowidth   = 5 / static_cast<float>(rate);
       arrow.setPointCount(3);
       arrow.setPoint(0, sf::Vector2f(arrowlength, 0));
       arrow.setPoint(1, sf::Vector2f(0, -arrowidth / 2));
