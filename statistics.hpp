@@ -27,7 +27,6 @@ class Sample
   double sum_x2_;
   int N_;
   Statistics parameters_;
-  bool update_state_{false};
 };
 
 struct FlockStats
@@ -40,8 +39,8 @@ struct FlockStats
 
   FlockStats() = default;
   FlockStats(std::vector<BoidState> const& flock);
-  void build_distance_entries(std::vector<BoidState> const& flock);
-  void build_pos_vel_entries(std::vector<BoidState> const& flock);
+  void build_distance_stats(std::vector<BoidState> const& flock);
+  void build_pos_vel_stats(std::vector<BoidState> const& flock);
 };
 
 } // namespace boids

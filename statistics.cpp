@@ -9,22 +9,17 @@ Sample::Sample(std::vector<double> const& entries)
     sum_x2_ += x * x;
     N_++;
   });
+  parameters_.mean  = sum_x_ / N_;
+  parameters_.sigma = sqrt(sum_x2_ / N_ - pow(parameters_.mean, 2));
 }
 
 Statistics Sample::result()
 {
-  if (N_ > 0 && !update_state_) {
-    parameters_.mean  = sum_x_ / N_;
-    parameters_.sigma = sqrt(sum_x2_ / N_ - pow(parameters_.mean, 2));
-    update_state_     = true;
+  if (N_ > 0) {
     return parameters_;
   } else {
-    if (N_ == 0) {
-      std::cerr << "Sample is empty" << "\n";
-      return Statistics{0., -1}; // sentinel state
-    } else {
-      return parameters_;
-    }
+    std::cerr << "Sample is empty" << "\n";
+    return Statistics{0., -1}; // sentinel state
   }
 }
 
@@ -33,10 +28,11 @@ void Sample::add(double entry)
   sum_x_ += entry;
   sum_x2_ += entry * entry;
   N_++;
-  update_state_ = false;
+  parameters_.mean  = sum_x_ / N_;
+  parameters_.sigma = sqrt(sum_x2_ / N_ - pow(parameters_.mean, 2));
 }
 
-void FlockStats::build_distance_entries(std::vector<BoidState> const& flock)
+void FlockStats::build_distance_stats(std::vector<BoidState> const& flock)
 {
   std::for_each(flock.begin(), flock.end() - 1, [&](auto const& boid) {
     auto next_iter = std::next(flock.begin(), &boid - &(*flock.begin()) + 1);
@@ -47,7 +43,7 @@ void FlockStats::build_distance_entries(std::vector<BoidState> const& flock)
                   });
   });
 }
-void FlockStats::build_pos_vel_entries(
+void FlockStats::build_pos_vel_stats(
     std::vector<BoidState> const& flock) // put together to optimize performace
 {
   std::for_each(flock.begin(), flock.end(), [&](auto const& boid) {
@@ -71,8 +67,8 @@ void FlockStats::build_pos_vel_entries(
 FlockStats::FlockStats(std::vector<BoidState> const& flock)
     : FlockStats{}
 {
-  build_pos_vel_entries(flock);
-  build_distance_entries(flock);
+  build_pos_vel_stats(flock);
+  build_distance_stats(flock);
 }
 
 } // namespace boids
