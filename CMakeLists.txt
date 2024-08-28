@@ -27,8 +27,8 @@ find_package(SFML 2.5 COMPONENTS graphics REQUIRED)
 
 include_directories(${TBB_INCLUDE_DIRS})
 include_directories(${TBB_INCLUDE_DIRS})
-add_executable(boidsfml boids.cpp boidsfml.cpp doublevec.cpp sfmlboids.cpp)
-add_executable(boidss boids.cpp mainprova.cpp doublevec.cpp)
+add_executable(boidsfml boids.cpp boidsfml.cpp doublevec.cpp sfmlboids.cpp statistics.cpp)
+add_executable(boidss boids.cpp mainprova.cpp doublevec.cpp statistics.cpp)
 add_executable(prove prove_varie.cpp doublevec.cpp)
 target_link_libraries(boidsfml PRIVATE sfml-graphics sfml-window sfml-system)
 target_link_libraries(boidsfml PRIVATE TBB::tbb TBB::tbbmalloc )
@@ -44,11 +44,14 @@ target_compile_options(boidss PRIVATE -DDIM=2)
 if (BUILD_TESTING)
 
   # aggiungi l'eseguibile all.t
-  add_executable(boids.t boids.cpp boids.test.cpp doublevec.cpp)
+  add_executable(boids.t boids.cpp boids.test.cpp doublevec.cpp) 
   add_executable(boids3d.t boids.test3d.cpp boids.cpp doublevec.cpp)
   target_link_libraries(boids.t PRIVATE TBB::tbb TBB::tbbmalloc)
   target_link_libraries(boids3d.t PRIVATE TBB::tbb TBB::tbbmalloc)
   target_compile_options(boids3d.t PRIVATE -DDIM=3)
+  add_executable(statistics.t statistics.test.cpp statistics.cpp boids.cpp doublevec.cpp)
+  target_link_libraries(statistics.t PRIVATE TBB::tbb TBB::tbbmalloc)
+
   #target_link_libraries(boids.t PRIVATE Boost::filesystem Boost::system)
   # aggiungi l'eseguibile all.t alla lista dei test
    add_test(NAME boids.t COMMAND boids.t)
