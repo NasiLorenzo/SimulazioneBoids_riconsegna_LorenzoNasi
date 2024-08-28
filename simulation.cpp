@@ -34,6 +34,11 @@ void Simulation::loop(unsigned int updates, unsigned int update_rate,
       && vel_mod_file.is_open() && distance_file.is_open()) {
     std::cout << "Inizio simulazione per " << updates * update_rate
               << " iterazioni\n";
+    pos_file << updates << "\n";
+    vel_file << updates << "\n";
+    pos_mod_file << updates << "\n";
+    vel_mod_file << updates << "\n";
+    distance_file << updates << "\n";
     for (unsigned int i = 0; i < updates; ++i) {
       // std::cout<<"\u2588";
       for (unsigned int j = 0; j < update_rate; ++j) {
@@ -41,7 +46,6 @@ void Simulation::loop(unsigned int updates, unsigned int update_rate,
         clock_ += params_.deltaT;
       }
       FlockStats temp_stats{flock_.set()};
-
       auto vel_iter = temp_stats.vel_stats.begin();
       std::for_each(temp_stats.pos_stats.begin(), temp_stats.pos_stats.end(),
                     [&](auto& sample) mutable {
@@ -54,11 +58,11 @@ void Simulation::loop(unsigned int updates, unsigned int update_rate,
       pos_file << clock_ << "\n";
       vel_file << clock_ << "\n";
       pos_mod_file << temp_stats.pos_mod_stats.result().mean << " "
-                   << temp_stats.pos_mod_stats.result().sigma << clock_ << "\n";
+                   << temp_stats.pos_mod_stats.result().sigma <<" "<< clock_ << "\n";
       vel_mod_file << temp_stats.vel_mod_stats.result().mean << " "
-                   << temp_stats.vel_mod_stats.result().sigma << clock_ << "\n";
-      vel_mod_file << temp_stats.vel_mod_stats.result().mean << " "
-                   << temp_stats.vel_mod_stats.result().sigma << clock_ << "\n";
+                   << temp_stats.vel_mod_stats.result().sigma <<" "<< clock_ << "\n";
+      distance_file << temp_stats.distance_stats.result().mean << " "
+                   << temp_stats.distance_stats.result().sigma << " "<<clock_ << "\n";
       std::cout << "fine loop " << "\n";
     }
     std::cout << "End of simulation, results collected " << "\n";
