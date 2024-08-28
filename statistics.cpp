@@ -19,7 +19,7 @@ Statistics Sample::result()
     return parameters_;
   } else {
     std::cerr << "Sample is empty" << "\n";
-    return Statistics{0., -1}; // sentinel state
+    return Statistics{0., -1.}; // sentinel state
   }
 }
 

@@ -8,7 +8,7 @@ using std::chrono::milliseconds;
 int main(int argc, char* argv[])
 {
     
-  boids::SFML_interface interface("parametrisfml.txt");
+  boids::SFML_interface interface("parametri.txt");
   boids::check_parallelism(argc,argv,interface.get_params());
   sf::VideoMode desktop = sf::VideoMode::getDesktopMode();  
   sf::RenderWindow window(sf::VideoMode(interface.get_params().pixel[0], interface.get_params().pixel[1],desktop.bitsPerPixel),

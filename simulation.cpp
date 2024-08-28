@@ -51,18 +51,19 @@ void Simulation::loop(unsigned int updates, unsigned int update_rate,
                     [&](auto& sample) mutable {
                       pos_file << sample.result().mean << " "
                                << sample.result().sigma << " ";
-                      vel_file << sample.result().mean << " "
-                               << sample.result().sigma << " ";
+                      vel_file << vel_iter->result().mean << " "
+                               << vel_iter->result().sigma << " ";
                       vel_iter++;
                     });
       pos_file << clock_ << "\n";
       vel_file << clock_ << "\n";
-      pos_mod_file << temp_stats.pos_mod_stats.result().mean << " "
-                   << temp_stats.pos_mod_stats.result().sigma <<" "<< clock_ << "\n";
-      vel_mod_file << temp_stats.vel_mod_stats.result().mean << " "
-                   << temp_stats.vel_mod_stats.result().sigma <<" "<< clock_ << "\n";
-      distance_file << temp_stats.distance_stats.result().mean << " "
-                   << temp_stats.distance_stats.result().sigma << " "<<clock_ << "\n";
+      pos_mod_file << clock_ << " " << temp_stats.pos_mod_stats.result().mean
+                   << " " << temp_stats.pos_mod_stats.result().sigma << "\n";
+      vel_mod_file << clock_ << " " << temp_stats.vel_mod_stats.result().mean
+                   << " " << temp_stats.vel_mod_stats.result().sigma << "\n";
+      distance_file << clock_ << " " << temp_stats.distance_stats.result().mean
+                    << " " << temp_stats.distance_stats.result().sigma << "\n";
+
       std::cout << "fine loop " << "\n";
     }
     std::cout << "End of simulation, results collected " << "\n";

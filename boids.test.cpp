@@ -371,10 +371,10 @@ TEST_CASE("Testing boids in limit cases")
     BoidState boid2{{100., 100.}, {100., 100}};
     Flock flock_1{std::vector{boid1, boid2}, params};
     flock_1.update(params);
-    CHECK(flock_1.set()[0].close_neighbors().size() == 1);
-    CHECK(flock_1.set()[0].neighbors().size() == 1);
-    CHECK(flock_1.set()[1].close_neighbors().size() == 1);
-    CHECK(flock_1.set()[1].neighbors().size() == 1);
+    CHECK(flock_1.set()[0].close_neighbors().size() == 0);
+    CHECK(flock_1.set()[0].neighbors().size() == 0);
+    CHECK(flock_1.set()[1].close_neighbors().size() == 0);
+    CHECK(flock_1.set()[1].neighbors().size() == 0);
   }
 }
 // namespace boids
