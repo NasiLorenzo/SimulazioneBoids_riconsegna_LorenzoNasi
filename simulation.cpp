@@ -18,7 +18,7 @@ auto& Simulation::flock()
   return flock_;
 }
 
-auto Simulation::loop(unsigned int updates, unsigned int update_rate,
+void Simulation::loop(unsigned int updates, unsigned int update_rate,
                       std::string const& output_position_plot,
                       std::string const& output_velocity_plot,
                       std::string const& output_position_mod_plot,
@@ -35,6 +35,7 @@ auto Simulation::loop(unsigned int updates, unsigned int update_rate,
     std::cout << "Inizio simulazione per " << updates * update_rate
               << " iterazioni\n";
     for (unsigned int i = 0; i < updates; ++i) {
+      // std::cout<<"\u2588";
       for (unsigned int j = 0; j < update_rate; ++j) {
         flock_.update(params_);
         clock_ += params_.deltaT;
@@ -43,22 +44,27 @@ auto Simulation::loop(unsigned int updates, unsigned int update_rate,
 
       auto vel_iter = temp_stats.vel_stats.begin();
       std::for_each(temp_stats.pos_stats.begin(), temp_stats.pos_stats.end(),
-                    [&pos_file, &vel_file, &vel_iter](auto& sample) mutable {
+                    [&](auto& sample) mutable {
                       pos_file << sample.result().mean << " "
-                               << sample.result().sigma << " " << clock_
-                               << "\n";
+                               << sample.result().sigma << " ";
                       vel_file << sample.result().mean << " "
-                               << sample.result().sigma << " " << clock_
-                               << "\n";
+                               << sample.result().sigma << " ";
                       vel_iter++;
                     });
+      pos_file << clock_ << "\n";
+      vel_file << clock_ << "\n";
       pos_mod_file << temp_stats.pos_mod_stats.result().mean << " "
                    << temp_stats.pos_mod_stats.result().sigma << clock_ << "\n";
       vel_mod_file << temp_stats.vel_mod_stats.result().mean << " "
                    << temp_stats.vel_mod_stats.result().sigma << clock_ << "\n";
       vel_mod_file << temp_stats.vel_mod_stats.result().mean << " "
                    << temp_stats.vel_mod_stats.result().sigma << clock_ << "\n";
+      std::cout << "fine loop " << "\n";
     }
+    std::cout << "End of simulation, results collected " << "\n";
+
+  } else {
+    throw std::runtime_error{"At least one output file cannot be opened.\n"};
   }
 }
 

@@ -353,6 +353,7 @@ class Flock
   void update_hashMap(ParamList const& params);
   void update(ParamList const& params);
 };
+
 } // namespace boids
 #include "boids.tpp" // namespace boids
 #endif

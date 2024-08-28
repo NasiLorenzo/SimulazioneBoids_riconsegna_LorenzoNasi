@@ -11,7 +11,7 @@ class Simulation
   Simulation(std::string const& inputfile, std::random_device& r);
   auto& flock() const;
   auto& flock();
-  auto Simulation::loop(unsigned int iterations, unsigned int update_rate,
+  void loop(unsigned int iterations, unsigned int update_rate,
                         std::string const& output_position_plot,
                         std::string const& output_velocity_plot,
                         std::string const& output_position_mod_plot,

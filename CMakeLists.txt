@@ -35,7 +35,8 @@ target_link_libraries(boidsfml PRIVATE TBB::tbb TBB::tbbmalloc )
 target_link_libraries(boidss PRIVATE TBB::tbb TBB::tbbmalloc )
 target_link_libraries(prove PRIVATE TBB::tbb TBB::tbbmalloc )
 target_compile_options(boidss PRIVATE -DDIM=2)
-
+add_executable(simulation boids.cpp doublevec.cpp base_run.cpp statistics.cpp simulation.cpp)
+target_link_libraries(simulation PRIVATE TBB::tbb TBB::tbbmalloc )
 
 
 
