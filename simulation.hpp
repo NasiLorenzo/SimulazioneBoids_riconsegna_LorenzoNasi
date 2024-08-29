@@ -11,6 +11,7 @@ class Simulation
   Simulation(std::string const& inputfile, std::random_device& r);
   auto& flock() const;
   auto& flock();
+  ParamList& params();
   void loop(std::string const& output_position_plot,
             std::string const& output_velocity_plot,
             std::string const& output_position_mod_plot,

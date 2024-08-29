@@ -17,6 +17,10 @@ auto& Simulation::flock()
 {
   return flock_;
 }
+ParamList& Simulation::params(){
+  return params_;
+}
+
 
 void graphs_menu()
 {
