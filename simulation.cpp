@@ -17,10 +17,10 @@ auto& Simulation::flock()
 {
   return flock_;
 }
-ParamList& Simulation::params(){
+ParamList& Simulation::params()
+{
   return params_;
 }
-
 
 void graphs_menu()
 {
@@ -35,15 +35,24 @@ void graphs_menu()
   std::cin >> graph_type;
   switch (graph_type) {
   case 'P':
-    std::system("root -l -e \".L ./flock_data.C\" -e \"pos_data();\"");
+    if (params::dim == 2)
+      std::system("root -l -e \".L ./flock_data.C\" -e \"pos_data();\"");
+    if (params::dim == 3)
+      std::system("root -l -e \".L ./flock_data.C\" -e \"pos_data_3d();\"");
     graphs_menu();
     break;
   case 'V':
-    std::system("root -l -e \".L ./flock_data.C\" -e \"vel_data();\"");
+    if (params::dim == 2)
+      std::system("root -l -e \".L ./flock_data.C\" -e \"vel_data();\"");
+    if (params::dim == 3)
+      std::system("root -l -e \".L ./flock_data.C\" -e \"vel_data_3d();\"");
     graphs_menu();
     break;
   case 'M':
-    std::system("root -l -e \".L ./flock_data.C\" -e \"mods_data();\"");
+    if (params::dim == 2)
+      std::system("root -l -e \".L ./flock_data.C\" -e \"mods_data();\"");
+    if (params::dim == 3)
+      std::system("root -l -e \".L ./flock_data.C\" -e \"mods_data_3d();\"");
     graphs_menu();
     break;
   case 'Q':
@@ -99,12 +108,10 @@ void Simulation::loop(std::string const& output_position_plot,
                       });
         pos_file << clock_ << "\n";
         vel_file << clock_ << "\n";
-        pos_mod_file << clock_ << " "
-                      << temp_stats.pos_mod_stats.result().mean << " "
-                      << temp_stats.pos_mod_stats.result().sigma << "\n";
-        vel_mod_file << clock_ << " "
-                      << temp_stats.vel_mod_stats.result().mean << " "
-                      << temp_stats.vel_mod_stats.result().sigma << "\n";
+        pos_mod_file << clock_ << " " << temp_stats.pos_mod_stats.result().mean
+                     << " " << temp_stats.pos_mod_stats.result().sigma << "\n";
+        vel_mod_file << clock_ << " " << temp_stats.vel_mod_stats.result().mean
+                     << " " << temp_stats.vel_mod_stats.result().sigma << "\n";
         distance_file << clock_ << " "
                       << temp_stats.distance_stats.result().mean << " "
                       << temp_stats.distance_stats.result().sigma << "\n";

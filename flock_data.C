@@ -75,12 +75,23 @@ void graph_1d_proj(TCanvas* canvas, std::string filename, const char* title,
   while (std::getline(infile, line)) {
     std::istringstream iss(line);
     if (canvas_number == 1) {
-      if (!(iss >> _coord[i] >> sigma_coord[i] >> skip >> skip >> time[i])) {
+      if (!(iss >> _coord[i] >> sigma_coord[i] >> skip >> skip >> skip >> skip
+            >> time[i])) {
         throw std::runtime_error{"Not enough columns!"};
       }
     } else {
-      if (!(iss >> skip >> skip >> _coord[i] >> sigma_coord[i] >> time[i])) {
-        throw std::runtime_error{"Not enough columns!"};
+      if (canvas_number == 2) {
+        if (!(iss >> skip >> skip >> _coord[i] >> sigma_coord[i] >> skip >> skip
+              >> time[i])) {
+          throw std::runtime_error{"Not enough columns!"};
+        }
+      } else {
+        if (canvas_number == 3) {
+          if (!(iss >> skip >> skip >> skip >> skip >> _coord[i]
+                >> sigma_coord[i] >> time[i])) {
+            throw std::runtime_error{"Not enough columns!"};
+          }
+        }
       }
     }
 
@@ -101,7 +112,7 @@ void graph_1d_proj(TCanvas* canvas, std::string filename, const char* title,
 }
 
 void graph_1d(TCanvas* canvas, const char* filename, const char* title,
-                   Int_t canvas_number)
+              Int_t canvas_number)
 {
   std::ifstream infile(filename);
 
@@ -109,8 +120,7 @@ void graph_1d(TCanvas* canvas, const char* filename, const char* title,
     std::cerr << "file cannot be opened!" << std::endl;
     return;
   }
-  auto graph_1d =
-      new TGraphErrors(filename,"%lg %lg %lg","");
+  auto graph_1d = new TGraphErrors(filename, "%lg %lg %lg", "");
   graph_1d->SetTitle(title);
   graph_1d->SetFillColor(1);
   graph_1d->SetMarkerSize(0.8);
@@ -122,8 +132,6 @@ void graph_1d(TCanvas* canvas, const char* filename, const char* title,
   canvas->cd(canvas_number);
   graph_1d->Draw("AP");
 }
-
-
 
 void pos_data()
 {
@@ -151,7 +159,6 @@ void pos_data()
                 "time;time [arb_units];y [arb_units]",
                 2);
   canvas_proj->SaveAs("x_y_projections.png");
-
 }
 void vel_data()
 {
@@ -188,19 +195,104 @@ void mods_data()
   auto canvas_mods = new TCanvas(
       "canvas_mods", "Means of the magnitude of pos and vel", 0, 0, 1000, 1200);
   canvas_mods->Divide(1, 2);
-  //Seventh graph: drawing the mean magnitude of position as a function of time
-  graph_1d(canvas_mods,"pos_mod.txt","mean distance from the origin as a function of "
-                          "time;time [arb_units];x [arb_units]",1);
+  // Seventh graph: drawing the mean magnitude of position as a function of
+  // time
+  graph_1d(canvas_mods, "pos_mod.txt",
+           "mean distance from the origin as a function of "
+           "time;time [arb_units];x [arb_units]",
+           1);
 
-  //Eight graph: drawing the mean magnitude of position as a function of time
-  graph_1d(canvas_mods,"vel_mod.txt","mean speed a function of "
-                          "time;time [arb_units];x [arb_units]",2);
+  // Eight graph: drawing the mean magnitude of position as a function of time
+  graph_1d(canvas_mods, "vel_mod.txt",
+           "mean speed a function of "
+           "time;time [arb_units];x [arb_units]",
+           2);
   canvas_mods->SaveAs("Mean_distance_from_origin_mean_speed.png");
 
   // Ninth grap: drawing the mean distance over time
   auto canvas_distance =
       new TCanvas("canvas_distance", "Mean distance", 0, 0, 1000, 600);
-  graph_1d(canvas_distance,"distance.txt","mean distance as a function of "
-                           "time;time [arb_units];x [arb_units]",1);
+  graph_1d(canvas_distance, "distance.txt",
+           "mean distance as a function of "
+           "time;time [arb_units];x [arb_units]",
+           1);
   canvas_distance->SaveAs("Mean_distance.png");
+}
+//Graphs for the 3d version
+void pos_data_3d()
+{
+
+  auto canvas_proj = new TCanvas("canvas_proj", "projection of the coordinates",
+                                 0, 0, 1000, 1200);
+  canvas_proj->Divide(2, 2);
+  // First graph: showing the projection on the x_axis
+  graph_1d_proj(canvas_proj, "pos3d.txt",
+                "x-coordinate of the center of mass as a function of "
+                "time;time [arb_units];x [arb_units]",
+                1);
+  // Second graph : showing the projection on the y_axis
+  graph_1d_proj(canvas_proj, "pos3d.txt",
+                "y-coordinate of the center of mass as a function of "
+                "time;time [arb_units];y [arb_units]",
+                2);
+  // Second graph : showing the projection on the z_axis
+  graph_1d_proj(canvas_proj, "pos3d.txt",
+                "z-coordinate of the center of mass as a function of "
+                "time;time [arb_units];z [arb_units]",
+                3);
+  canvas_proj->SaveAs("x_y_z_projections.png");
+}
+void vel_data_3d()
+{
+  
+  auto canvas_vel_proj =
+      new TCanvas("canvas_vel_proj", "projection of the velocity components", 0,
+                  0, 1000, 1200);
+  canvas_vel_proj->Divide(2, 2);
+  canvas_vel_proj->cd();
+  // Fifth graph: showing the projection on the x_axis
+  graph_1d_proj(canvas_vel_proj, "vel3d.txt",
+                "x-coordinate of the mean velocity as a function of "
+                "time;time [arb_units];x [arb_units]",
+                1);
+  // Sixth graph : showing the projection on the y_axis
+  graph_1d_proj(canvas_vel_proj, "vel3d.txt",
+                "y-coordinate of the mean velocity as a function of "
+                "time;time [arb_units];y [arb_units]",
+                2);
+  // Sixth graph : showing the projection on the y_axis
+  graph_1d_proj(canvas_vel_proj, "vel3d.txt",
+                "z-coordinate of the mean velocity as a function of "
+                "time;time [arb_units];z [arb_units]",
+                3);
+  canvas_vel_proj->SaveAs("x_y_z_vel_projections.png");
+}
+
+void mods_data_3d()
+{
+  auto canvas_mods = new TCanvas(
+      "canvas_mods", "Means of the magnitude of pos and vel", 0, 0, 1000, 1200);
+  canvas_mods->Divide(1, 2);
+  // Seventh graph: drawing the mean magnitude of position as a function of
+  // time
+  graph_1d(canvas_mods, "pos_mod3d.txt",
+           "mean distance from the origin as a function of "
+           "time;time [arb_units];x [arb_units]",
+           1);
+
+  // Eight graph: drawing the mean magnitude of position as a function of time
+  graph_1d(canvas_mods, "vel_mod3d.txt",
+           "mean speed a function of "
+           "time;time [arb_units];x [arb_units]",
+           2);
+  canvas_mods->SaveAs("Mean_distance_from_origin_mean_speed_3d.png");
+
+  // Ninth grap: drawing the mean distance over time
+  auto canvas_distance =
+      new TCanvas("canvas_distance", "Mean distance", 0, 0, 1000, 600);
+  graph_1d(canvas_distance, "distance3d.txt",
+           "mean distance as a function of "
+           "time;time [arb_units];x [arb_units]",
+           1);
+  canvas_distance->SaveAs("Mean_distance_3d.png");
 }

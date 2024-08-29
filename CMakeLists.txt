@@ -37,7 +37,9 @@ target_link_libraries(prove PRIVATE TBB::tbb TBB::tbbmalloc )
 target_compile_options(boidss PRIVATE -DDIM=2)
 add_executable(simulation boids.cpp doublevec.cpp base_run.cpp statistics.cpp simulation.cpp)
 target_link_libraries(simulation PRIVATE TBB::tbb TBB::tbbmalloc )
-
+add_executable(simulation3d boids.cpp doublevec.cpp base_run_3d.cpp statistics.cpp simulation.cpp)
+target_link_libraries(simulation3d PRIVATE TBB::tbb TBB::tbbmalloc )
+target_compile_options(simulation3d PRIVATE -DDIM=3)
 
 
 
