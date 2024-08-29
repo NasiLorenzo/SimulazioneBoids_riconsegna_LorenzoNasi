@@ -32,7 +32,8 @@ void update_id(boid& boid, const double view_range)
 {
   auto posit = boid.pos().begin();
   std::for_each(boid.GridID().begin(), boid.GridID().end(), [&](auto& ID_comp) {
-    ID_comp = static_cast<int>(std::floor(*posit / view_range) + 1);
+    ID_comp = static_cast<int>(
+        std::copysign((std::abs(std::floor(*posit / view_range)) + 1),*posit));
     ++posit;
   });
 }
@@ -102,8 +103,9 @@ void update_neighbors(boid const& boid_, std::vector<boid const*>& neighbors,
                       const double alpha, Criterion const criterion)
 {
   neighbors.clear();
-  std::array<int, 3> grid_range       = {-1, 0, 1};
-  std::size_t combinations_size = static_cast<std::size_t>(std::pow(3, params::dim));
+  std::array<int, 3> grid_range = {-1, 0, 1};
+  std::size_t combinations_size =
+      static_cast<std::size_t>(std::pow(3, params::dim));
 
   for (std::size_t i = 0; i < combinations_size; ++i) {
     GridID neighbor_ID;

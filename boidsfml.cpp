@@ -14,7 +14,7 @@ int main(int argc, char* argv[])
   sf::RenderWindow window(sf::VideoMode(interface.get_params().pixel[0], interface.get_params().pixel[1],desktop.bitsPerPixel),
                           "boids simulation");
   const sf::Time frameTime = sf::seconds(interface.get_params().deltaT);
-
+  std::cout<<"Arrow size: "<<interface.set_Arrowset().size()<<"\n";
   sf::Clock clock;
   int i=0;
   while (window.isOpen()) {

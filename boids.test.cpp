@@ -95,6 +95,38 @@ TEST_CASE("Testing rules")
 
   CHECK(stormo.set()[9].vel()[0] == doctest::Approx(2550.077778));
   CHECK(stormo.set()[9].vel()[1] == doctest::Approx(424.5));
+
+  //checking the positions 
+
+  CHECK(stormo.set()[0].pos()[0] == doctest::Approx(754.558));
+  CHECK(stormo.set()[0].pos()[1] == doctest::Approx(170.409));
+
+  CHECK(stormo.set()[1].pos()[0] == doctest::Approx(499.891));
+  CHECK(stormo.set()[1].pos()[1] == doctest::Approx(293.668));
+
+  CHECK(stormo.set()[2].pos()[0] == doctest::Approx(866.024));
+  CHECK(stormo.set()[2].pos()[1] == doctest::Approx(235.090));
+
+  CHECK(stormo.set()[3].pos()[0] == doctest::Approx(1126.41));
+  CHECK(stormo.set()[3].pos()[1] == doctest::Approx(111.505));
+
+  CHECK(stormo.set()[4].pos()[0] == doctest::Approx(139.743));
+  CHECK(stormo.set()[4].pos()[1] == doctest::Approx(548.483));
+
+  CHECK(stormo.set()[5].pos()[0] == doctest::Approx(250.854));
+  CHECK(stormo.set()[5].pos()[1] == doctest::Approx(475.15));
+
+  CHECK(stormo.set()[6].pos()[0] == doctest::Approx(444.187));
+  CHECK(stormo.set()[6].pos()[1] == doctest::Approx(421.075));
+
+  CHECK(stormo.set()[7].pos()[0] == doctest::Approx(-41.738));
+  CHECK(stormo.set()[7].pos()[1] == doctest::Approx(447.15));
+
+  CHECK(stormo.set()[8].pos()[0] == doctest::Approx(33.9656));
+  CHECK(stormo.set()[8].pos()[1] == doctest::Approx(172.483));
+
+  CHECK(stormo.set()[9].pos()[0] == doctest::Approx(995.0026));
+  CHECK(stormo.set()[9].pos()[1] == doctest::Approx(429.15));
 }
 
 TEST_CASE("Testing multiple iterations of the rules")
