@@ -99,7 +99,6 @@ struct gridID_hash
 {
   inline std::size_t operator()(GridID const& other) const noexcept
   {
-    int i       = 1;
     auto result = std::hash<int>{}(other[0]);
     std::for_each(other.begin() + 1, other.end(), [&](auto& ID_comp) {
       result ^= std::hash<int>{}(ID_comp) /*+ 0x9e3779b9*/ + (result << 6)
@@ -323,11 +322,11 @@ class Flock
     std::for_each(set_.begin(), set_.end(), [&params](auto& boid) {
       update_id(boid.boid(), params.view_range);
     });
-    update_hashMap(params);
+    update_hashMap();
     std::for_each(set_.begin(), set_.end(), [&params](auto& boid) {
       update_id(boid.boid(), params.view_range);
     });
-    update_hashMap(params);
+    update_hashMap();
   }
   auto& set() const
   {
@@ -352,7 +351,7 @@ class Flock
   {
     return set_.size();
   }
-  void update_hashMap(ParamList const& params);
+  void update_hashMap();
   void update(ParamList const& params);
 };
 

@@ -103,7 +103,7 @@ void update_neighbors(boid const& boid_, std::vector<boid const*>& neighbors,
 {
   neighbors.clear();
   std::array<int, 3> grid_range       = {-1, 0, 1};
-  const std::size_t combinations_size = std::pow(3, params::dim);
+  std::size_t combinations_size = static_cast<std::size_t>(std::pow(3, params::dim));
 
   for (std::size_t i = 0; i < combinations_size; ++i) {
     GridID neighbor_ID;
@@ -246,7 +246,7 @@ std::vector<BoidState> generate_flock(std::default_random_engine& eng,
   return set;
 }
 
-void Flock::update_hashMap(ParamList const& params)
+void Flock::update_hashMap()
 {
   // auto t1=high_resolution_clock::now();
   hashMap_.clear();
@@ -275,7 +275,7 @@ void Flock::update(ParamList const& params)
                   [&](auto& boid) { posvel_update(boid, params); });
   };
   std::visit(update_neighbors_rules, params.ExecPolicy);
-  update_hashMap(params);
+  update_hashMap();
 }
 
 } // namespace boids
