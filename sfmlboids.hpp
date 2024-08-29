@@ -23,7 +23,7 @@ class SFML_interface
   std::vector<sf::ConvexShape> Arrowset{};
   std::vector<RGB> colorvec;
   std::random_device r;
-  std::default_random_engine eng{1};
+  std::default_random_engine eng{r()};
   Flock set;
 
  public:

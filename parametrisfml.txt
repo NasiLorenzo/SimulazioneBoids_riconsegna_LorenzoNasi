@@ -4,14 +4,14 @@ cohesion_factor         0.08
 view_range       40    //distanza di vicinanza, per le regole 2 e 3
 repulsion_range  15     //distanza di repulsione, per la regola 1
 border_repulsion       7      //parametro di repulsione ai bordi dell'area di generazione
-alpha            0.55  //metà dell'angolo visivo in funzione di pi greco
-speedlimit       100    // limiti superiori e inferiori di velocità
+alpha            0.7  //metà dell'angolo visivo in funzione di pi greco
+speedlimit       200    // limiti superiori e inferiori di velocità
 speedminimum     80     
 deltaT           0.0333 //granularità della discretizzazione della simulazione, coincidente con 1/framerate
-size             5000  //numero totale di boids
-flocksize        5000  //dimensione di ogni stormo
+size             2000  //numero totale di boids
+flocksize        2000  //dimensione di ogni stormo
 pixel.x          1510   //dimensioni della finestra in pixel
 pixel.y          910
-rate             3     //rapporto tra l'area di generazione e la dimensione in pixel della finestra
+rate             2     //rapporto tra l'area di generazione e la dimensione in pixel della finestra
 bordersize       50     //distanza dal bordo da cui si inizia ad applicare la repulsione ai bordi, in pixel
 sigma            100    //sigma della distribuzione binomiale delle velocità

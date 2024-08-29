@@ -73,6 +73,8 @@ struct ParamList
           pixel[0] = static_cast<unsigned int>(value);
         else if (name == "pixel.y")
           pixel[1] = static_cast<unsigned int>(value);
+        else if (name == "pixel.z" && params::dim == 3)
+          pixel[2] = static_cast<unsigned int>(value);
         else if (name == "rate")
           rate = value;
         else if (name == "bordersize")
@@ -332,12 +334,12 @@ class Flock
     return set_;
   }
 
-  auto& set() 
+  auto& set()
   {
     return set_;
   }
 
-  auto& hashMap() 
+  auto& hashMap()
   {
     return this->hashMap_;
   }
