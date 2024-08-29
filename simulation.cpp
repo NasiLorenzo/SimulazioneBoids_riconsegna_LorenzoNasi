@@ -74,7 +74,7 @@ void Simulation::loop(std::string const& output_position_plot,
     unsigned int update_rate{};
     while (updates <= 0 || update_rate <= 0) {
       std::cout
-          << "Inserisci updates e update_rate, entrambi maggiori di zero: ";
+          << "Insert updates and update_rate, both greater than zero: ";
       std::cin >> updates >> update_rate;
     }
     std::ofstream pos_file{output_position_plot};
@@ -84,8 +84,8 @@ void Simulation::loop(std::string const& output_position_plot,
     std::ofstream distance_file{output_distance_plot};
     if (pos_file.is_open() && vel_file.is_open() && pos_mod_file.is_open()
         && vel_mod_file.is_open() && distance_file.is_open()) {
-      std::cout << "Inizio simulazione per " << updates * update_rate
-                << " iterazioni\n";
+      std::cout << "Starting simulation for " << updates * update_rate
+                << " iterations\n";
       pos_file << updates << "\n";
       vel_file << updates << "\n";
       pos_mod_file << updates << "\n";
@@ -117,7 +117,7 @@ void Simulation::loop(std::string const& output_position_plot,
                       << temp_stats.distance_stats.result().sigma << "\n";
 
         // std::cout << "fine loop " << "\n";
-        std::cout << "%" << std::flush;
+        std::cout << "." << std::flush;
       }
       std::cout << "End of simulation, results collected " << "\n";
       pos_file.close();

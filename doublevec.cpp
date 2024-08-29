@@ -22,13 +22,19 @@ DoubleVec& operator*=(DoubleVec& a, double const b)
 DoubleVec operator*(DoubleVec const& a, const double b)
 {
   auto result{a};
-  return result*=b;
+  return result *= b;
 }
 
-DoubleVec operator/(DoubleVec& b, const double a)
+DoubleVec& operator/=(DoubleVec& b, const double a)
 {
   std::for_each(b.begin(), b.end(), [&a](double& x) { x = x / a; });
   return b;
+}
+
+DoubleVec operator/(DoubleVec const& b, const double a)
+{
+  auto result{b};
+  return result /= a;
 }
 
 DoubleVec& operator+=(DoubleVec& a, DoubleVec const& b)
@@ -58,19 +64,21 @@ double mod(DoubleVec const& vec)
 void normalize(DoubleVec& vec)
 {
   auto modulo = mod(vec);
-  if (modulo == 0)
-    modulo = 1.;
-  vec / modulo;
+  if (modulo != 0)
+    vec /= modulo;
 }
 
-double distance(DoubleVec const& a, DoubleVec const& b)
+double distance_squared(DoubleVec const& a, DoubleVec const& b)
 {
   return std::transform_reduce(
       a.begin(), a.end(), b.begin(), 0., std::plus<>(),
       [](double c, double d) { return pow(c - d, 2); });
 }
 
-double cos_angle_between(DoubleVec const& a, DoubleVec const& b)
+double cos_angle_between(
+    DoubleVec const& a,
+    DoubleVec const& b) // if one of the vectors is zero, the result is zero, but should be
+                        // undefined. Anyway this can never occur because of implicit conditions on the input
 {
   auto c = a;
   auto d = b;

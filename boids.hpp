@@ -282,6 +282,10 @@ void update_neighbors(boid const& boid_, std::vector<boid const*>& neighbors,
                       MyHashMap const& map, const double align_distance,
                       const double alpha, Criterion const criterion);
 
+std::vector<GridID> update_neighbors_testing(boid const& boid_, std::vector<boid const*>& neighbors,
+                      MyHashMap const& map, const double align_distance,
+                      const double alpha, Criterion const criterion);
+
 void update_close_neighbors(boid const& boid_,
                             std::vector<boid const*>& close_neighbors,
                             std::vector<boid const*> const& set,

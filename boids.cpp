@@ -32,8 +32,7 @@ void update_id(boid& boid, const double view_range)
 {
   auto posit = boid.pos().begin();
   std::for_each(boid.GridID().begin(), boid.GridID().end(), [&](auto& ID_comp) {
-    ID_comp = static_cast<int>(
-        std::copysign((std::abs(std::floor(*posit / view_range)) + 1),*posit));
+    ID_comp = static_cast<int>(std::floor(*posit / view_range)+1);
     ++posit;
   });
 }
@@ -69,7 +68,7 @@ bool is_neighbor(boid const& boid_, boid const& neighbor,
                  const double view_range, const double alpha,
                  Criterion criterion)
 {
-  auto distanza = distance(boid_.pos(), neighbor.pos());
+  auto distanza = distance_squared(boid_.pos(), neighbor.pos());
   if (distanza < pow(view_range, 2) && distanza != 0 /*&neighbor != &boid_*/
       && (criterion == Criterion::any
           || (criterion == Criterion::similar
@@ -98,6 +97,7 @@ void add_neighbors(GridID const& neighborID, boid const& boid_,
   });
 }
 
+
 void update_neighbors(boid const& boid_, std::vector<boid const*>& neighbors,
                       MyHashMap const& map, const double align_distance,
                       const double alpha, Criterion const criterion)
@@ -115,12 +115,34 @@ void update_neighbors(boid const& boid_, std::vector<boid const*>& neighbors,
       neighbor_ID[j] = grid_range[index % 3] + boid_.GridID()[j];
       index /= 3;
     }
-    // std::cout<<"la dimensione di comb è "<<combination.size()<<"\n";
-    // std::cout << "controllo vicini in: (" << combination[0] << ", "
-    //         << combination[1] <<" e "<<combination[2]<< ")\n";
     add_neighbors(neighbor_ID, boid_, align_distance, alpha, criterion, map,
                   neighbors);
   }
+}
+
+std::vector<GridID>
+update_neighbors_testing(boid const& boid_, std::vector<boid const*>& neighbors,
+                         MyHashMap const& map, const double align_distance,
+                         const double alpha, Criterion const criterion)
+{
+  neighbors.clear();
+  std::array<int, 3> grid_range = {-1, 0, 1};
+  std::size_t combinations_size =
+      static_cast<std::size_t>(std::pow(3, params::dim));
+  std::vector<GridID> all_combinations{};
+  for (std::size_t i = 0; i < combinations_size; ++i) {
+    GridID neighbor_ID;
+    std::size_t index = i;
+
+    for (std::size_t j = 0; j < params::dim; ++j) {
+      neighbor_ID[j] = grid_range[index % 3] + boid_.GridID()[j];
+      index /= 3;
+    }
+    all_combinations.push_back(neighbor_ID);
+    add_neighbors(neighbor_ID, boid_, align_distance, alpha, criterion, map,
+                  neighbors);
+  }
+  return all_combinations;
 }
 
 void update_close_neighbors(boid const& boid_,
@@ -130,7 +152,7 @@ void update_close_neighbors(boid const& boid_,
 {
   close_neighbors.clear();
   std::for_each(neighbors.begin(), neighbors.end(), [&](auto& neighbor) {
-    auto distanza = distance(boid_.pos(), neighbor->pos());
+    auto distanza = distance_squared(boid_.pos(), neighbor->pos());
     if (distanza < pow(repulsion_distance, 2)
         && /*neighbor != &boid_*/ distanza != 0) {
       close_neighbors.emplace_back(neighbor);

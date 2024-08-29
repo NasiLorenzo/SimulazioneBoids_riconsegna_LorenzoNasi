@@ -39,7 +39,7 @@ void FlockStats::build_distance_stats(std::vector<BoidState> const& flock)
     std::for_each(next_iter, flock.end(),
                   [&](auto& neighbor) { // executing diagonal search
                     distance_stats.add(
-                        sqrt(distance(boid.pos(), neighbor.pos())));
+                        sqrt(distance_squared(boid.pos(), neighbor.pos())));
                   });
   });
 }

@@ -55,12 +55,7 @@ TEST_CASE("Testing rules in 3 dimensions,just repeating the old test")
                              boid6, boid7, boid8, boid9, boid10};
 
   Flock stormo{set, params};
-  std::cout << "Initial velocities:\n";
-  for (const auto& boid : stormo.set()) {
-    std::cout << "Boid velocity: (" << boid.vel()[0] << ", " << boid.vel()[1]
-              << ")\n";
-  }
-
+  
   stormo.update(params);
 
   REQUIRE(stormo.size() == 10);
@@ -94,8 +89,8 @@ TEST_CASE("Testing rules in 3 dimensions,just repeating the old test")
 
   CHECK(stormo.set()[9].vel()[1] == doctest::Approx(2550.077778));
   CHECK(stormo.set()[9].vel()[2] == doctest::Approx(424.5));
-  
-  //testing the positions;
+
+  // testing the positions;
 
   CHECK(stormo.set()[0].pos()[1] == doctest::Approx(754.558));
   CHECK(stormo.set()[0].pos()[2] == doctest::Approx(170.409));
@@ -127,9 +122,6 @@ TEST_CASE("Testing rules in 3 dimensions,just repeating the old test")
   CHECK(stormo.set()[9].pos()[1] == doctest::Approx(995.0026));
   CHECK(stormo.set()[9].pos()[2] == doctest::Approx(429.15));
 
-  std::for_each(
-      stormo.set()[0].vel().begin(), stormo.set()[0].vel().end(),
-      [](auto& comp) { std::cout << "Print coordinate: " << comp << "\n"; });
 }
 
 TEST_CASE(
@@ -186,7 +178,42 @@ TEST_CASE(
   CHECK(stormo2.set()[3].vel()[1] == doctest::Approx(3121.0591));
 }
 
-TEST_CASE("Testing hash map search")
+TEST_CASE("Testing GridID"){
+  double view_range=100.;
+  boid test_boid_1{DoubleVec{80.,120.,210.},DoubleVec{0.,0.,0.}};
+  update_id(test_boid_1,view_range);
+  CHECK(test_boid_1.GridID_[0]==doctest::Approx(1));
+  CHECK(test_boid_1.GridID_[1]==doctest::Approx(2));
+  CHECK(test_boid_1.GridID_[2]==doctest::Approx(3));
+
+  boid test_boid_2{DoubleVec{-80.,-120.,-210.},DoubleVec{0.,0.,0.}};
+  update_id(test_boid_2,view_range);
+
+  CHECK(test_boid_2.GridID_[0]==doctest::Approx(0));
+  CHECK(test_boid_2.GridID_[1]==doctest::Approx(-1));
+  CHECK(test_boid_2.GridID_[2]==doctest::Approx(-2));
+
+  boid test_boid_3{DoubleVec{1000.,0.,-50.},DoubleVec{0.,0.,0.}};
+  update_id(test_boid_3,view_range);
+  CHECK(test_boid_3.GridID_[0]==doctest::Approx(11));
+  CHECK(test_boid_3.GridID_[1]==doctest::Approx(1));
+  CHECK(test_boid_3.GridID_[2]==doctest::Approx(0));
+}
+
+TEST_CASE("Testing hashing"){
+  GridID gridID_1{1,1,2};
+  GridID gridID_2{2,1,1};
+  GridID gridID_3{1,1,2};
+  GridID gridID_4{1,1,1};
+  GridID gridID_5{1,1,1};
+  GridID gridID_6{1,1,1};
+  gridID_hash hasher;
+  CHECK(hasher(gridID_1)!=hasher(gridID_2));
+  CHECK(hasher(gridID_3)!=hasher(gridID_4));
+  CHECK(hasher(gridID_5)==hasher(gridID_6));
+}
+
+TEST_CASE("Testing distances, view angle, grid")
 {
   ParamList params{};
   params.repulsion_factor = 0.7;
@@ -206,14 +233,63 @@ TEST_CASE("Testing hash map search")
   params.pixel[2]         = 1000;
   BoidState boid1;
   boid1.pos() = {50., 50., 50.};
-  boid1.vel() = {0., 300., -10.};
+  boid1.vel() = {10., 0., 0.};
   BoidState boid2;
-  boid2.pos() = {0., 500., 300.};
+  boid2.pos() = {-2., -2., -2.};
   boid2.vel() = {0., 5., 0.};
   BoidState boid3;
-  boid3.pos() = {0., 800., 250.};
-  boid3.vel() = {0., -88., 98.};
+  boid3.pos() = {50., 100., 50.};
+  boid3.vel() = {0., -10., 20.};
   BoidState boid4;
-  boid4.pos() = {0., 1000., 150.};
-  boid4.vel() = {0., 400., 77.};
+  boid4.pos() = {100., 150., 50.};
+  boid4.vel() = {0., 10., -10.};
+  Flock flock{std::vector<BoidState>{boid1, boid2, boid3, boid4}, params};
+  SUBCASE("Testing distances")
+  {
+    update_neighbors( // updating only the first boid's neighbors
+        flock.set()[0].boid(), flock.set()[0].neighbors(), flock.hashMap(),
+        params.view_range, params.alpha, Criterion::similar);
+    CHECK(flock.set()[0].neighbors().size() == doctest::Approx(2));
+    CHECK(distance_squared(flock.set()[0].pos(), flock.set()[1].pos())
+          == doctest::Approx(8112));
+    CHECK(distance_squared(flock.set()[0].pos(), flock.set()[2].pos())
+          == doctest::Approx(2500));
+    CHECK(distance_squared(flock.set()[0].pos(), flock.set()[3].pos())
+          == doctest::Approx(12500));
+  }
+
+  SUBCASE("Testing the grid range")
+  {
+    auto grid_range =
+        update_neighbors_testing( // creating the vector of checked locations
+            flock.set()[0].boid(), flock.set()[0].neighbors(), flock.hashMap(),
+            params.view_range, params.alpha, Criterion::any);
+    CHECK(flock.set()[0].GridID()[0] == doctest::Approx(1));
+    CHECK(grid_range.front()[0] == doctest::Approx(0));
+    CHECK(grid_range.front()[1] == doctest::Approx(0));
+    CHECK(grid_range.front()[2] == doctest::Approx(0));
+    CHECK(grid_range.back()[0] == doctest::Approx(2));
+    CHECK(grid_range.back()[1] == doctest::Approx(2));
+    CHECK(grid_range.back()[2] == doctest::Approx(2));
+  }
+  SUBCASE("Testing the view angle")
+  {
+    params.alpha = 0.5 * M_PI; // redefine the angle and test again neighbors;
+    update_neighbors(flock.set()[0].boid(), flock.set()[0].neighbors(),
+                     flock.hashMap(), params.view_range, params.alpha,
+                     Criterion::similar);
+    CHECK(cos_angle_between(flock.set()[1].pos() - flock.set()[0].pos(),
+                            flock.set()[0].vel())
+          == doctest::Approx(-1 / sqrt(3)).epsilon(0.001));
+    CHECK(cos_angle_between(flock.set()[2].pos() - flock.set()[0].pos(),
+                            flock.set()[0].vel())
+          == doctest::Approx(0).epsilon(
+              0.001)); // this boid should get seen, but it doesn't since it's
+                       // right on the edge and std::cos(pi/)!=0.
+    CHECK(cos_angle_between(flock.set()[3].pos() - flock.set()[0].pos(),
+                            flock.set()[0].vel())
+          == doctest::Approx(0.4472).epsilon(0.001));
+    CHECK(std::cos(0.5 * M_PI) == doctest::Approx(6.12323 * std::pow(10, -17)));
+    CHECK(flock.set()[0].neighbors().size() == doctest::Approx(0));
+  }
 }

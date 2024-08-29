@@ -51,8 +51,8 @@ void graph_2d(std::string file, const char* title, const char* save_as)
   graph2D->Draw("err p0");
   graph2D->SaveAs(save_as);
 }
-void graph_1d_proj(TCanvas* canvas, std::string filename, const char* title,
-                   Int_t canvas_number)
+void graph_1d_proj_3d(TCanvas* canvas, std::string filename, const char* title,
+                      Int_t canvas_number)
 {
   std::ifstream infile(filename);
 
@@ -97,6 +97,59 @@ void graph_1d_proj(TCanvas* canvas, std::string filename, const char* title,
 
     i++;
   }
+
+  auto graph_proj =
+      new TGraphErrors(points_number, time, _coord, nullptr, sigma_coord);
+  graph_proj->SetTitle(title);
+  graph_proj->SetFillColor(1);
+  graph_proj->SetMarkerSize(0.8);
+  graph_proj->SetMarkerStyle(26);
+  graph_proj->SetMarkerColor(kRed);
+  graph_proj->SetLineColor(kBlack);
+  graph_proj->SetLineWidth(1);
+  graph_proj->SetLineStyle(1);
+  canvas->cd(canvas_number);
+  graph_proj->Draw("AP");
+}
+
+void graph_1d_proj(TCanvas* canvas, std::string filename, const char* title,
+                   Int_t canvas_number)
+{
+  std::ifstream infile(filename);
+
+  if (!infile) {
+    std::cerr << "file cannot be opened!" << std::endl;
+    return;
+  }
+  Int_t points_number;
+  Double_t *_coord = 0, *time = 0;
+  Double_t* sigma_coord = 0;
+  Double_t skip;
+  std::string line;
+  std::getline(infile, line);
+  std::istringstream iss(line);
+  iss >> points_number;
+  _coord      = new Double_t[points_number];
+  time        = new Double_t[points_number];
+  sigma_coord = new Double_t[points_number];
+  Int_t i     = 0;
+  while (std::getline(infile, line)) {
+    std::istringstream iss(line);
+    if (canvas_number == 1) {
+      if (!(iss >> _coord[i] >> sigma_coord[i] >> skip >> skip >> time[i])) {
+        throw std::runtime_error{"Not enough columns!"};
+      }
+    } else {
+      if (canvas_number == 2) {
+        if (!(iss >> skip >> skip >> _coord[i] >> sigma_coord[i] >> time[i])) {
+          throw std::runtime_error{"Not enough columns!"};
+        }
+      }
+    }
+
+    i++;
+  }
+
   auto graph_proj =
       new TGraphErrors(points_number, time, _coord, nullptr, sigma_coord);
   graph_proj->SetTitle(title);
@@ -218,25 +271,24 @@ void mods_data()
            1);
   canvas_distance->SaveAs("Mean_distance.png");
 }
-//Graphs for the 3d version
+// Graphs for the 3d version
 void pos_data_3d()
 {
-
   auto canvas_proj = new TCanvas("canvas_proj", "projection of the coordinates",
                                  0, 0, 1000, 1200);
   canvas_proj->Divide(2, 2);
   // First graph: showing the projection on the x_axis
-  graph_1d_proj(canvas_proj, "pos3d.txt",
+  graph_1d_proj_3d(canvas_proj, "pos3d.txt",
                 "x-coordinate of the center of mass as a function of "
                 "time;time [arb_units];x [arb_units]",
                 1);
   // Second graph : showing the projection on the y_axis
-  graph_1d_proj(canvas_proj, "pos3d.txt",
+  graph_1d_proj_3d(canvas_proj, "pos3d.txt",
                 "y-coordinate of the center of mass as a function of "
                 "time;time [arb_units];y [arb_units]",
                 2);
   // Second graph : showing the projection on the z_axis
-  graph_1d_proj(canvas_proj, "pos3d.txt",
+  graph_1d_proj_3d(canvas_proj, "pos3d.txt",
                 "z-coordinate of the center of mass as a function of "
                 "time;time [arb_units];z [arb_units]",
                 3);
@@ -244,24 +296,23 @@ void pos_data_3d()
 }
 void vel_data_3d()
 {
-  
   auto canvas_vel_proj =
       new TCanvas("canvas_vel_proj", "projection of the velocity components", 0,
                   0, 1000, 1200);
   canvas_vel_proj->Divide(2, 2);
   canvas_vel_proj->cd();
   // Fifth graph: showing the projection on the x_axis
-  graph_1d_proj(canvas_vel_proj, "vel3d.txt",
+  graph_1d_proj_3d(canvas_vel_proj, "vel3d.txt",
                 "x-coordinate of the mean velocity as a function of "
                 "time;time [arb_units];x [arb_units]",
                 1);
   // Sixth graph : showing the projection on the y_axis
-  graph_1d_proj(canvas_vel_proj, "vel3d.txt",
+  graph_1d_proj_3d(canvas_vel_proj, "vel3d.txt",
                 "y-coordinate of the mean velocity as a function of "
                 "time;time [arb_units];y [arb_units]",
                 2);
   // Sixth graph : showing the projection on the y_axis
-  graph_1d_proj(canvas_vel_proj, "vel3d.txt",
+  graph_1d_proj_3d(canvas_vel_proj, "vel3d.txt",
                 "z-coordinate of the mean velocity as a function of "
                 "time;time [arb_units];z [arb_units]",
                 3);

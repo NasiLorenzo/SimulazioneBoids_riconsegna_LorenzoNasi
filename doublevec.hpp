@@ -46,6 +46,8 @@ DoubleVec& operator*=(DoubleVec& a, const double b);
 
 DoubleVec operator*(DoubleVec const& a, const double b);
 
+DoubleVec& operator/=(DoubleVec& b, const double a);
+
 DoubleVec operator/(DoubleVec& b, const double a);
 
 DoubleVec& operator+=(DoubleVec& a, DoubleVec const& b);
@@ -58,7 +60,7 @@ double mod(DoubleVec const& vec);
 
 void normalize(DoubleVec& vec);
 
-double distance(DoubleVec const& a, DoubleVec const& b);
+double distance_squared(DoubleVec const& a, DoubleVec const& b);
 
 double cos_angle_between(DoubleVec const& a, DoubleVec const& b);
 } // namespace boids

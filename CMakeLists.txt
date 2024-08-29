@@ -48,7 +48,7 @@ if (BUILD_TESTING)
 
   # aggiungi l'eseguibile all.t
   add_executable(boids.t boids.cpp boids.test.cpp doublevec.cpp) 
-  add_executable(boids3d.t boids.test3d.cpp boids.cpp doublevec.cpp)
+  add_executable(boids3d.t doublevec.cpp boids.cpp boids.test3d.cpp)
   target_link_libraries(boids.t PRIVATE TBB::tbb TBB::tbbmalloc)
   target_link_libraries(boids3d.t PRIVATE TBB::tbb TBB::tbbmalloc)
   target_compile_options(boids3d.t PRIVATE -DDIM=3)

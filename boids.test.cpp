@@ -3,6 +3,23 @@
 #include "doctest.h"
 using namespace boids;
 
+TEST_CASE("Testing mod and normalize")
+{
+  DoubleVec vec1{1., 1.};
+  DoubleVec vec2{0., 0.};
+  DoubleVec vec3{2., 1.};
+
+  CHECK(mod(vec1) == doctest::Approx(std::sqrt(2)));
+  CHECK(mod(vec3) == doctest::Approx(std::sqrt(5)));
+  CHECK(mod(vec2) == doctest::Approx(0));
+  normalize(vec1);
+  normalize(vec2);
+  normalize(vec3);
+  CHECK(mod(vec1) == doctest::Approx(1));
+  CHECK(mod(vec3) == doctest::Approx(1));
+  CHECK(mod(vec2) == doctest::Approx(0));
+}
+
 TEST_CASE("Testing rules")
 {
   ParamList params{};
@@ -58,8 +75,8 @@ TEST_CASE("Testing rules")
 
   std::cout << "Initial velocities:\n";
   for (const auto& boid : stormo.set()) {
-    std::cout << "Boid velocity: (" << boid.vel()[0] << ", "
-              << boid.vel()[1] << ")\n";
+    std::cout << "Boid velocity: (" << boid.vel()[0] << ", " << boid.vel()[1]
+              << ")\n";
   }
 
   stormo.update(params);
@@ -96,7 +113,7 @@ TEST_CASE("Testing rules")
   CHECK(stormo.set()[9].vel()[0] == doctest::Approx(2550.077778));
   CHECK(stormo.set()[9].vel()[1] == doctest::Approx(424.5));
 
-  //checking the positions 
+  // checking the positions
 
   CHECK(stormo.set()[0].pos()[0] == doctest::Approx(754.558));
   CHECK(stormo.set()[0].pos()[1] == doctest::Approx(170.409));
@@ -169,8 +186,8 @@ TEST_CASE("Testing multiple iterations of the rules")
   stormo2.update(params);
   stormo2.update(params);
   for (auto& boid : stormo2.set()) {
-    std::cout << "Le velocità sono: " << boid.vel()[0] << ", "
-              << boid.vel()[1] << "\n";
+    std::cout << "Le velocità sono: " << boid.vel()[0] << ", " << boid.vel()[1]
+              << "\n";
   }
 
   REQUIRE(stormo2.size() == 4);
@@ -228,12 +245,9 @@ TEST_CASE("Testing the speed limits")
   SUBCASE("Testing the vel()ocity after the adjustment")
   {
     CHECK(boids::mod(boids[0].vel()) == doctest::Approx(300.167));
-    CHECK(boids::mod(boids[1].vel())
-          == doctest::Approx(params.speedminimum));
-    CHECK(boids::mod(boids[2].vel())
-          == doctest::Approx(params.speedminimum));
-    CHECK(boids::mod(boids[3].vel())
-          == doctest::Approx(params.speedlimit));
+    CHECK(boids::mod(boids[1].vel()) == doctest::Approx(params.speedminimum));
+    CHECK(boids::mod(boids[2].vel()) == doctest::Approx(params.speedminimum));
+    CHECK(boids::mod(boids[3].vel()) == doctest::Approx(params.speedlimit));
   }
 }
 
@@ -283,8 +297,7 @@ TEST_CASE("Testing boid sight") // each boid contains itself in the vector of
     std::vector<BoidState> pair1{boid1, boid2};
     boids::Flock stormo_1{pair1, params};
     stormo_1.update(params);
-    CHECK(boids::cos_angle_between(boid2.pos() - boid1.pos(),
-                                   boid1.vel())
+    CHECK(boids::cos_angle_between(boid2.pos() - boid1.pos(), boid1.vel())
           == doctest::Approx(cos(0)).epsilon(0.001));
     CHECK(stormo_1.set()[0].neighbors().size() == 1);
   }
@@ -294,8 +307,7 @@ TEST_CASE("Testing boid sight") // each boid contains itself in the vector of
     std::vector<BoidState> pair2{boid1, boid3};
     Flock stormo_2{pair2, params};
     stormo_2.update(params);
-    CHECK(boids::cos_angle_between(boid3.pos() - boid1.pos(),
-                                   boid1.vel())
+    CHECK(boids::cos_angle_between(boid3.pos() - boid1.pos(), boid1.vel())
           == doctest::Approx(cos(1.2490)).epsilon(0.001));
     CHECK(stormo_2.set()[0].neighbors().size() == 0);
   }
@@ -305,8 +317,7 @@ TEST_CASE("Testing boid sight") // each boid contains itself in the vector of
     std::vector<BoidState> pair3{boid1, boid4};
     Flock stormo_3{pair3, params};
     stormo_3.update(params);
-    CHECK(boids::cos_angle_between(boid4.pos() - boid1.pos(),
-                                   boid1.vel())
+    CHECK(boids::cos_angle_between(boid4.pos() - boid1.pos(), boid1.vel())
           == doctest::Approx(cos(3.798)).epsilon(0.001));
     CHECK(stormo_3.set()[0].neighbors().size() == 0);
   }
@@ -316,8 +327,7 @@ TEST_CASE("Testing boid sight") // each boid contains itself in the vector of
     std::vector<BoidState> pair4{boid1, boid5};
     Flock stormo_4{pair4, params};
     stormo_4.update(params);
-    CHECK(boids::cos_angle_between(boid5.pos() - boid1.pos(),
-                                   boid1.vel())
+    CHECK(boids::cos_angle_between(boid5.pos() - boid1.pos(), boid1.vel())
           == doctest::Approx(cos(M_PI)).epsilon(0.001));
     CHECK(stormo_4.set()[0].neighbors().size() == 0);
   }
@@ -359,7 +369,7 @@ TEST_CASE("Testing the limit distance")
     std::vector<BoidState> pair1{boid1, boid2};
     Flock stormo_1{pair1, params};
     stormo_1.update(params);
-    CHECK(sqrt(distance(boid1.pos(), boid2.pos()))
+    CHECK(sqrt(distance_squared(boid1.pos(), boid2.pos()))
           == doctest::Approx(832.165));
     CHECK(stormo_1.set()[0].neighbors().size() == 0);
   }
@@ -368,17 +378,46 @@ TEST_CASE("Testing the limit distance")
     std::vector<BoidState> pair2{boid1, boid3};
     Flock stormo_2{pair2, params};
     stormo_2.update(params);
-    CHECK(sqrt(distance(boid1.pos(), boid3.pos()))
+    CHECK(sqrt(distance_squared(boid1.pos(), boid3.pos()))
           == doctest::Approx(5.38516));
     CHECK(stormo_2.set()[0].neighbors().size() == 1);
   }
 }
 
-TEST_CASE("Testing the hashing")
+TEST_CASE("Testing GridID")
 {
-  boids::MyHashMap map{};
-  boids::GridID test_id{};
+  double view_range = 100.;
+  boid test_boid_1{DoubleVec{80., 120.}, DoubleVec{0., 0.}};
+  update_id(test_boid_1, view_range);
+  CHECK(test_boid_1.GridID_[0] == doctest::Approx(1));
+  CHECK(test_boid_1.GridID_[1] == doctest::Approx(2));
+
+  boid test_boid_2{DoubleVec{-80., -120.}, DoubleVec{0., 0.}};
+  update_id(test_boid_2, view_range);
+
+  CHECK(test_boid_2.GridID_[0] == doctest::Approx(0));
+  CHECK(test_boid_2.GridID_[1] == doctest::Approx(-1));
+
+  boid test_boid_3{DoubleVec{1000., 0.}, DoubleVec{0., 0.}};
+  update_id(test_boid_3, view_range);
+  CHECK(test_boid_3.GridID_[0] == doctest::Approx(11));
+  CHECK(test_boid_3.GridID_[1] == doctest::Approx(1));
 }
+
+TEST_CASE("Testing hashing")
+{
+  GridID gridID_1{2, 1};
+  GridID gridID_2{1, 2};
+  GridID gridID_3{1, 1};
+  GridID gridID_4{2, 2};
+  GridID gridID_5{1, 1};
+  GridID gridID_6{1, 1};
+  gridID_hash hasher;
+  CHECK(hasher(gridID_1) != hasher(gridID_2));
+  CHECK(hasher(gridID_3) != hasher(gridID_4));
+  CHECK(hasher(gridID_5) == hasher(gridID_6));
+}
+
 TEST_CASE("Testing boids in limit cases")
 {
   SUBCASE("Testing if boids on the same spot see each others")
