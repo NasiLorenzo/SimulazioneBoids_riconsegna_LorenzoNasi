@@ -75,7 +75,9 @@ bool is_neighbor(boid const& boid_, boid const& neighbor,
               && boid_.flockID() == neighbor.flockID()))) {
     auto cosangolo =
         cos_angle_between(neighbor.pos() - boid_.pos(), boid_.vel());
-    if ((cosangolo) >= std::cos(alpha)) {
+    std::cout<<"cosangolo: "<<cosangolo<<" e cosalpha"<<std::cos(alpha)<<"\n";
+    std::cout<<"Stato angolo: "<<isgreaterequal((cosangolo),std::cos(alpha))<<"\n";
+    if (isgreaterequal((cosangolo),std::cos(alpha))) {
       return 1;
     } else {
       return 0;

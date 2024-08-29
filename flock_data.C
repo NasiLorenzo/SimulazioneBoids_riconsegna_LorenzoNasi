@@ -10,7 +10,7 @@
 #include <string>
 #include <vector>
 
-void graph_2d(std::string file, const char* title, const char* save_as)
+void graph_2d(std::string file, const char* title, const char* save_as, TCanvas* canvas)
 {
   std::ifstream infile(file);
 
@@ -41,15 +41,15 @@ void graph_2d(std::string file, const char* title, const char* save_as)
   auto graph2D = new TGraph2DErrors(points_number, _x, time, _y, sigma_x,
                                     nullptr, sigma_y);
   graph2D->SetTitle(title);
-  graph2D->SetFillColor(1);
+  graph2D->SetFillColor(kRed);
   graph2D->SetMarkerSize(0.8);
   graph2D->SetMarkerStyle(26);
   graph2D->SetMarkerColor(kRed);
   graph2D->SetLineColor(kBlack);
   graph2D->SetLineWidth(1);
   graph2D->SetLineStyle(3);
-  graph2D->Draw("err p0");
-  graph2D->SaveAs(save_as);
+  graph2D->Draw("err p1");
+  canvas->SaveAs(save_as);
 }
 void graph_1d_proj_3d(TCanvas* canvas, std::string filename, const char* title,
                       Int_t canvas_number)
@@ -196,7 +196,7 @@ void pos_data()
   graph_2d("pos.txt",
            "Center of mass of the flock as it varies in time;x "
            "[arb_units];time [arb_units];y [arb_units]",
-           "Center_of_mass_2D_plot.png");
+           "Center_of_mass_2D_plot.png",canvas);
 
   auto canvas_proj = new TCanvas("canvas_proj", "projection of the coordinates",
                                  0, 0, 1000, 1200);
@@ -224,7 +224,7 @@ void vel_data()
   graph_2d("vel.txt",
            "Mean components of the velocity as they vary in time;vel_x "
            "[arb_units];time [arb_units];vel_y [arb_units]",
-           "Velocities_2D_graph.png");
+           "Velocities_2D_graph.png",canvas_vel);
   auto canvas_vel_proj =
       new TCanvas("canvas_vel_proj", "projection of the velocity components", 0,
                   0, 1000, 1200);
