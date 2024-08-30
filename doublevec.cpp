@@ -72,7 +72,7 @@ double distance_squared(DoubleVec const& a, DoubleVec const& b)
 {
   return std::transform_reduce(
       a.begin(), a.end(), b.begin(), 0., std::plus<>(),
-      [](double c, double d) { return pow(c - d, 2); });
+      [](double c, double d) { return pow(c - d, 2.); });
 }
 
 double cos_angle_between(

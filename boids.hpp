@@ -31,59 +31,7 @@ struct ParamList
       ExecPolicy = std::execution::seq;
   double rate;
   ParamList() = default;
-  ParamList(std::string const& inputfile)
-      : ParamList{}
-  {
-    std::ifstream input{inputfile};
-    if (!input) {
-      throw std::runtime_error{"Input file not found"};
-      // return 1;
-    }
-    std::string line{};
-    while (std::getline(input, line)) {
-      std::istringstream inputline(line);
-      double value{};
-      std::string name{};
-      if (inputline >> name >> value) {
-        if (name == "repulsion_factor")
-          repulsion_factor = value;
-        else if (name == "steering_factor")
-          steering_factor = value;
-        else if (name == "cohesion_factor")
-          cohesion_factor = value;
-        else if (name == "view_range")
-          view_range = value;
-        else if (name == "repulsion_range")
-          repulsion_range = value;
-        else if (name == "border_repulsion")
-          border_repulsion = value;
-        else if (name == "alpha")
-          alpha = value * M_PI;
-        else if (name == "speedlimit")
-          speedlimit = value;
-        else if (name == "speedminimum")
-          speedminimum = value;
-        else if (name == "deltaT")
-          deltaT = static_cast<float>(value);
-        else if (name == "size")
-          size = static_cast<unsigned int>(value);
-        else if (name == "flocksize")
-          flocksize = static_cast<unsigned int>(value);
-        else if (name == "pixel.x")
-          pixel[0] = static_cast<unsigned int>(value);
-        else if (name == "pixel.y")
-          pixel[1] = static_cast<unsigned int>(value);
-        else if (name == "pixel.z" && params::dim == 3)
-          pixel[2] = static_cast<unsigned int>(value);
-        else if (name == "rate")
-          rate = value;
-        else if (name == "bordersize")
-          bordersize = value;
-        else if (name == "sigma")
-          sigma = value;
-      }
-    }
-  }
+  ParamList(std::string const& inputfile);
 };
 
 void check_parallelism(int argc, char* argv[], ParamList& params);

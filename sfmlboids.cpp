@@ -15,72 +15,67 @@ std::vector<RGB> generatecolors(std::default_random_engine& eng,
   return colorvec;
 }
 
-  ParamList parse_input(std::string const& inputfile){
-    ParamList params{};
-    std::ifstream input{inputfile};
-  if (!input) {
-    std::cerr << "File di input non trovato!\n";
-    //return 1;
+std::vector<sf::ConvexShape> buildArrowSet(unsigned int size,
+                                           std::vector<RGB> colorvec,
+                                           const double rate,
+                                           unsigned int flocksize)
+{
+  std::vector<sf::ConvexShape> arrowset{};
+  for (unsigned int i = 0; i < size; i++) {
+    sf::ConvexShape arrow;
+    float arrowlength = 10 / static_cast<float>(rate);
+    float arrowidth   = 5 / static_cast<float>(rate);
+    arrow.setPointCount(3);
+    arrow.setPoint(0, sf::Vector2f(arrowlength, 0));
+    arrow.setPoint(1, sf::Vector2f(0, -arrowidth / 2));
+    arrow.setPoint(2, sf::Vector2f(0, arrowidth / 2));
+    arrow.setOrigin(arrowlength / 2, 0);
+    arrow.setFillColor(sf::Color(colorvec[i / flocksize].red,
+                                 colorvec[i / flocksize].green,
+                                 colorvec[i / flocksize].blue));
+    arrowset.push_back(arrow);
   }
-  std::string line{};
-  while (std::getline(input, line)) {
-    std::istringstream inputline(line);
-    double value{};
-    std::string name{};
-    if (inputline >> name >> value) {
-      if (name == "repulsion_factor")
-        params.repulsion_factor = value;
-      else if (name == "steering_factor")
-        params.steering_factor = value;
-      else if (name == "cohesion_factor")
-        params.cohesion_factor = value;
-      else if (name == "view_range")
-        params.view_range = value;
-      else if (name == "repulsion_range")
-        params.repulsion_range = value;
-      else if (name == "border_repulsion")
-        params.border_repulsion = value;
-      else if (name == "alpha")
-        params.alpha = value * M_PI;
-      else if (name == "speedlimit")
-        params.speedlimit = value;
-      else if (name == "speedminimum")
-        params.speedminimum = value;
-      else if (name == "deltaT")
-        params.deltaT = static_cast<float>(value);
-      else if (name == "size")
-        params.size = static_cast<unsigned int>(value);
-      else if (name == "flocksize")
-        params.flocksize = static_cast<unsigned int>(value);
-      else if (name == "pixel.x")
-        params.pixel[0] = static_cast<unsigned int>(value);
-      else if (name == "pixel.y")
-        params.pixel[1] = static_cast<unsigned int>(value);
-      else if (name == "rate")
-        params.rate = value;
-      else if (name == "bordersize")
-        params.bordersize = value;
-      else if (name == "sigma")
-        params.sigma = value;
+  return arrowset;
+}
+
+void SFML_Interface::run()
+{
+  const sf::Time frameTime = sf::seconds(params_.deltaT);
+  sf::Clock clock;
+  int i = 0;
+  while (window_.isOpen()) {
+    sf::Event evento;
+    while (window_.pollEvent(evento)) {
+      if (evento.type == sf::Event::Closed)
+        window_.close();
     }
-  }
-  return params;
-  }
+    auto t1 = std::chrono::high_resolution_clock::now();
+    clock.restart();
+    flock_.update(params_);
+    window_.clear(sf::Color::White);
 
-sf::ConvexShape buildArrow(unsigned int i, std::vector<RGB> colorvec, const double rate){
-  sf::ConvexShape arrow;
-      float arrowlength = 10 / static_cast<float>(rate);
-      float arrowidth   = 5 / static_cast<float>(rate);
-      arrow.setPointCount(3);
-      arrow.setPoint(0, sf::Vector2f(arrowlength, 0));
-      arrow.setPoint(1, sf::Vector2f(0, -arrowidth / 2));
-      arrow.setPoint(2, sf::Vector2f(0, arrowidth / 2));
-      arrow.setOrigin(arrowlength / 2, 0);
-      arrow.setFillColor(sf::Color(colorvec[i].red,
-                                    colorvec[i].green,
-                                    colorvec[i].blue));
-      return arrow;
+    auto boidit = flock_.set().begin();
+    for (auto& arrow : arrowset_) {
+      float angle = static_cast<float>(boids::angle(boidit->vel()));
+      arrow.setPosition(
+          static_cast<float>(boidit->pos()[0] / params_.rate),
+          static_cast<float>(boidit->pos()[1] / params_.rate));
+      arrow.setRotation(angle * 180 / static_cast<float>(M_PI));
+      window_.draw(arrow);
+      boidit++;
+    }
 
+    window_.display();
+    i++;
+    auto t2                                = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double, std::milli> ms_double = t2 - t1;
+    std::cout << "posizione primo boid "
+              << flock_.set()[0].pos()[0] << " " << i << "\n";
+    std::cout << ms_double.count() << "ms\n";
+    if (frameTime < clock.getElapsedTime())
+      std::cout << "Lag" << "\n";
+    sf::sleep(frameTime - clock.getElapsedTime());
+  }
 }
 
 } // namespace boids

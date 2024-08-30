@@ -16,36 +16,57 @@ void assigncolors(Flock& ensemble, std::vector<RGB> const& colorvec);
 
 ParamList parse_input(std::string const& inputfile);
 
-sf::ConvexShape buildArrow(unsigned int i, std::vector<RGB> colorvec, const double rate);
-class SFML_interface
+std::vector<sf::ConvexShape> buildArrowSet(unsigned int size,
+                                           std::vector<RGB> colorvec,
+                                           const double rate,
+                                           unsigned int flocksize);
+class SFML_Interface
 {
-  ParamList params{};
-  std::vector<sf::ConvexShape> Arrowset{};
-  std::vector<RGB> colorvec;
-  std::random_device r;
-  std::default_random_engine eng{r()};
-  Flock set;
-
  public:
-  SFML_interface(std::string const& inputfile)
-      : params{parse_input(inputfile)}
-      , colorvec{generatecolors(eng, params)}
-      , set{eng, params}
+  SFML_Interface(std::string const& inputfile, std::random_device& r)
+      : eng_{r()}
+      , params_{inputfile}
+      , colorvec_{generatecolors(eng_, params_)}
+      , arrowset_{buildArrowSet(params_.size, colorvec_, params_.rate,
+                                params_.flocksize)}
+      , flock_{eng_, params_}
+      , window_{sf::VideoMode(params_.pixel[0], params_.pixel[1],
+                              sf::VideoMode::getDesktopMode().bitsPerPixel),
+                "boids simulation"}
+  {}
+  void run();
+  auto& arrowset()
   {
-    for(unsigned int i=0;i<params.size;i++ ) {
-      Arrowset.push_back(buildArrow(set.set()[i].flockID(), colorvec,params.rate));
-    }
+    return arrowset_;
+  }
+  auto& arrowset() const
+  {
+    return arrowset_;
+  }
+  auto& params()
+  {
+    return params_;
+  }
+  auto& params() const
+  {
+    return params_;
+  }
+  auto& flock()
+  {
+    return flock_;
+  }
+  auto& flock() const
+  {
+    return flock_;
+  }
 
-  }
-  auto& set_Arrowset() {
-    return Arrowset;
-  }
-  auto& get_params(){
-    return params;
-  }
-  auto& get_flock(){
-    return set;
-  }
+ private:
+  std::default_random_engine eng_{};
+  ParamList params_{};
+  std::vector<RGB> colorvec_;
+  std::vector<sf::ConvexShape> arrowset_{};
+  Flock flock_;
+  sf::RenderWindow window_;
 };
 
 } // namespace boids

@@ -6,6 +6,102 @@ using std::chrono::duration;
 using std::chrono::duration_cast;
 using std::chrono::high_resolution_clock;
 using std::chrono::milliseconds;
+ParamList::ParamList(std::string const& inputfile)
+    : ParamList{}
+{
+  std::ifstream input{inputfile};
+  if (!input) {
+    throw std::runtime_error{"Input file not found"};
+  }
+  std::string line{};
+  while (std::getline(input, line)) {
+    std::istringstream inputline(line);
+    double value{};
+    std::string name{};
+    if (inputline >> name >> value) {
+      if (name == "repulsion_factor") {
+        repulsion_factor = value;
+        if (repulsion_factor < 0)
+          throw std::runtime_error{"repulsion factor must be non-negative"};
+      } else if (name == "steering_factor") {
+        steering_factor = value;
+        if (steering_factor < 0)
+          throw std::runtime_error{"steering factor must be non-negative"};
+      } else if (name == "cohesion_factor") {
+        cohesion_factor = value;
+        if (cohesion_factor<0)
+          throw std::runtime_error{"cohesion factor must be non-negative"};
+      } else if (name == "view_range") {
+        view_range = value;
+        if (view_range <= 0)
+          throw std::runtime_error{"view_range must be positive"};
+      } else if (name == "repulsion_range") {
+        repulsion_range = value;
+        if (repulsion_range <= 0)
+          throw std::runtime_error{"repulsion_range must be positive"};
+      } else if (name == "border_repulsion") {
+        border_repulsion = value;
+        if (border_repulsion <= 0)
+          throw std::runtime_error{"border_repulsion must be positive"};
+      } else if (name == "alpha") {
+        alpha = value * M_PI;
+        if (value < -1 || value > 1)
+          throw std::runtime_error{"alpha must be between -1 and 1"};
+      } else if (name == "speedlimit") {
+        speedlimit = value;
+        if (speedlimit <= 0)
+          throw std::runtime_error{"speedlimit must be positive"};
+      } else if (name == "speedminimum") {
+        speedminimum = value;
+        if (speedminimum <= 0)
+          throw std::runtime_error{"speedminimum must be positive"};
+        if (speedminimum >= speedlimit)
+          throw std::runtime_error{"speedminimum must be smaller speedlimit"};
+      } else if (name == "deltaT") {
+        deltaT = static_cast<float>(value);
+        if (deltaT <= 0)
+          throw std::runtime_error{"deltaT must be positive"};
+      } else if (name == "size") {
+        if (value <= 0)
+          throw std::runtime_error{"size must be positive"};
+        size = static_cast<unsigned int>(value);
+      } else if (name == "flocksize") {
+        if (value <= 0)
+          throw std::runtime_error{"flocksize must be positive"};
+        flocksize = static_cast<unsigned int>(value);
+        if (flocksize > size)
+          throw std::runtime_error{"flocksize must be smaller than size"};
+      } else if (name == "pixel.x") {
+        if (value <= 0)
+          throw std::runtime_error{"pixels must be positive"};
+        pixel[0] = static_cast<unsigned int>(value);
+      } else if (name == "pixel.y") {
+        if (value <= 0)
+          throw std::runtime_error{"pixels must be positive"};
+        pixel[1] = static_cast<unsigned int>(value);
+      } else if (name == "pixel.z" && params::dim == 3) {
+        if (value <= 0)
+          throw std::runtime_error{"pixels must be positive"};
+        pixel[2] = static_cast<unsigned int>(value);
+      } else if (name == "rate") {
+        rate = value;
+        if (rate <= 0)
+          throw std::runtime_error{"rate must be positive"};
+      } else if (name == "bordersize") {
+        bordersize = value;
+        if (bordersize < 0)
+          throw std::runtime_error{"bordersize must be non-negative"};
+      } else if (name == "sigma") {
+        sigma = value;
+        if (sigma <= 0)
+          throw std::runtime_error{"sigma must be positive"};
+      }
+    } else {
+      throw std::runtime_error{
+          "Can't properly read line in parameter initializer"};
+    }
+  }
+}
 
 void check_parallelism(int argc, char* argv[], ParamList& params)
 {
@@ -32,7 +128,7 @@ void update_id(boid& boid, const double view_range)
 {
   auto posit = boid.pos().begin();
   std::for_each(boid.GridID().begin(), boid.GridID().end(), [&](auto& ID_comp) {
-    ID_comp = static_cast<int>(std::floor(*posit / view_range)+1);
+    ID_comp = static_cast<int>(std::floor(*posit / view_range) + 1);
     ++posit;
   });
 }
@@ -75,9 +171,10 @@ bool is_neighbor(boid const& boid_, boid const& neighbor,
               && boid_.flockID() == neighbor.flockID()))) {
     auto cosangolo =
         cos_angle_between(neighbor.pos() - boid_.pos(), boid_.vel());
-    std::cout<<"cosangolo: "<<cosangolo<<" e cosalpha"<<std::cos(alpha)<<"\n";
-    std::cout<<"Stato angolo: "<<isgreaterequal((cosangolo),std::cos(alpha))<<"\n";
-    if (isgreaterequal((cosangolo),std::cos(alpha))) {
+    // std::cout<<"cosangolo: "<<cosangolo<<" e
+    // cosalpha"<<std::cos(alpha)<<"\n"; std::cout<<"Stato angolo:
+    // "<<isgreaterequal((cosangolo),std::cos(alpha))<<"\n";
+    if ((cosangolo) > std::cos(alpha)) {
       return 1;
     } else {
       return 0;
@@ -98,7 +195,6 @@ void add_neighbors(GridID const& neighborID, boid const& boid_,
       neighbors.push_back(neighbor.second);
   });
 }
-
 
 void update_neighbors(boid const& boid_, std::vector<boid const*>& neighbors,
                       MyHashMap const& map, const double align_distance,
