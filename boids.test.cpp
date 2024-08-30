@@ -67,17 +67,11 @@ TEST_CASE("Testing rules")
   boid10.pos() = {910., 415.};
   boid10.vel() = {-300., -200.};
 
-  std::cout << "dim vale: " << params::dim << "\n";
+  std::cout << "dim is: " << params::dim << "\n";
   std::vector<BoidState> set{boid1, boid2, boid3, boid4, boid5,
                              boid6, boid7, boid8, boid9, boid10};
 
   Flock stormo{set, params};
-
-  std::cout << "Initial velocities:\n";
-  for (const auto& boid : stormo.set()) {
-    std::cout << "Boid velocity: (" << boid.vel()[0] << ", " << boid.vel()[1]
-              << ")\n";
-  }
 
   stormo.update(params);
 
@@ -185,10 +179,6 @@ TEST_CASE("Testing multiple iterations of the rules")
   stormo2.update(params);
   stormo2.update(params);
   stormo2.update(params);
-  for (auto& boid : stormo2.set()) {
-    std::cout << "Le velocità sono: " << boid.vel()[0] << ", " << boid.vel()[1]
-              << "\n";
-  }
 
   REQUIRE(stormo2.size() == 4);
 

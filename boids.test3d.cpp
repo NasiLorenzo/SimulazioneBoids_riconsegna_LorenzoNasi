@@ -5,7 +5,7 @@ using namespace boids;
 
 TEST_CASE("Testing rules in 3 dimensions,just repeating the old test")
 {
-  std::cout << "dim vale: " << params::dim << "\n";
+  std::cout << "dim is: " << params::dim << "\n";
   ParamList params{};
   params.rate             = 1.;
   params.repulsion_factor = 0.7;
@@ -165,10 +165,6 @@ TEST_CASE(
   stormo2.update(params);
   stormo2.update(params);
   stormo2.update(params);
-  for (auto& boid : stormo2.set()) {
-    std::cout << "Le velocità sono: " << boid.vel()[1] << ", " << boid.vel()[2]
-              << "\n";
-  }
 
   REQUIRE(stormo2.size() == 4);
 
@@ -265,6 +261,8 @@ TEST_CASE("Testing distances, view angle, grid")
             flock.set()[0].boid(), flock.set()[0].neighbors(), flock.hashMap(),
             params.view_range, params.alpha, Criterion::any);
     CHECK(flock.set()[0].gridID()[0] == doctest::Approx(1));
+    CHECK(flock.set()[0].gridID()[1] == doctest::Approx(1));
+    CHECK(flock.set()[0].gridID()[2] == doctest::Approx(1));
     CHECK(grid_range.front()[0] == doctest::Approx(0));
     CHECK(grid_range.front()[1] == doctest::Approx(0));
     CHECK(grid_range.front()[2] == doctest::Approx(0));
