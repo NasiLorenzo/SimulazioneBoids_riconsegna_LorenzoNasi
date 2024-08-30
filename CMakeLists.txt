@@ -22,8 +22,8 @@ if(CMAKE_BUILD_TYPE STREQUAL "Release")
     add_compile_options(-O3 -DNDEBUG)
 endif()
 
-include_directories("/opt/homebrew/Cellar/sfml/2.6.1/include")
-include_directories("/opt/homebrew/Cellar/tbb/2021.13.0/include")
+#include_directories(YOUR_INCLUDE_PATH)
+#include_directories(YOUR_INCLUDE_PATH)
 
 find_package(TBB REQUIRED)
 find_package(SFML 2.5 COMPONENTS graphics REQUIRED)
