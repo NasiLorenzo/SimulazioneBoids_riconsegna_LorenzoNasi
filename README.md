@@ -1,7 +1,11 @@
 # Simulazione di boids
 
+---
+
 -[Introduzione](#introduzione)\\
 -[Indicazioni per la compilazione](#indicazioni-per-la-compilazione)
+
+---
 
 ## Introduzione
 Questa è una riconsegna individuale da parte di Lorenzo Nasi del progetto di gruppo nominato "Simulazione di boids su SFML", che aveva come altri componenti Tommaso Vicenzi e Alice Pezzi. Tommaso Vicenzi ha abbandonato il progetto.
