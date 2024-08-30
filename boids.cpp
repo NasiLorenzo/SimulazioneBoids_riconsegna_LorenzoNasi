@@ -142,7 +142,7 @@ auto random_boid(std::default_random_engine& eng, ParamList const& params)
 void update_id(Boid& boid, const double view_range) 
 {
   auto posit = boid.pos().begin();
-  std::for_each(boid.GridID().begin(), boid.GridID().end(), [&](auto& ID_comp) {
+  std::for_each(boid.gridID().begin(), boid.gridID().end(), [&](auto& ID_comp) {
     ID_comp = static_cast<int>(std::floor(*posit / view_range) + 1);
     ++posit;
   });
@@ -221,7 +221,7 @@ void update_neighbors(Boid const& boid_, std::vector<Boid const*>& neighbors,
     std::size_t index = i;
 
     for (std::size_t j = 0; j < params::dim; ++j) {
-      neighbor_ID[j] = grid_range[index % 3] + boid_.GridID()[j];
+      neighbor_ID[j] = grid_range[index % 3] + boid_.gridID()[j];
       index /= 3;
     }
     add_neighbors(neighbor_ID, boid_, align_distance, alpha, criterion, map,
@@ -244,7 +244,7 @@ update_neighbors_testing(Boid const& boid_, std::vector<Boid const*>& neighbors,
     std::size_t index = i;
 
     for (std::size_t j = 0; j < params::dim; ++j) {
-      neighbor_ID[j] = grid_range[index % 3] + boid_.GridID()[j];
+      neighbor_ID[j] = grid_range[index % 3] + boid_.gridID()[j];
       index /= 3;
     }
     all_combinations.push_back(neighbor_ID);
@@ -362,7 +362,7 @@ void Flock::update_hashMap()
 {
   hashMap_.clear();
   std::for_each(set_.begin(), set_.end(), [&](auto& boid) {
-    hashMap_.insert({boid.GridID(), &(boid.boid())});
+    hashMap_.insert({boid.gridID(), &(boid.boid())});
   });
 }
 

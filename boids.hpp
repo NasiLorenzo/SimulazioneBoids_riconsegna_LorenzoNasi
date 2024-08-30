@@ -48,11 +48,7 @@ bool operator==(GridID const& lhs, GridID const& rhs);
 
 class Boid
 {
-  DoubleVec pos_;
-  DoubleVec vel_;
-  GridID GridID_{};
-  unsigned int flockID_{0};
-public:
+ public:
   Boid(DoubleVec pos, DoubleVec vel)
       : pos_{pos}
       , vel_{vel}
@@ -88,14 +84,20 @@ public:
   {
     return this->flockID_;
   }
-  auto& GridID() const
+  auto& gridID() const
   {
-    return this->GridID_;
+    return this->gridID_;
   }
-  auto& GridID()
+  auto& gridID()
   {
-    return this->GridID_;
+    return this->gridID_;
   }
+
+ private:
+  DoubleVec pos_;
+  DoubleVec vel_;
+  GridID gridID_{};
+  unsigned int flockID_{0};
 };
 // custom hash_map
 using MyHashMap = std::unordered_multimap<GridID, Boid const*, gridID_hash>;
@@ -139,13 +141,13 @@ class BoidState
   {
     return boid_.flockID();
   }
-  auto& GridID() const
+  auto& gridID() const
   {
-    return boid_.GridID();
+    return boid_.gridID();
   }
-  auto& GridID()
+  auto& gridID()
   {
-    return boid_.GridID();
+    return boid_.gridID();
   }
 
   auto& boid() const

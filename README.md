@@ -52,3 +52,7 @@ Sono poi presenti 3 differenti eseguibili di testing: `boids.t` per il testing d
 
 ## Modifiche implementative
 
+### Boid e BoidState
+
+Le seguenti modifiche sono state apportate:
+La classe `BoidState` contiene ora la classe `Boid`, la quale contiene
