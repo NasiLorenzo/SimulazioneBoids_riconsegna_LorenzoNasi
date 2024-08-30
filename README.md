@@ -13,7 +13,7 @@ Questa è una riconsegna individuale da parte di Lorenzo Nasi del progetto di gr
 ### Principali modifiche 
 - modifica delle classi boidstate ed ensemble
 - rimozione dell'utilizzo simulaneo di template e polimorfismo, (ora nessuno dei due è presente)
-- completata flessibilità del codice di simulare stormi in 2 oppure 3 dimensioni
+- completata flessibilità del codice di simulare stormi in 2, 3 dimensioni (o potenzialmente a piacere)
 - implementazione di hashing spaziale per migliorare la performance e poter sostenere grandi aree generative su SFML
 - supporto alla parallelizzazione per migliorare la velocità di esecuzione (considerazioni successivamente)
 - implementazione delle statistiche dello stormo e produzione di grafici tramite ROOT
@@ -69,7 +69,7 @@ La classe `ensemble` è stata sostituita dalla classe `Flock`, che contiene il m
 In particolare, la funzione update esegue due `std::for_each` su tutti gli elementi di `set_`, il primo per aggiornare i vettori dei vicini dei boid e applicare le regole, il secondo per aggiornare le posizioni e le velocità dei boid. Per entrambi i cicli è possibile utilizzare una `ExecPolicy` parallela, con vettorizzazzione. Infine ricostruita la hash map con il metodo `update_hashMap`.
 ### Funzioni libere richiamate da `Flock::update()`
 
-- Le funzioni `speed_adjust`, `bordercheck`, e le regole di volo rimaste pressoché invariate a prima. E' stata aggiunta la funzione `random_boid` per generare un singolo boid casuale. Il `gridID` del boid viene aggiornato tramite la funzione `update_id`, secondo la convenzione per cui il quadrato della griglia più vicino all'origine, nel quadrante positivo, prende le coordinate (1,1) o (1,1,1) a seconda che ci si trovi in 2 o 3 dimensioni.
+- Le funzioni `speed_adjust`, `bordercheck`, e le regole di volo rimaste pressoché invariate a prima. E' stata aggiunta la funzione `random_boid` per generare un singolo boid casuale. Il `gridID` del boid viene aggiornato tramite la funzione `update_id`, secondo una convenzione trattata più avanti.
 
 - La funzione `is_neighbor` stabilisce se due boid sono vicini in base alla distanza, all'angolo di vista e al criterio di appartenenza allo stormo. In questa funzione, come in altre, vengono fatti confronti tra double, che possono dare risultati imprecisi, soprattuto quando si confrontano con lo zero, ma non è stato possibile trovare soluzioni soddisfacenti in tempo. Inoltre all'interno di questa funzione viene richiamata la funzione `cos_angle_between`, per calcolare l'angolo tra il vettore velocità di un boid, e il vettore differenza con un suo vicino. Quando uno dei due input è zero, la funzione restituisce 0, ma è in realtà indefinita, in quanto non si può stabilire un angolo. Invece di gestire questa possibilità all'interno della funzione, l'input viene garantito essere diverso da 0, in quanto il parametro `speedminimum` deve essere >0, mentre preliminarmente un boid non viene considerato come vicino se la `distanza==0`, escludendo quindi che il vettore differenza sia uguale a 0. La scelta di non considerare un boid che si trova sulla stessa posizione di un altro come vicino è stata fatta in quanto non è appunto possibile stabilire se in quel caso limite i due boid si vedano o meno, oltre ad essere una condizione rara e transitoria.
 
@@ -97,4 +97,31 @@ Inoltre è stato deciso di mantenere il parallelismo in quanto non causa altri e
 
 ### Hashing spaziale
 
-E' stato deciso di implementare un hashing spaziale per migliorare l'efficienza del programma, soprattutto quando l'area di generazione è molto più grande del range visivo di un boid. Normalmente, per controllare chi sono i vicini, un boid deve controllare su tutto lo stormo, e questo deve essere ripetuto per tutti i boid, producendo un algoritmo di ricerca di complessità media $O(n^2)$. Utilizzando una hash map, l'operazione di ricerca dei vicini per un singolo boid diventa compresa tra $O(1)$ e $O(n)$, dando quindi grandi vantaggi
+E' stato deciso di implementare un hashing spaziale per migliorare l'efficienza del programma, soprattutto quando l'area di generazione è molto più grande del range visivo di un boid. Normalmente, per controllare chi sono i vicini, un boid deve controllare su tutto lo stormo, e questo deve essere ripetuto per tutti i boid, producendo un algoritmo di ricerca di complessità $O(n^2)$, sia nel best-case che nel worst-case scenario. 
+
+Utilizzando una hash map, l'operazione di ricerca dei vicini per un singolo boid diventa compresa tra $O(1)$ e $O(n)$, dando quindi una complessità di ricerda di $O(n)$ nel best-case scenario. A questo si deve sommare la complessità dell'applicazione delle regole, che è di $O(n^2)$ nel worst-case scenario, ma che in media si avvicina di più a $O(n)$, in quanto in condizioni di equilibrio dinamico del sistema il numero di vicini per ogni boid non dipende dalla dimensione totale dello stormo.
+
+E' stato deciso di implementare un hashing spaziale per migliorare l'efficienza del programma, soprattutto quando l'area di generazione è molto più grande del range visivo di un boid. Normalmente, per controllare chi sono i vicini, un boid deve controllare su tutto lo stormo, e questo deve essere ripetuto per tutti i boid, producendo un algoritmo di ricerca di complessità media $O(n^2)$. Utilizzando una hash map, l'operazione di ricerca dei vicini per un singolo boid diventa compresa tra $O(1)$ e $O(n)$, dando quindi una complessità di ricerda di $O(n)$.
+
+La hash map è stata costruita in primo luogo utilizzando un contenitore associativo fornito dalla standard library, ovvero una `std::unordered_multimap`, che consente di creare un contenitore associativo non ordinato in cui è possibile avere elementi associati ad una stessa chiave, eventualmente anche coincidenti. I parametri di template della mappa sono il `GridID` come chiave e un `boid const*` come valore associato. Dato che GridID non è convertibile direttamente ad un `std::size_t` tramite `std::hash<typename>{}()`, è necessario creare un hasher personalizzato per il tipo `GridID`, in modo simile a `std::hash`. L'approccio che è stato utilizzato prende ispirazione dalla funzione `boost::hash_combine`, che dati due hash value, ne produce uno nuovo applicando delle operazioni bitwise nel seguente modo:
+```c++
+std::size_t gridID_hash::operator()(GridID const& other) const noexcept
+{
+  std::hash<int> int_hasher;
+  auto result = int_hasher(other[0]);
+  std::for_each(other.begin() + 1, other.end(), [&](auto& ID_comp) {
+    result ^= int_hasher(ID_comp)  + (result << 6) //+ 0x9e3779b9 optionally
+            + (result >> 2);
+  });
+  return result;
+}
+```
+La prima componente dell'`ID` viene quindi trasformata nell'hash value corrispondente, a cui successivamente viene applicato un __bitwise XOR__ insieme ad un __bitwise right shift__ e __left shift__, a cui si può anche aggiungere una costante grande per rendere più diluiti i risultati ed evitare la sovrapposizione nell'encoding. L'XOR è di base un buon metodo per creare combinare valori di tipo intero, ma è un operatore commutativo, il che significherebbe che (3,1) e (1,3) verrebbero per esempio mappati con lo stesso hash_value. Per questo motivo si aggiungono altre operazioni di bit shifting per creare una mappatura efficace.
+
+L'idea di base dell'hashing spaziale è quella immaginare una griglia sullo spazio di generazione, allineata con gli assi cartesiani, la quale esiste nel programma all'interno della funzione `update_id`, dettando quindi le regole matematiche per l'aggiornamento del gridID.
+
+La convenzione che ho scelto è quella qui mostrata: 
+```c++
+ID_comp = static_cast<int>(std::floor(pos_comp / view_range) + 1);
+```
+Viene così data priorità al quadrante positivo della generazione, per cui lo spazio (quadrato o cubo che sia), che si trova più vicino all'origine in questo quadrante abbia un `ID` di (1,1), o (1,1,1). Se mi muovo in una cordinata fino a superare un limite della griglia, la corrispettiva componente dell'`ID` aumenterà di 1.

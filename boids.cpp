@@ -117,9 +117,10 @@ void check_parallelism(int argc, char* argv[], ParamList& params)
 
 std::size_t gridID_hash::operator()(GridID const& other) const noexcept
 {
-  auto result = std::hash<int>{}(other[0]);
+  std::hash<int> int_hasher;
+  auto result = int_hasher(other[0]);
   std::for_each(other.begin() + 1, other.end(), [&](auto& ID_comp) {
-    result ^= std::hash<int>{}(ID_comp) /*+ 0x9e3779b9*/ + (result << 6)
+    result ^= int_hasher(ID_comp)  + (result << 6) //+ 0x9e3779b9 optionally
             + (result >> 2);
   });
   return result;

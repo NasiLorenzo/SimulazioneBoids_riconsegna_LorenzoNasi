@@ -15,8 +15,8 @@ string(APPEND CMAKE_CXX_FLAGS
       " -Wshadow -Wimplicit-fallthrough -Wextra-semi -Wold-style-cast")
 
 # abilita asserzioni di debug (in gcc), l'address sanitizer e l'undefined-behaviour sanitizer in debug mode
-string(APPEND CMAKE_CXX_FLAGS_DEBUG " -D_GLIBCXX_ASSERTIONS  -fno-omit-frame-pointer -fsanitize=address,undefined")
-string(APPEND CMAKE_EXE_LINKER_FLAGS_DEBUG "  -fno-omit-frame-pointer -fsanitize=address,undefined")
+string(APPEND CMAKE_CXX_FLAGS_DEBUG " -D_GLIBCXX_ASSERTIONS  -fno-omit-frame-pointer")# -fsanitize=address,undefined")
+string(APPEND CMAKE_EXE_LINKER_FLAGS_DEBUG "  -fno-omit-frame-pointer")# -fsanitize=address,undefined")
 
 if(CMAKE_BUILD_TYPE STREQUAL "Release")
     add_compile_options(-O3 -DNDEBUG)
