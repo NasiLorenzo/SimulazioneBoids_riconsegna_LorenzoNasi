@@ -1,9 +1,4 @@
 # Simulazione di boids
-<figure>
-    <img src="flockSFML.png"
-         alt="Simulazione a 30 FPS con 20000 boids">
-    <figcaption>Simulazione a 30 FPS con 20000 boids.</figcaption>
-</figure>
 
 - [Introduzione](#introduzione)
 - [Indicazioni per la compilazione](#indicazioni-per-la-compilazione)
@@ -174,4 +169,12 @@ Il testing riprende l'approccio utilizzato nella consegna precedente, includendo
 
 Tutte le operazioni che vengono fatte sui boid, ad eccezione di quelle relative alla parte di SFML, e di ROOT,  sono pensate per funzionare con un valore arbitrario della `static constexpr unsigned int params::dim`, che deve essere noto a compile time. Per rendere possibile l'utilizzo di più valori di `dim`, il suo valore è settato inizialmente a 2 da una macro del preprocessore chiamata `DIM`. Quando si compila il codice, si può quindi settarla a qualsiasi altro valore con l'opzione `-DDIM=value`.
 
-
+# Esempio
+Per concludere:
+---
+<figure>
+    <img src="flockSFML.png"
+         alt="Simulazione a 30 FPS con 20000 boids">
+    <figcaption>Simulazione a 30 FPS con 20000 boids.</figcaption>
+</figure>
+---
