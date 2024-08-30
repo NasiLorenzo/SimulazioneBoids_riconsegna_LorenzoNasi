@@ -3,7 +3,7 @@ steering_factor         0.06   //parametro di allineamento
 cohesion_factor         0.08
 view_range       40    //distanza di vicinanza, per le regole 2 e 3
 repulsion_range  15     //distanza di repulsione, per la regola 1
-border_repulsion       7      //parametro di repulsione ai bordi dell'area di generazione
+border_repulsion       70      //parametro di repulsione ai bordi dell'area di generazione
 alpha            0.7  //metà dell'angolo visivo in funzione di pi greco
 speedlimit       200    // limiti superiori e inferiori di velocità
 speedminimum     80     

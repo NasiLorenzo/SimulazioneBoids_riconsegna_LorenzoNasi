@@ -1,4 +1,5 @@
 #include "sfmlboids.hpp"
+#include "statistics.hpp"
 namespace boids {
 std::vector<RGB> generatecolors(std::default_random_engine& eng,
                                 ParamList const& params)
@@ -38,18 +39,73 @@ std::vector<sf::ConvexShape> buildArrowSet(unsigned int size,
   return arrowset;
 }
 
+enum class State : int
+{
+  stats,
+  exit,
+  none,
+};
+
+State SFML_menu()
+{
+  char input;
+  std::cout
+      << "Type S to see stats, type N to continue, type Q to close the run: "
+      << "(statistics heavily impact performance) \n"
+      << "____________________________________\n";
+  std::cin >> input;
+  switch (input) {
+  case 'S':
+    return State::stats;
+    break;
+  case 'Q':
+    return State::exit;
+    break;
+  case 'N':
+    return State::none;
+    break;
+  }
+  return State::none;
+}
+
+void show_stats(Flock const& flock)
+{
+  FlockStats flock_data{flock.set()};
+  std::cout << "The flock stats are: \n"
+            << "x position  mean: " << flock_data.pos_stats[0].result().mean
+            << " sigma: " << flock_data.pos_stats[0].result().sigma << "\n"
+            << "y position  mean: " << flock_data.pos_stats[1].result().mean
+            << " sigma: " << flock_data.pos_stats[1].result().sigma << "\n"
+
+            << "x velocity  mean: " << flock_data.vel_stats[0].result().mean
+            << " sigma: " << flock_data.vel_stats[0].result().sigma << "\n"
+            << "y velocity  mean: " << flock_data.vel_stats[1].result().mean
+            << " sigma: " << flock_data.vel_stats[1].result().sigma << "\n"
+
+            << "mean speed: " << flock_data.vel_mod_stats.result().mean
+            << " sigma: " << flock_data.vel_mod_stats.result().sigma << "\n"
+            << "mean distance from origin: "
+            << flock_data.pos_mod_stats.result().mean
+            << " sigma: " << flock_data.pos_mod_stats.result().sigma << "\n"
+            << "mean distance b-ween boids: "
+            << flock_data.distance_stats.result().mean
+            << " sigma: " << flock_data.distance_stats.result().sigma << "\n"
+            <<"___________________________________\n";
+}
+
 void SFML_Interface::run()
 {
   const sf::Time frameTime = sf::seconds(params_.deltaT);
   sf::Clock clock;
-  int i = 0;
+  auto state = SFML_menu();
+  if (state == State::exit)
+    window_.close();
   while (window_.isOpen()) {
     sf::Event evento;
     while (window_.pollEvent(evento)) {
       if (evento.type == sf::Event::Closed)
         window_.close();
     }
-    auto t1 = std::chrono::high_resolution_clock::now();
     clock.restart();
     flock_.update(params_);
     window_.clear(sf::Color::White);
@@ -57,23 +113,20 @@ void SFML_Interface::run()
     auto boidit = flock_.set().begin();
     for (auto& arrow : arrowset_) {
       float angle = static_cast<float>(boids::angle(boidit->vel()));
-      arrow.setPosition(
-          static_cast<float>(boidit->pos()[0] / params_.rate),
-          static_cast<float>(boidit->pos()[1] / params_.rate));
+      arrow.setPosition(static_cast<float>(boidit->pos()[0] / params_.rate),
+                        static_cast<float>(boidit->pos()[1] / params_.rate));
       arrow.setRotation(angle * 180 / static_cast<float>(M_PI));
       window_.draw(arrow);
       boidit++;
     }
 
     window_.display();
-    i++;
-    auto t2                                = std::chrono::high_resolution_clock::now();
-    std::chrono::duration<double, std::milli> ms_double = t2 - t1;
-    std::cout << "posizione primo boid "
-              << flock_.set()[0].pos()[0] << " " << i << "\n";
-    std::cout << ms_double.count() << "ms\n";
-    if (frameTime < clock.getElapsedTime())
-      std::cout << "Lag" << "\n";
+    
+    if (state == State::stats)
+      show_stats(flock_);
+    std::cout << " Run time: " << clock.getElapsedTime().asMilliseconds()
+              << " ms\n"
+              << " Manually close window to exit\n";
     sf::sleep(frameTime - clock.getElapsedTime());
   }
 }
