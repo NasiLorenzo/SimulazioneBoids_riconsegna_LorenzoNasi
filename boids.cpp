@@ -257,13 +257,13 @@ update_neighbors_testing(Boid const& boid_, std::vector<Boid const*>& neighbors,
 void update_close_neighbors(Boid const& boid_,
                             std::vector<Boid const*>& close_neighbors,
                             std::vector<Boid const*> const& neighbors,
-                            double repulsion_distance) 
+                            double repulsion_distance)
 {
   close_neighbors.clear();
   std::for_each(neighbors.begin(), neighbors.end(), [&](auto& neighbor) {
     auto distanza = distance_squared(boid_.pos(), neighbor->pos());
     if (distanza < pow(repulsion_distance, 2)
-        && /*neighbor != &boid_*/ distanza != 0) {
+        && distanza != 0) {
       close_neighbors.emplace_back(neighbor);
     }
   });
@@ -285,15 +285,12 @@ void regola2_3_old(Boid const& boid_, DoubleVec& deltavel_,
                    double steering_factor, double cohesion)
 {
   auto n = neighbors.size();
-  // auto velcopia = this->get_vel();
   std::for_each(neighbors.begin(), neighbors.end(), [&](auto& neighbor) {
     auto x = neighbor->vel_ - boid_.vel_;
     deltavel_ += x * (steering_factor / static_cast<double>(n));
     auto y = neighbor->pos_ - boid_.pos_;
     deltavel_ += y * (cohesion / static_cast<double>(n));
   });
-  // deltavel_+=(boid_.pos_)*(-cohesion);
-  // deltavel_+=boid_.vel_*(-steering_factor);
 }
 
 void rules_cohesion_alignment(Boid const& boid_, DoubleVec& deltavel_,
@@ -301,7 +298,6 @@ void rules_cohesion_alignment(Boid const& boid_, DoubleVec& deltavel_,
                double steering_factor, double cohesion) 
 {
   auto n = neighbors.size();
-  // auto velcopia = this->get_vel();
   std::for_each(neighbors.begin(), neighbors.end(), [&](auto& neighbor) {
     deltavel_ += neighbor->vel_ * (steering_factor / static_cast<double>(n));
     deltavel_ += neighbor->pos_ * (cohesion / static_cast<double>(n));
@@ -361,8 +357,6 @@ std::vector<BoidState> generate_flock(std::default_random_engine& eng,
     auto pix = params.pixel.begin();
     BoidState boidprova{random_boid(eng, params)};
     boidprova.flockID() = i / params.flocksize;
-    // std::cout << "Il Flock id vale: " << boidprova.cget_boid().flockID <<
-    // "\n";
     update_id(boidprova.boid(), params.view_range);
     for (auto it = boidprova.pos().begin(); it != boidprova.pos().end();
          ++it, ++pix) {
