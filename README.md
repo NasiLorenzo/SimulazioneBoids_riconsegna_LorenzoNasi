@@ -1,4 +1,9 @@
 # Simulazione di boids
+<figure>
+    <img src="flockSFML.png"
+         alt="Simulazione a 30 FPS con 20000 boids">
+    <figcaption>Simulazione a 30 FPS con 20000 boids.</figcaption>
+</figure>
 
 - [Introduzione](#introduzione)
 - [Indicazioni per la compilazione](#indicazioni-per-la-compilazione)
