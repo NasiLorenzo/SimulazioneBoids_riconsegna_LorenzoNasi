@@ -79,10 +79,12 @@ In particolare, la funzione update esegue due `std::for_each` su tutti gli eleme
 Come anticipato in [`Flock`](###Flock), all'interno della funzione update, i `for_each` possono essere eseguiti con l'`ExecPolicy` `par_unseq`. Il codice è stato pensato per poter essere eseguito in ambito di concurrency, in quanto, durante `update_all_neighbors`, per ogni boid:
 - Il membro `boid_` viene letto dai vicini, che ha accesso solo a quella parte dell'oggetto
 - I membri `close_neighbors_` e `neighbors_` vengono modificati dal boid, ma i vicini non ne hanno accesso
+
 Per questo motivo alcune delle funzioni elencate precedentemente prendono alcuni membri dell'oggetto come `&` e altri come `const&`, per evidenziare cosa viene modificato o meno, invece che passare l'intero oggetto.
 In questo modo non c'è alcun membro su cui avvenga <ins>effettivamente</ins> lettura e scrittura contemporanea, creando una data race. Analogamente, durante la `update_rules`, per ogni boid:
 - Il membro `deltavel_` viene modificato dal boid
 - Il membro `boid_` viene letto dai vicini, che hanno accesso solo a quello.
+
 Quindi anche qui le operazioni possono essere logicamente effettuate in parallelo.
 
 Nonostante ciò, durante il `for_each` in `Flock::update`, all'interno della lambda, viene dato accesso a tutto l'oggetto del range, ovvero il `BoidState`, il quale ha comunque accesso in scrittura al membro `boid_`, anche se effettivamente la scrittura su questo membro non avvenga mai. Di conseguenza, data la <ins>potenzialità</ins> di scrittura da parte del boid e di lettura da parte dei vicini, se si esegue il codice con il Thread Sanitizer (opzione `-fsanitize=thread`), ci sono warning di race condition. Per questo motivo il parallelismo è stato inserito come opzione per una maggiore velocità di esecuzione, rimanendo però un'opzione e non una feature definitiva (sarebbero da considerare `lock_guards` o differenti architetture delle classi).
