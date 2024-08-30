@@ -2,7 +2,7 @@
 
 - [Introduzione](#introduzione)
 - [Indicazioni per la compilazione](#indicazioni-per-la-compilazione)
-
+- [Modifiche implementative](#)
 ## Introduzione
 Questa è una riconsegna individuale da parte di Lorenzo Nasi del progetto di gruppo nominato "Simulazione di boids su SFML", che aveva come altri componenti Tommaso Vicenzi e Alice Pezzi. Tommaso Vicenzi ha abbandonato il progetto.
 
@@ -34,7 +34,7 @@ trasformandoli negli standard
 #include<algorithms>
 #include<execution>
 ```
-Sia per `SFML` che per `TBB` è necessario indicare, all'interno delle `include_directories()` di CMAKE i rispettivi percorsi.
+Sia per `SFML` che per `TBB` è necessario indicare, all'interno delle `include_directories()` di CMake i rispettivi percorsi.
 Infine è necessario aver installato ROOT per la visualizzazione dei grafici.
 
 Per costruire la build in debug mode, eseguire:
@@ -49,3 +49,6 @@ la quale abilita opzioni aggressive di ottimizzazione come `-03` e rimuove il de
 
 I target costruiti dal progetto sono: `boidsfml`, che avvia una simulazione su `SFML`, per cui i parametri della simulazione sono da modificare all'interno del file `parametersfml.txt`; `simulation`, che avvia una simulazione dello stormo in base ai parametri letti dal file `parameters.txt`. All'inizio del programma vengono chiesti i valori di `updates` e `update_rate`, il primo che rappresenta il numero di iterazioni su cui calcolare la statistica, il secondo che specifica il numero di update del sistema prima di ogni registrazione dei dati statistici. `simulation3d` analogamente avvia la stessa simulazione, ma in 3 dimensioni. Tutti questi eseguibili possono essere fatti eseguire in parallelo, utilizzando l'opzione `--parallel` quando si esegue il programma. Inoltre si segnala come la statistica si riferisca sempre a tutti i boid generati, e quindi, se vengono generati più stormi differenti, i risultati saranno meno significativi.
 Sono poi presenti 3 differenti eseguibili di testing: `boids.t` per il testing dello stormo in 2 dimensioni, `boids3d.t` per il testing in 3 dimensioni, e `statistics.t` per il testing della classe di statistica.
+
+## Modifiche implementative
+

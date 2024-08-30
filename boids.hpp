@@ -46,13 +46,13 @@ struct gridID_hash
 
 bool operator==(GridID const& lhs, GridID const& rhs);
 
-struct Boid
+class Boid
 {
   DoubleVec pos_;
   DoubleVec vel_;
   GridID GridID_{};
   unsigned int flockID_{0};
-
+public:
   Boid(DoubleVec pos, DoubleVec vel)
       : pos_{pos}
       , vel_{vel}
@@ -116,36 +116,36 @@ class BoidState
   {}
   auto& pos() const
   {
-    return this->boid_.pos_;
+    return this->boid_.pos();
   }
   auto& pos()
   {
-    return this->boid_.pos_;
+    return this->boid_.pos();
   }
 
   auto& vel() const
   {
-    return this->boid_.vel_;
+    return this->boid_.vel();
   }
   auto& vel()
   {
-    return this->boid_.vel_;
+    return this->boid_.vel();
   }
   auto& flockID() const
   {
-    return this->boid_.flockID_;
+    return this->boid_.flockID();
   }
   auto& flockID()
   {
-    return boid_.flockID_;
+    return boid_.flockID();
   }
   auto& GridID() const
   {
-    return boid_.GridID_;
+    return boid_.GridID();
   }
   auto& GridID()
   {
-    return boid_.GridID_;
+    return boid_.GridID();
   }
 
   auto& boid() const

@@ -182,22 +182,22 @@ TEST_CASE("Testing GridID"){
   double view_range=100.;
   Boid test_boid_1{DoubleVec{80.,120.,210.},DoubleVec{0.,0.,0.}};
   update_id(test_boid_1,view_range);
-  CHECK(test_boid_1.GridID_[0]==doctest::Approx(1));
-  CHECK(test_boid_1.GridID_[1]==doctest::Approx(2));
-  CHECK(test_boid_1.GridID_[2]==doctest::Approx(3));
+  CHECK(test_boid_1.GridID()[0]==doctest::Approx(1));
+  CHECK(test_boid_1.GridID()[1]==doctest::Approx(2));
+  CHECK(test_boid_1.GridID()[2]==doctest::Approx(3));
 
   Boid test_boid_2{DoubleVec{-80.,-120.,-210.},DoubleVec{0.,0.,0.}};
   update_id(test_boid_2,view_range);
 
-  CHECK(test_boid_2.GridID_[0]==doctest::Approx(0));
-  CHECK(test_boid_2.GridID_[1]==doctest::Approx(-1));
-  CHECK(test_boid_2.GridID_[2]==doctest::Approx(-2));
+  CHECK(test_boid_2.GridID()[0]==doctest::Approx(0));
+  CHECK(test_boid_2.GridID()[1]==doctest::Approx(-1));
+  CHECK(test_boid_2.GridID()[2]==doctest::Approx(-2));
 
   Boid test_boid_3{DoubleVec{1000.,0.,-50.},DoubleVec{0.,0.,0.}};
   update_id(test_boid_3,view_range);
-  CHECK(test_boid_3.GridID_[0]==doctest::Approx(11));
-  CHECK(test_boid_3.GridID_[1]==doctest::Approx(1));
-  CHECK(test_boid_3.GridID_[2]==doctest::Approx(0));
+  CHECK(test_boid_3.GridID()[0]==doctest::Approx(11));
+  CHECK(test_boid_3.GridID()[1]==doctest::Approx(1));
+  CHECK(test_boid_3.GridID()[2]==doctest::Approx(0));
 }
 
 TEST_CASE("Testing hashing"){

@@ -280,31 +280,18 @@ void rule_repulsion(Boid const& boid_, DoubleVec& deltavel_,
                 });
 }
 
-void regola2_3_old(Boid const& boid_, DoubleVec& deltavel_,
-                   std::vector<Boid const*> const& neighbors,
-                   double steering_factor, double cohesion)
-{
-  auto n = neighbors.size();
-  std::for_each(neighbors.begin(), neighbors.end(), [&](auto& neighbor) {
-    auto x = neighbor->vel_ - boid_.vel_;
-    deltavel_ += x * (steering_factor / static_cast<double>(n));
-    auto y = neighbor->pos_ - boid_.pos_;
-    deltavel_ += y * (cohesion / static_cast<double>(n));
-  });
-}
-
 void rules_cohesion_alignment(Boid const& boid_, DoubleVec& deltavel_,
                std::vector<Boid const*> const& neighbors,
                double steering_factor, double cohesion) 
 {
   auto n = neighbors.size();
   std::for_each(neighbors.begin(), neighbors.end(), [&](auto& neighbor) {
-    deltavel_ += neighbor->vel_ * (steering_factor / static_cast<double>(n));
-    deltavel_ += neighbor->pos_ * (cohesion / static_cast<double>(n));
+    deltavel_ += neighbor->vel() * (steering_factor / static_cast<double>(n));
+    deltavel_ += neighbor->pos() * (cohesion / static_cast<double>(n));
   });
   if (neighbors.size() != 0) {
-    deltavel_ -= boid_.pos_ * cohesion;
-    deltavel_ -= boid_.vel_ * steering_factor;
+    deltavel_ -= boid_.pos() * cohesion;
+    deltavel_ -= boid_.vel()* steering_factor;
   }
 }
 
