@@ -177,4 +177,3 @@ Per concludere:
          alt="Simulazione a 30 FPS con 20000 boids">
     <figcaption>Simulazione a 30 FPS con 20000 boids.</figcaption>
 </figure>
----
