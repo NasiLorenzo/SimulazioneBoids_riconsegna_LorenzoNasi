@@ -2,8 +2,8 @@
 
 ---
 
--[Introduzione](#introduzione)\\
--[Indicazioni per la compilazione](#indicazioni-per-la-compilazione)
+- [Introduzione](#introduzione)
+- [Indicazioni per la compilazione](#indicazioni-per-la-compilazione)
 
 ---
 
