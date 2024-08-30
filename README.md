@@ -55,4 +55,9 @@ Sono poi presenti 3 differenti eseguibili di testing: `boids.t` per il testing d
 ### Boid e BoidState
 
 Le seguenti modifiche sono state apportate:
-La classe `BoidState` contiene ora la classe `Boid`, la quale contiene
+La classe `BoidState` contiene come memmbro `boid_` la classe `Boid` , la quale ha a sua volta i membri privati `pos_` e `vel_` di tipo `DoubleVec`, oltre al `flockID_`, di tipo `unsigned int` e al `gridID_`, di tipo `GridID`, che è un alias per `std::array<int. params::dim>`. Il `gridID` rappresenta l'identificatore nella griglia dell'hashing spaziale in cui si trova il boid.
+Inoltre la classe `BoidState` contiene come membri `deltavel_`, ovvero un `DoubleVec` che contiene gli update apportati dalle 3 regole, oltre a `neighbors` e `close_neighbors`, degli `std::vector<boid const*>`, ovvero dei vettori di puntatori costanti a boid, che contengono i puntatori ai vicini del boid.
+
+### Funzioni libere
+
+Le funzioni `speedadjust`, `bordercheck`, e le regole di volo rimaste pressoché invariate a prima. E' stata aggiunta la funzione `random_boid` per generare un singolo boid casuale. Il gridID del boid viene aggiornato tramite la funzione `update_id`, secondo la convenzione per cui il quadrato della griglia più vicino all'origine, nel quadrante positivo, prende le coordinate (1,1) o (1,1,1) a seconda che ci si trovi in 2 o 3 dimensioni.
