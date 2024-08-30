@@ -130,7 +130,7 @@ bool operator==(GridID const& lhs, GridID const& rhs)
   return std::equal(lhs.begin(), lhs.end(), rhs.begin());
 }
 
-auto random_boid(std::default_random_engine& eng, ParamList const& params) noexcept
+auto random_boid(std::default_random_engine& eng, ParamList const& params) 
 {
   BoidState newboid{};
   std::normal_distribution<double> dist(0.0, params.sigma);
@@ -139,7 +139,7 @@ auto random_boid(std::default_random_engine& eng, ParamList const& params) noexc
   return newboid;
 }
 
-void update_id(Boid& boid, const double view_range) noexcept
+void update_id(Boid& boid, const double view_range) 
 {
   auto posit = boid.pos().begin();
   std::for_each(boid.GridID().begin(), boid.GridID().end(), [&](auto& ID_comp) {
@@ -148,7 +148,7 @@ void update_id(Boid& boid, const double view_range) noexcept
   });
 }
 
-void speed_adjust(Boid& boid, double speedlimit, double speedminimum) noexcept
+void speed_adjust(Boid& boid, double speedlimit, double speedminimum) 
 {
   auto vmod = mod(boid.vel());
   if (vmod > speedlimit) {
@@ -161,7 +161,7 @@ void speed_adjust(Boid& boid, double speedlimit, double speedminimum) noexcept
   };
 }
 void bordercheck(Boid& boid, std::array<unsigned int, params::dim> const& pixel,
-                 double bordersize, double border_repulsion, double rate) noexcept
+                 double bordersize, double border_repulsion, double rate) 
 {
   auto pix_iter = pixel.begin();
   auto pos_iter = boid.pos().begin();
@@ -177,7 +177,7 @@ void bordercheck(Boid& boid, std::array<unsigned int, params::dim> const& pixel,
 }
 
 bool is_neighbor(Boid const& boid_, Boid const& neighbor, double view_range,
-                 double alpha, Criterion criterion) noexcept
+                 double alpha, Criterion criterion) 
 {
   auto distanza = distance_squared(boid_.pos(), neighbor.pos());
   if (distanza < pow(view_range, 2) && distanza != 0 /*&neighbor != &boid_*/
@@ -198,7 +198,7 @@ bool is_neighbor(Boid const& boid_, Boid const& neighbor, double view_range,
 
 void add_neighbors(GridID const& neighborID, Boid const& boid_,
                    double view_range, double alpha, Criterion criterion,
-                   MyHashMap const& map, std::vector<Boid const*>& neighbors) noexcept
+                   MyHashMap const& map, std::vector<Boid const*>& neighbors) 
 {
   auto neigh_range = map.equal_range(neighborID);
   std::for_each(neigh_range.first, neigh_range.second, [&](auto& neighbor) {
@@ -209,7 +209,7 @@ void add_neighbors(GridID const& neighborID, Boid const& boid_,
 
 void update_neighbors(Boid const& boid_, std::vector<Boid const*>& neighbors,
                       MyHashMap const& map, double align_distance, double alpha,
-                      Criterion const criterion) noexcept
+                      Criterion const criterion) 
 {
   neighbors.clear();
   std::array<int, 3> grid_range = {-1, 0, 1};
@@ -232,7 +232,7 @@ void update_neighbors(Boid const& boid_, std::vector<Boid const*>& neighbors,
 std::vector<GridID>
 update_neighbors_testing(Boid const& boid_, std::vector<Boid const*>& neighbors,
                          MyHashMap const& map, double align_distance,
-                         double alpha, Criterion criterion) noexcept
+                         double alpha, Criterion criterion) 
 {
   neighbors.clear();
   std::array<int, 3> grid_range = {-1, 0, 1};
@@ -257,7 +257,7 @@ update_neighbors_testing(Boid const& boid_, std::vector<Boid const*>& neighbors,
 void update_close_neighbors(Boid const& boid_,
                             std::vector<Boid const*>& close_neighbors,
                             std::vector<Boid const*> const& neighbors,
-                            double repulsion_distance) noexcept
+                            double repulsion_distance) 
 {
   close_neighbors.clear();
   std::for_each(neighbors.begin(), neighbors.end(), [&](auto& neighbor) {
@@ -271,7 +271,7 @@ void update_close_neighbors(Boid const& boid_,
 
 void rule_repulsion(Boid const& boid_, DoubleVec& deltavel_,
              std::vector<Boid const*> const& close_neighbors,
-             double repulsion_factor) noexcept
+             double repulsion_factor) 
 {
   std::for_each(close_neighbors.begin(), close_neighbors.end(),
                 [&](auto& neighbor) {
@@ -298,7 +298,7 @@ void regola2_3_old(Boid const& boid_, DoubleVec& deltavel_,
 
 void rules_cohesion_alignment(Boid const& boid_, DoubleVec& deltavel_,
                std::vector<Boid const*> const& neighbors,
-               double steering_factor, double cohesion) noexcept
+               double steering_factor, double cohesion) 
 {
   auto n = neighbors.size();
   // auto velcopia = this->get_vel();
@@ -312,7 +312,7 @@ void rules_cohesion_alignment(Boid const& boid_, DoubleVec& deltavel_,
   }
 }
 
-void posvel_update(BoidState& boid, ParamList const& params) noexcept
+void posvel_update(BoidState& boid, ParamList const& params) 
 {
   boid.vel() += boid.deltavel();
   speed_adjust(boid.boid(), params.speedlimit, params.speedminimum);
@@ -327,7 +327,7 @@ void update_allneighbors(Boid const& boid_, std::vector<Boid const*>& neighbors,
                          std::vector<Boid const*>& close_neighbors,
                          MyHashMap const& map, double repulsion_distance,
                          double align_distance, double alpha, unsigned int size,
-                         unsigned int flocksize) noexcept
+                         unsigned int flocksize) 
 {
   if (flocksize < size) {
     update_neighbors(boid_, neighbors, map, align_distance, alpha,
@@ -345,7 +345,7 @@ void update_allneighbors(Boid const& boid_, std::vector<Boid const*>& neighbors,
 void update_rules(Boid const& boid_, DoubleVec& deltavel_,
                   std::vector<Boid const*>& neighbors,
                   std::vector<Boid const*>& close_neighbors,
-                  ParamList const& params) noexcept
+                  ParamList const& params) 
 {
   rule_repulsion(boid_, deltavel_, close_neighbors, params.repulsion_factor);
   rules_cohesion_alignment(boid_, deltavel_, neighbors, params.steering_factor,
