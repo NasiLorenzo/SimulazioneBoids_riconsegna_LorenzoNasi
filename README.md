@@ -7,6 +7,7 @@
   - [Flock](#flock)
   - [Funcioni libere richiamate da `Flock::update()`](#funzioni-libere-richiamate-da-flockupdate)
   - [Parallelismo](#parallelismo)
+  - [Hashing spaziale](#hashing-spaziale)
 ## Introduzione
 Questa è una riconsegna individuale da parte di Lorenzo Nasi del progetto di gruppo nominato "Simulazione di boids su SFML", che aveva come altri componenti Tommaso Vicenzi e Alice Pezzi. Tommaso Vicenzi ha abbandonato il progetto.
 
@@ -15,7 +16,7 @@ Questa è una riconsegna individuale da parte di Lorenzo Nasi del progetto di gr
 - rimozione dell'utilizzo simulaneo di template e polimorfismo, (ora nessuno dei due è presente)
 - completata flessibilità del codice di simulare stormi in 2, 3 dimensioni (o potenzialmente a piacere)
 - implementazione di hashing spaziale per migliorare la performance e poter sostenere grandi aree generative su SFML
-- supporto alla parallelizzazione per migliorare la velocità di esecuzione (considerazioni successivamente)
+- supporto alla parallelizzazione per migliorare la velocità di esecuzione
 - implementazione delle statistiche dello stormo e produzione di grafici tramite ROOT
 - aggiunte interfacce per le differenti simulazioni
 - completamento del testing
@@ -130,3 +131,23 @@ La griglia secondo la quale vengono stabiliti i valori delle chiavi è quadrata,
 In due dimensioni, quindi, un boid dovrà controllare le 8 celle intorno alla sua, più la sua, per cercare vicini.
 
 Se ho a disposizione le chiavi corrispondenti a tutti gli spazi della griglia da considerare, passando un valore di `GridID` alla mappa come parametro del metodo `map.equal_range(key)`, ottengo come risultato un `std::pair` che contiene gli estremi del range di elementi corrispondenti alla chiave.
+
+### Statistics
+
+La statistica si basa sulla classe `Sample`, che contiene i membri `sum_x_`, `sum_x2_` e `N_` e una statistica contente media e sigma dei dati di ingresso. Quando la classe viene inizializzata con un `std::vector<double>`, i membri vengono inizializzati in uno stato valido. Con il metodo `add()`, si possono aggiungere elementi al `Sample`.
+
+La struct `FlockStats`, quando inizializzata, prende in input un `std::vector<BoidState>` da cui estrae i `Sample` statistici per ogni componente di `pos_` e `vel_`, per i loro moduli, e per il `Sample` delle distanze.
+
+### Interfacce
+
+Per avviare le varie simulazioni all'interno di un main, la classe `Flock` viene messa all'interno di due interfacce che fanno da wrapper, e contengono altri elementi come un `std::default_random_engine`, o la `ParamList`.
+
+#### SFML_Interface
+
+Per SFML è stata costruita una classe che contiene, oltre a quello già citato, un vettore di colori generati casualmente per i vari stormi di boid, chiamato `colorvec`, un vettore che contiene gli oggetti che rappresentano i boid su SFML, ovvero `sf::ConvexShape`, chiamato `arrowset`, e la finestra di SFML, di tipo `sf::RenderWindow`. 
+La simulazione viene avviata con il metodo `SFML_Interface::run()`, che richiama il metodo `Flock::update()` e inoltre disegna i boids.
+
+#### Simulation
+
+La classe `Simulation` è il wrapper minimale, che esegue la funzione `Simulation::loop()`, la quale genera e simula i boids per un numero di iterazioni determinato dall'utente. Le statistiche prodotte vengono poi scritte sui file contenuti nella cartella `data`.
+Alla fine della simulazione viene data la possibilità di visualizzare i grafici all'interno di ROOT.

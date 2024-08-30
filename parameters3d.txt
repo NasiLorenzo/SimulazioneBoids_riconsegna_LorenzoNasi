@@ -11,7 +11,7 @@ deltaT           0.0333 //granularità della discretizzazione della simulazione,
 size             500    //numero totale di boids
 flocksize        500    //dimensione di ogni stormo
 pixel.x          1510   //dimensioni della finestra in pixel
-pixel.y          910
+pixel.y          910    //Lo spazio di generazione ha una dimensione di pixel*rate
 pixel.z          800
 rate             1.2    //rapporto tra l'area di generazione e la dimensione in pixel della finestra
 bordersize       50     //distanza dal bordo da cui si inizia ad applicare la repulsione ai bordi, in pixel
