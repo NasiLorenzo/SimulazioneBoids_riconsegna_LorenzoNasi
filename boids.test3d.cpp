@@ -285,7 +285,7 @@ TEST_CASE("Testing distances, view angle, grid")
                             flock.set()[0].vel())
           == doctest::Approx(0).epsilon(
               0.001)); // this boid should get seen, but it doesn't since it's
-                       // right on the edge and std::cos(pi/)!=0.
+                       // right on the edge and std::cos(~pi/2)!=0. Sign of bad direct comparison between doubles
     CHECK(cos_angle_between(flock.set()[3].pos() - flock.set()[0].pos(),
                             flock.set()[0].vel())
           == doctest::Approx(0.4472).epsilon(0.001));
