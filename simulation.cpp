@@ -70,8 +70,8 @@ void Simulation::loop(std::string const& output_position_plot,
   std::cout << "Do you want to use the previous data? (yes/no): ";
   std::cin >> input;
   if (input != "yes") {
-    unsigned int updates{};
-    unsigned int update_rate{};
+    int updates{};
+    int update_rate{};
     while (updates <= 0 || update_rate <= 0) {
       std::cout
           << "Insert updates and update_rate, both greater than zero: ";
@@ -91,8 +91,8 @@ void Simulation::loop(std::string const& output_position_plot,
       pos_mod_file << updates << "\n";
       vel_mod_file << updates << "\n";
       distance_file << updates << "\n";
-      for (unsigned int i = 0; i < updates; ++i) {
-        for (unsigned int j = 0; j < update_rate; ++j) {
+      for (int i = 0; i < updates; ++i) {
+        for (int j = 0; j < update_rate; ++j) {
           flock_.update(params_);
           clock_ += params_.deltaT;
         }
@@ -119,7 +119,7 @@ void Simulation::loop(std::string const& output_position_plot,
         // std::cout << "fine loop " << "\n";
         std::cout << "." << std::flush;
       }
-      std::cout << "End of simulation, results collected " << "\n";
+      std::cout << "\nEnd of simulation, results collected " << "\n";
       pos_file.close();
       vel_file.close();
       pos_mod_file.close();

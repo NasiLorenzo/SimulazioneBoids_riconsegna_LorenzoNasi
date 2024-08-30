@@ -1,62 +1,60 @@
 cmake_minimum_required(VERSION 3.16)
 project(progettopf VERSION 0.1.0)
 
-# abilita il supporto per i test, tra cui l'opzione BUILD_TESTING usata sotto
+# Enable testing support
 include(CTest)
 
-set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-
-# richiedi l'uso di C++17, senza estensioni non-standard offerte dal compilatore usato 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-# abilita warning
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
 string(APPEND CMAKE_CXX_FLAGS
       " -Wall -Wextra -Wpedantic -Wconversion -Wsign-conversion"
       " -Wshadow -Wimplicit-fallthrough -Wextra-semi -Wold-style-cast")
 
 # abilita asserzioni di debug (in gcc), l'address sanitizer e l'undefined-behaviour sanitizer in debug mode
-string(APPEND CMAKE_CXX_FLAGS_DEBUG " -D_GLIBCXX_ASSERTIONS  -fno-omit-frame-pointer")# -fsanitize=address,undefined")
-string(APPEND CMAKE_EXE_LINKER_FLAGS_DEBUG "  -fno-omit-frame-pointer")# -fsanitize=address,undefined")
+string(APPEND CMAKE_CXX_FLAGS_DEBUG " -D_GLIBCXX_ASSERTIONS  -fno-omit-frame-pointer -fsanitize=address,undefined")
+string(APPEND CMAKE_EXE_LINKER_FLAGS_DEBUG "  -fno-omit-frame-pointer -fsanitize=address,undefined")
+
+if(CMAKE_BUILD_TYPE STREQUAL "Release")
+    add_compile_options(-O3 -DNDEBUG)
+endif()
 
 include_directories("/opt/homebrew/Cellar/sfml/2.6.1/include")
 include_directories("/opt/homebrew/Cellar/tbb/2021.13.0/include")
+
 find_package(TBB REQUIRED)
-find_package(SFML 2.5 COMPONENTS graphics REQUIRED) 
+find_package(SFML 2.5 COMPONENTS graphics REQUIRED)
 
-include_directories(${TBB_INCLUDE_DIRS})
-include_directories(${TBB_INCLUDE_DIRS})
-add_executable(boidsfml boids.cpp boidsfml.cpp doublevec.cpp sfmlboids.cpp statistics.cpp)
-add_executable(boidss boids.cpp mainprova.cpp doublevec.cpp statistics.cpp)
-add_executable(prove prove_varie.cpp doublevec.cpp)
+# Function to make the setting shorter
+function(add_boids_executable target_name sources)
+    add_executable(${target_name} ${sources})
+    target_link_libraries(${target_name} PRIVATE TBB::tbb TBB::tbbmalloc)#comment this line if you are not on MacOS
+endfunction()
+
+# Define targets with the custom function
+add_boids_executable(boidsfml "boids.cpp;boidsfml.cpp;doublevec.cpp;sfmlboids.cpp;statistics.cpp")
 target_link_libraries(boidsfml PRIVATE sfml-graphics sfml-window sfml-system)
-target_link_libraries(boidsfml PRIVATE TBB::tbb TBB::tbbmalloc )
-target_link_libraries(boidss PRIVATE TBB::tbb TBB::tbbmalloc )
-target_link_libraries(prove PRIVATE TBB::tbb TBB::tbbmalloc )
-target_compile_options(boidss PRIVATE -DDIM=2)
-add_executable(simulation boids.cpp doublevec.cpp base_run.cpp statistics.cpp simulation.cpp)
-target_link_libraries(simulation PRIVATE TBB::tbb TBB::tbbmalloc )
-add_executable(simulation3d boids.cpp doublevec.cpp base_run_3d.cpp statistics.cpp simulation.cpp)
-target_link_libraries(simulation3d PRIVATE TBB::tbb TBB::tbbmalloc )
-target_compile_options(simulation3d PRIVATE -DDIM=3)
 
+add_boids_executable(boidss "boids.cpp;mainprova.cpp;doublevec.cpp;statistics.cpp")
+target_compile_definitions(boidss PRIVATE -DDIM=2)
 
+add_boids_executable(prove "prove_varie.cpp;doublevec.cpp")
 
+add_boids_executable(simulation "boids.cpp;doublevec.cpp;base_run.cpp;statistics.cpp;simulation.cpp")
+add_boids_executable(simulation3d "boids.cpp;doublevec.cpp;base_run_3d.cpp;statistics.cpp;simulation.cpp")
+target_compile_definitions(simulation3d PRIVATE -DDIM=3)
 
 if (BUILD_TESTING)
+    # Testing executables
+    add_boids_executable(boids.t "boids.cpp;boids.test.cpp;doublevec.cpp")
+    add_boids_executable(boids3d.t "doublevec.cpp;boids.cpp;boids.test3d.cpp")
+    target_compile_definitions(boids3d.t PRIVATE -DDIM=3)
 
-  # aggiungi l'eseguibile all.t
-  add_executable(boids.t boids.cpp boids.test.cpp doublevec.cpp) 
-  add_executable(boids3d.t doublevec.cpp boids.cpp boids.test3d.cpp)
-  target_link_libraries(boids.t PRIVATE TBB::tbb TBB::tbbmalloc)
-  target_link_libraries(boids3d.t PRIVATE TBB::tbb TBB::tbbmalloc)
-  target_compile_options(boids3d.t PRIVATE -DDIM=3)
-  add_executable(statistics.t statistics.test.cpp statistics.cpp boids.cpp doublevec.cpp)
-  target_link_libraries(statistics.t PRIVATE TBB::tbb TBB::tbbmalloc)
+    add_boids_executable(statistics.t "statistics.test.cpp;statistics.cpp;boids.cpp;doublevec.cpp")
 
-  #target_link_libraries(boids.t PRIVATE Boost::filesystem Boost::system)
-  # aggiungi l'eseguibile all.t alla lista dei test
-   add_test(NAME boids.t COMMAND boids.t)
-
+    # Register the test with CTest
+    add_test(NAME boids.t COMMAND boids.t)
 endif()
