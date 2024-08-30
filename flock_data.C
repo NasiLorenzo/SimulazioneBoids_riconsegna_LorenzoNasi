@@ -193,7 +193,7 @@ void pos_data()
       new TCanvas("canvas", "Center of mass of the flock as it varies in time",
                   0, 0, 1000, 600);
   canvas->cd();
-  graph_2d("pos.txt",
+  graph_2d("./data/pos.txt",
            "Center of mass of the flock as it varies in time;x "
            "[arb_units];time [arb_units];y [arb_units]",
            "Center_of_mass_2D_plot.png",canvas);
@@ -202,12 +202,12 @@ void pos_data()
                                  0, 0, 1000, 1200);
   canvas_proj->Divide(1, 2);
   // Second graph: showing the projection on the x_axis
-  graph_1d_proj(canvas_proj, "pos.txt",
+  graph_1d_proj(canvas_proj, "./data/pos.txt",
                 "x-coordinate of the center of mass as a function of "
                 "time;time [arb_units];x [arb_units]",
                 1);
   // Third graph : showing the projection on the y_axis
-  graph_1d_proj(canvas_proj, "pos.txt",
+  graph_1d_proj(canvas_proj, "./data/pos.txt",
                 "y-coordinate of the center of mass as a function of "
                 "time;time [arb_units];y [arb_units]",
                 2);
@@ -221,7 +221,7 @@ void vel_data()
   canvas_vel->cd();
   // fourth graph: Drawing the 2D graph of the center of mass as a function of
   // time
-  graph_2d("vel.txt",
+  graph_2d("./data/vel.txt",
            "Mean components of the velocity as they vary in time;vel_x "
            "[arb_units];time [arb_units];vel_y [arb_units]",
            "Velocities_2D_graph.png",canvas_vel);
@@ -231,12 +231,12 @@ void vel_data()
   canvas_vel_proj->Divide(1, 2);
   canvas_vel_proj->cd();
   // Fifth graph: showing the projection on the x_axis
-  graph_1d_proj(canvas_vel_proj, "vel.txt",
+  graph_1d_proj(canvas_vel_proj, "./data/vel.txt",
                 "x-coordinate of the mean velocity as a function of "
                 "time;time [arb_units];x [arb_units]",
                 1);
   // Sixth graph : showing the projection on the y_axis
-  graph_1d_proj(canvas_vel_proj, "vel.txt",
+  graph_1d_proj(canvas_vel_proj, "./data/vel.txt",
                 "y-coordinate of the mean velocity as a function of "
                 "time;time [arb_units];y [arb_units]",
                 2);
@@ -250,13 +250,13 @@ void mods_data()
   canvas_mods->Divide(1, 2);
   // Seventh graph: drawing the mean magnitude of position as a function of
   // time
-  graph_1d(canvas_mods, "pos_mod.txt",
+  graph_1d(canvas_mods, "./data/pos_mod.txt",
            "mean distance from the origin as a function of "
            "time;time [arb_units];x [arb_units]",
            1);
 
   // Eight graph: drawing the mean magnitude of position as a function of time
-  graph_1d(canvas_mods, "vel_mod.txt",
+  graph_1d(canvas_mods, "./data/vel_mod.txt",
            "mean speed a function of "
            "time;time [arb_units];x [arb_units]",
            2);
@@ -265,7 +265,7 @@ void mods_data()
   // Ninth grap: drawing the mean distance over time
   auto canvas_distance =
       new TCanvas("canvas_distance", "Mean distance", 0, 0, 1000, 600);
-  graph_1d(canvas_distance, "distance.txt",
+  graph_1d(canvas_distance, "./data/distance.txt",
            "mean distance as a function of "
            "time;time [arb_units];x [arb_units]",
            1);
@@ -278,17 +278,17 @@ void pos_data_3d()
                                  0, 0, 1000, 1200);
   canvas_proj->Divide(2, 2);
   // First graph: showing the projection on the x_axis
-  graph_1d_proj_3d(canvas_proj, "pos3d.txt",
+  graph_1d_proj_3d(canvas_proj, "./data/pos3d.txt",
                 "x-coordinate of the center of mass as a function of "
                 "time;time [arb_units];x [arb_units]",
                 1);
   // Second graph : showing the projection on the y_axis
-  graph_1d_proj_3d(canvas_proj, "pos3d.txt",
+  graph_1d_proj_3d(canvas_proj, "./data/pos3d.txt",
                 "y-coordinate of the center of mass as a function of "
                 "time;time [arb_units];y [arb_units]",
                 2);
   // Second graph : showing the projection on the z_axis
-  graph_1d_proj_3d(canvas_proj, "pos3d.txt",
+  graph_1d_proj_3d(canvas_proj, "./data/pos3d.txt",
                 "z-coordinate of the center of mass as a function of "
                 "time;time [arb_units];z [arb_units]",
                 3);
@@ -302,17 +302,17 @@ void vel_data_3d()
   canvas_vel_proj->Divide(2, 2);
   canvas_vel_proj->cd();
   // Fifth graph: showing the projection on the x_axis
-  graph_1d_proj_3d(canvas_vel_proj, "vel3d.txt",
+  graph_1d_proj_3d(canvas_vel_proj, "./data/vel3d.txt",
                 "x-coordinate of the mean velocity as a function of "
                 "time;time [arb_units];x [arb_units]",
                 1);
   // Sixth graph : showing the projection on the y_axis
-  graph_1d_proj_3d(canvas_vel_proj, "vel3d.txt",
+  graph_1d_proj_3d(canvas_vel_proj, "./data/vel3d.txt",
                 "y-coordinate of the mean velocity as a function of "
                 "time;time [arb_units];y [arb_units]",
                 2);
   // Sixth graph : showing the projection on the y_axis
-  graph_1d_proj_3d(canvas_vel_proj, "vel3d.txt",
+  graph_1d_proj_3d(canvas_vel_proj, "./data/vel3d.txt",
                 "z-coordinate of the mean velocity as a function of "
                 "time;time [arb_units];z [arb_units]",
                 3);
@@ -326,13 +326,13 @@ void mods_data_3d()
   canvas_mods->Divide(1, 2);
   // Seventh graph: drawing the mean magnitude of position as a function of
   // time
-  graph_1d(canvas_mods, "pos_mod3d.txt",
+  graph_1d(canvas_mods, "./data/pos_mod3d.txt",
            "mean distance from the origin as a function of "
            "time;time [arb_units];x [arb_units]",
            1);
 
   // Eight graph: drawing the mean magnitude of position as a function of time
-  graph_1d(canvas_mods, "vel_mod3d.txt",
+  graph_1d(canvas_mods, "./data/vel_mod3d.txt",
            "mean speed a function of "
            "time;time [arb_units];x [arb_units]",
            2);
@@ -341,7 +341,7 @@ void mods_data_3d()
   // Ninth grap: drawing the mean distance over time
   auto canvas_distance =
       new TCanvas("canvas_distance", "Mean distance", 0, 0, 1000, 600);
-  graph_1d(canvas_distance, "distance3d.txt",
+  graph_1d(canvas_distance, "./data/distance3d.txt",
            "mean distance as a function of "
            "time;time [arb_units];x [arb_units]",
            1);

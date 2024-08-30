@@ -179,14 +179,14 @@ void bordercheck(Boid& boid, std::array<unsigned int, params::dim> const& pixel,
 bool is_neighbor(Boid const& boid_, Boid const& neighbor, double view_range,
                  double alpha, Criterion criterion) 
 {
-  auto distanza = distance_squared(boid_.pos(), neighbor.pos());
-  if (distanza < pow(view_range, 2) && distanza != 0 /*&neighbor != &boid_*/
+  auto distance_2 = distance_squared(boid_.pos(), neighbor.pos());
+  if (distance_2 < pow(view_range, 2) && distance_2 != 0 /*&neighbor != &boid_*/
       && (criterion == Criterion::any
           || (criterion == Criterion::similar
               && boid_.flockID() == neighbor.flockID()))) {
-    auto cosangolo =
+    auto cos_angle =
         cos_angle_between(neighbor.pos() - boid_.pos(), boid_.vel());
-    if ((cosangolo) > std::cos(alpha)) {
+    if ((cos_angle) > std::cos(alpha)) {
       return 1;
     } else {
       return 0;
@@ -261,9 +261,9 @@ void update_close_neighbors(Boid const& boid_,
 {
   close_neighbors.clear();
   std::for_each(neighbors.begin(), neighbors.end(), [&](auto& neighbor) {
-    auto distanza = distance_squared(boid_.pos(), neighbor->pos());
-    if (distanza < pow(repulsion_distance, 2)
-        && distanza != 0) {
+    auto distance2 = distance_squared(boid_.pos(), neighbor->pos());
+    if (distance2 < pow(repulsion_distance, 2)
+        && distance2 != 0) {
       close_neighbors.emplace_back(neighbor);
     }
   });
@@ -355,17 +355,17 @@ std::vector<BoidState> generate_flock(std::default_random_engine& eng,
   MyHashMap HashMap{};
   for (unsigned int i = 0; i < params.size; i++) {
     auto pix = params.pixel.begin();
-    BoidState boidprova{random_boid(eng, params)};
-    boidprova.flockID() = i / params.flocksize;
-    update_id(boidprova.boid(), params.view_range);
-    for (auto it = boidprova.pos().begin(); it != boidprova.pos().end();
+    BoidState newboid{random_boid(eng, params)};
+    newboid.flockID() = i / params.flocksize;
+    update_id(newboid.boid(), params.view_range);
+    for (auto it = newboid.pos().begin(); it != newboid.pos().end();
          ++it, ++pix) {
       std::uniform_real_distribution<double> dis(
           params.bordersize * params.rate,
           static_cast<double>((*pix - params.bordersize) * params.rate));
       *it += dis(eng);
     }
-    set.push_back(boidprova);
+    set.push_back(newboid);
   }
 
   return set;

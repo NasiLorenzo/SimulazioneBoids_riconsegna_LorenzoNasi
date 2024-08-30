@@ -25,6 +25,9 @@ class Simulation
   double clock_{};
 };
 
+void graphs_menu();
+
+
 } // namespace boids
 
 #endif
