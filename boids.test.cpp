@@ -251,7 +251,7 @@ TEST_CASE("Testing the speed limits")
   }
 }
 
-TEST_CASE("Testing boid sight") // each boid contains itself in the vector of
+TEST_CASE("Testing Boid sight") // each Boid contains itself in the vector of
                                 // its neighbors
 {
   ParamList params{};
@@ -387,18 +387,18 @@ TEST_CASE("Testing the limit distance")
 TEST_CASE("Testing GridID")
 {
   double view_range = 100.;
-  boid test_boid_1{DoubleVec{80., 120.}, DoubleVec{0., 0.}};
+  Boid test_boid_1{DoubleVec{80., 120.}, DoubleVec{0., 0.}};
   update_id(test_boid_1, view_range);
   CHECK(test_boid_1.GridID_[0] == doctest::Approx(1));
   CHECK(test_boid_1.GridID_[1] == doctest::Approx(2));
 
-  boid test_boid_2{DoubleVec{-80., -120.}, DoubleVec{0., 0.}};
+  Boid test_boid_2{DoubleVec{-80., -120.}, DoubleVec{0., 0.}};
   update_id(test_boid_2, view_range);
 
   CHECK(test_boid_2.GridID_[0] == doctest::Approx(0));
   CHECK(test_boid_2.GridID_[1] == doctest::Approx(-1));
 
-  boid test_boid_3{DoubleVec{1000., 0.}, DoubleVec{0., 0.}};
+  Boid test_boid_3{DoubleVec{1000., 0.}, DoubleVec{0., 0.}};
   update_id(test_boid_3, view_range);
   CHECK(test_boid_3.GridID_[0] == doctest::Approx(11));
   CHECK(test_boid_3.GridID_[1] == doctest::Approx(1));

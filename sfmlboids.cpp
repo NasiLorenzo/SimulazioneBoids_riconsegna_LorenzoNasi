@@ -1,5 +1,4 @@
 #include "sfmlboids.hpp"
-#include "statistics.hpp"
 namespace boids {
 std::vector<RGB> generatecolors(std::default_random_engine& eng,
                                 ParamList const& params)
@@ -38,13 +37,6 @@ std::vector<sf::ConvexShape> buildArrowSet(unsigned int size,
   }
   return arrowset;
 }
-
-enum class State : int
-{
-  stats,
-  exit,
-  none,
-};
 
 State SFML_menu()
 {

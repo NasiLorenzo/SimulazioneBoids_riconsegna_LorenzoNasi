@@ -1,12 +1,20 @@
 #ifndef SFMLBOIDS_HPP
 #define SFMLBOIDS_HPP
 #include "boids.hpp"
+#include "statistics.hpp"
 namespace boids {
 struct RGB
 {
   uint8_t red;
   uint8_t blue;
   uint8_t green;
+};
+
+enum class State : int
+{
+  stats,
+  exit,
+  none,
 };
 
 std::vector<RGB> generatecolors(std::default_random_engine& eng,
@@ -68,6 +76,10 @@ class SFML_Interface
   Flock flock_;
   sf::RenderWindow window_;
 };
+
+void show_stats(Flock const& flock);
+
+State SFML_menu();
 
 } // namespace boids
 #endif

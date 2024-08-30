@@ -32,8 +32,6 @@ namespace boids {
 struct params
 {
   static unsigned constexpr int dim=DIM; // dimensione
-  static double
-      rate; // rapporto tra la dimensione dello schermo e della generazione
 };
 
 using DoubleVec=std::array<double, params::dim>;
