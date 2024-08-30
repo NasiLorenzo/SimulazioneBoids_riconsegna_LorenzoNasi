@@ -1,6 +1,6 @@
 # Simulazione di boids
 
--[Introduzione](#introduzione)
+-[Introduzione](#introduzione)\\
 -[Indicazioni per la compilazione](#indicazioni-per-la-compilazione)
 
 ## Introduzione
