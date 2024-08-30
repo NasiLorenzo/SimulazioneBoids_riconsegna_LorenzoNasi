@@ -82,7 +82,7 @@ void show_stats(Flock const& flock)
             << "mean distance b-ween boids: "
             << flock_data.distance_stats.result().mean
             << " sigma: " << flock_data.distance_stats.result().sigma << "\n"
-            <<"___________________________________\n";
+            << "___________________________________\n";
 }
 
 void SFML_Interface::run()
@@ -103,17 +103,18 @@ void SFML_Interface::run()
     window_.clear(sf::Color::White);
 
     auto boidit = flock_.set().begin();
-    for (auto& arrow : arrowset_) {
+    
+    std::for_each(arrowset_.begin(), arrowset_.end(), [&](auto& arrow) mutable {
       float angle = static_cast<float>(boids::angle(boidit->vel()));
       arrow.setPosition(static_cast<float>(boidit->pos()[0] / params_.rate),
                         static_cast<float>(boidit->pos()[1] / params_.rate));
       arrow.setRotation(angle * 180 / static_cast<float>(M_PI));
       window_.draw(arrow);
       boidit++;
-    }
+    });
 
     window_.display();
-    
+
     if (state == State::stats)
       show_stats(flock_);
     std::cout << " Run time: " << clock.getElapsedTime().asMilliseconds()
