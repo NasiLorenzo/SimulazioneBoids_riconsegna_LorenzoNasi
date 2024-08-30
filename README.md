@@ -2,8 +2,11 @@
 
 - [Introduzione](#introduzione)
 - [Indicazioni per la compilazione](#indicazioni-per-la-compilazione)
-- [Modifiche implementative](#Modifiche-implementative)
-  - [Parallelismo](#Parallelismo)
+- [Modifiche implementative](#modifiche-implementative)
+  - [Boid e BoidState](#boid-e-boidstate)
+  - [Flock](#flock)
+  - [Funcioni libere richiamate da `Flock::update()`](#funzioni-libere-richiamate-da-flockupdate)
+  - [Parallelismo](#parallelismo)
 ## Introduzione
 Questa è una riconsegna individuale da parte di Lorenzo Nasi del progetto di gruppo nominato "Simulazione di boids su SFML", che aveva come altri componenti Tommaso Vicenzi e Alice Pezzi. Tommaso Vicenzi ha abbandonato il progetto.
 
