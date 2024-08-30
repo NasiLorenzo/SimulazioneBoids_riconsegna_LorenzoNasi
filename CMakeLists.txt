@@ -35,11 +35,10 @@ function(add_boids_executable target_name sources)
 endfunction()
 
 # Define targets with the custom function
-add_boids_executable(boidsfml "boids.cpp;boidsfml.cpp;doublevec.cpp;sfmlboids.cpp;statistics.cpp")
+add_boids_executable(boidsfml "boids.cpp;boidsfml.cpp;doublevec.cpp;sfmlinterface.cpp;statistics.cpp")
 target_link_libraries(boidsfml PRIVATE sfml-graphics sfml-window sfml-system)
 
 add_boids_executable(boidss "boids.cpp;mainprova.cpp;doublevec.cpp;statistics.cpp")
-target_compile_definitions(boidss PRIVATE -DDIM=2)
 
 add_boids_executable(prove "prove_varie.cpp;doublevec.cpp")
 

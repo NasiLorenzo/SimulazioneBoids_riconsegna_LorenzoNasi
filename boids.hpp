@@ -196,60 +196,58 @@ auto random_boid(std::default_random_engine&, ParamList const& params);
 
 void rule_repulsion(Boid const& boid_, DoubleVec& deltavel_,
                     std::vector<Boid const*> const& close_neighbors,
-                    double repulsion_factor) ;
+                    double repulsion_factor);
 
 void rules_cohesion_alignment(Boid const& boid_, DoubleVec& deltavel_,
                               double steering_factor,
                               std::vector<Boid const*> const& neighbors,
-                              double cohesion) ;
+                              double cohesion);
 
-void update_id(Boid& boid, double view_range) ;
+void update_id(Boid& boid, double view_range);
 
 void update_rules(Boid const& boid_, DoubleVec& deltavel_,
                   std::vector<Boid const*>& neighbors,
                   std::vector<Boid const*>& close_neighbors,
-                  ParamList const& params) ;
+                  ParamList const& params);
 
-void speed_adjust(Boid& boid, double speedlimit, double speedminimum) ;
+void speed_adjust(Boid& boid, double speedlimit, double speedminimum);
 
 void bordercheck(Boid& boid, std::vector<unsigned int> const& pixel,
-                 double bordersize, double border_repulsion,
-                 double rate) ;
+                 double bordersize, double border_repulsion, double rate);
 
 bool is_neighbor(Boid const& boid_, Boid const& neighbor, double view_range,
-                 double alpha, Criterion criterion) ;
+                 double alpha, Criterion criterion);
 
 void add_neighbors(GridID const& neighborID, Boid const& boid_,
                    double view_range, double alpha, Criterion criterion,
-                   MyHashMap const& map,
-                   std::vector<Boid const*>& neighbors) ;
+                   MyHashMap const& map, std::vector<Boid const*>& neighbors);
 
 void update_neighbors(Boid const& boid_, std::vector<Boid const*>& neighbors,
                       MyHashMap const& map, double align_distance, double alpha,
-                      Criterion criterion) ;
+                      Criterion criterion);
 
 std::vector<GridID>
 update_neighbors_testing(Boid const& boid_, std::vector<Boid const*>& neighbors,
                          MyHashMap const& map, double align_distance,
-                         double alpha, Criterion criterion) ;
+                         double alpha, Criterion criterion);
 
 void update_close_neighbors(Boid const& boid_,
                             std::vector<Boid const*>& close_neighbors,
                             std::vector<Boid const*> const& set,
-                            double repulsion_distance) ;
+                            double repulsion_distance);
 
-void posvel_update(BoidState& boid, ParamList const& params) ;
+void posvel_update(BoidState& boid, ParamList const& params);
 
 void update_allneighbors(Boid const& boid_, std::vector<Boid const*>& neighbors,
                          std::vector<Boid const*>& close_neighbors,
                          MyHashMap const& map, double repulsion_distance,
                          double align_distance, double alpha, unsigned int size,
-                         unsigned int flocksize) ;
+                         unsigned int flocksize);
 
 void update_rules(Boid const& boid_, DoubleVec& deltavel_,
                   std::vector<Boid const*>& neighbors,
                   std::vector<Boid const*>& close_neighbors,
-                  ParamList const& params) ;
+                  ParamList const& params);
 
 std::vector<BoidState> generate_flock(std::default_random_engine& eng,
                                       ParamList const& params);
@@ -307,5 +305,4 @@ class Flock
 };
 
 } // namespace boids
-#include "boids.tpp" // namespace boids
 #endif
