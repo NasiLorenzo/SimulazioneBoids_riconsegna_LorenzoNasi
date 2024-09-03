@@ -26,7 +26,8 @@ endif()
 #include_directories(YOUR_INCLUDE_PATH)
 
 find_package(TBB REQUIRED)
-find_package(SFML 2.5 COMPONENTS graphics REQUIRED)
+find_package(SFML 2.5 COMPONENTS window graphics REQUIRED)
+find_package(OpenGL REQUIRED)
 
 # Function to make the setting shorter
 function(add_boids_executable target_name sources)
@@ -40,8 +41,10 @@ target_link_libraries(boidsfml PRIVATE sfml-graphics sfml-window sfml-system)
 
 add_boids_executable(simulation "boids.cpp;doublevec.cpp;base_run.cpp;statistics.cpp;simulation.cpp")
 add_boids_executable(simulation3d "boids.cpp;doublevec.cpp;base_run_3d.cpp;statistics.cpp;simulation.cpp")
+add_boids_executable(prova3d "prova3d.cpp;doublevec.cpp;boids.cpp")
 target_compile_definitions(simulation3d PRIVATE -DDIM=3)
-
+target_link_libraries(prova3d PRIVATE sfml-graphics sfml-window sfml-system OpenGL::GL)
+target_compile_definitions(prova3d PRIVATE -DDIM=3)
 if (BUILD_TESTING)
     # Testing executables
     add_boids_executable(boids.t "boids.cpp;boids.test.cpp;doublevec.cpp")
