@@ -108,8 +108,15 @@ int main(int argc, char* argv[])
   duration<double, std::milli> ms_double = t2 - t1;
   std::cout << "posizione primo boid " << stormo.set()[0].pos()[0] << "\n";
   std::cout << ms_double.count() << "ms\n";
+  /*MyHashMap test_map;
+  Boid test_boid{{120.,-210},{}};
+  update_id(test_boid,100);
+  test_map.insert({test_boid.gridID(),&test_boid});
+  auto test_ref =test_map.find(GridID{2,-3});
+  std::cout<<"il boid vale: "<<test_ref->second->pos()[0]<<"e "<<test_ref->second->pos()[1]<<"\n";*/
   /*boids::MyHashMap map{};
   gridID test_id{1,3};
+
   gridID_hash hasher;
   std::size_t test_hash = hasher(test_id);
   std::cout <<test_hash<< "\n";*/

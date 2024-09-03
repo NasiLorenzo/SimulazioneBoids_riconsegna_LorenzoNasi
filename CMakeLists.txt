@@ -39,6 +39,8 @@ endfunction()
 add_boids_executable(boidsfml "boids.cpp;boidsfml.cpp;doublevec.cpp;sfmlinterface.cpp;statistics.cpp")
 target_link_libraries(boidsfml PRIVATE sfml-graphics sfml-window sfml-system)
 
+add_boids_executable(boidss "boids.cpp;mainprova.cpp;doublevec.cpp")
+
 add_boids_executable(simulation "boids.cpp;doublevec.cpp;base_run.cpp;statistics.cpp;simulation.cpp")
 add_boids_executable(simulation3d "boids.cpp;doublevec.cpp;base_run_3d.cpp;statistics.cpp;simulation.cpp")
 add_boids_executable(prova3d "prova3d.cpp;doublevec.cpp;boids.cpp")
