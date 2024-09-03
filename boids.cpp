@@ -276,8 +276,7 @@ void rule_repulsion(Boid const& boid_, DoubleVec& deltavel_,
 {
   std::for_each(close_neighbors.begin(), close_neighbors.end(),
                 [&](auto& neighbor) {
-                  auto x = neighbor->pos() - boid_.pos();
-                  deltavel_ += x * (-repulsion_factor);
+                  deltavel_ += (neighbor->pos() - boid_.pos()) * (-repulsion_factor);
                 });
 }
 
@@ -290,7 +289,7 @@ void rules_cohesion_alignment(Boid const& boid_, DoubleVec& deltavel_,
     deltavel_ += neighbor->vel() * (steering_factor / static_cast<double>(n));
     deltavel_ += neighbor->pos() * (cohesion / static_cast<double>(n));
   });
-  if (neighbors.size() != 0) {
+  if (n != 0) {
     deltavel_ -= boid_.pos() * cohesion;
     deltavel_ -= boid_.vel()* steering_factor;
   }
