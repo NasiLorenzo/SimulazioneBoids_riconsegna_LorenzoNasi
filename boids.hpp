@@ -269,7 +269,7 @@ class Flock
     std::for_each(set_.begin(), set_.end(), [&params](auto& boid) {
       update_id(boid.boid(), params.view_range);
     });
-    update_hashMap(params);
+    update_hashMap();
   }
   auto& set() const
   {
@@ -294,7 +294,7 @@ class Flock
   {
     return set_.size();
   }
-  void update_hashMap(ParamList const& params);
+  void update_hashMap();
   void update(ParamList const& params);
 
  private:

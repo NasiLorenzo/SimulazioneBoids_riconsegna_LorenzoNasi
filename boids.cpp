@@ -359,10 +359,9 @@ std::vector<BoidState> generate_flock(std::default_random_engine& eng,
   return set;
 }
 
-void Flock::update_hashMap(ParamList const& params)
+void Flock::update_hashMap()
 {
   hashMap_.clear();
-  hashMap_.reserve(static_cast<std::size_t>(params.pixel[0]/params.view_range*params.pixel[1]/params.view_range));
   std::for_each(set_.begin(), set_.end(), [&](auto& boid) {
     hashMap_.insert({boid.gridID(), &(boid.boid())});
   });
@@ -382,7 +381,7 @@ void Flock::update(ParamList const& params)
                   [&](auto& boid) { posvel_update(boid, params); });
   };
   std::visit(update_neighbors_rules, params.ExecPolicy);
-  update_hashMap(params);
+  update_hashMap();
 }
 
 } // namespace boids
