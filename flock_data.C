@@ -10,7 +10,8 @@
 #include <string>
 #include <vector>
 
-void graph_2d(std::string file, const char* title, const char* save_as, TCanvas* canvas)
+void graph_2d(std::string file, const char* title, const char* save_as,
+              TCanvas* canvas)
 {
   std::ifstream infile(file);
 
@@ -26,7 +27,7 @@ void graph_2d(std::string file, const char* title, const char* save_as, TCanvas*
   std::istringstream iss(line);
   iss >> points_number;
   _x      = new Double_t[points_number]; // auto _x{new Double_t[points_number]}
-  _y      = new Double_t[points_number];
+  _y      = new Double_t[points_number]; // Double_t _y[points_number]{};
   time    = new Double_t[points_number];
   sigma_x = new Double_t[points_number];
   sigma_y = new Double_t[points_number];
@@ -196,7 +197,7 @@ void pos_data()
   graph_2d("./data/pos.txt",
            "Center of mass of the flock as it varies in time;x "
            "[arb_units];time [arb_units];y [arb_units]",
-           "Center_of_mass_2D_plot.png",canvas);
+           "Center_of_mass_2D_plot.png", canvas);
 
   auto canvas_proj = new TCanvas("canvas_proj", "projection of the coordinates",
                                  0, 0, 1000, 1200);
@@ -224,7 +225,7 @@ void vel_data()
   graph_2d("./data/vel.txt",
            "Mean components of the velocity as they vary in time;vel_x "
            "[arb_units];time [arb_units];vel_y [arb_units]",
-           "Velocities_2D_graph.png",canvas_vel);
+           "Velocities_2D_graph.png", canvas_vel);
   auto canvas_vel_proj =
       new TCanvas("canvas_vel_proj", "projection of the velocity components", 0,
                   0, 1000, 1200);
@@ -279,19 +280,19 @@ void pos_data_3d()
   canvas_proj->Divide(2, 2);
   // First graph: showing the projection on the x_axis
   graph_1d_proj_3d(canvas_proj, "./data/pos3d.txt",
-                "x-coordinate of the center of mass as a function of "
-                "time;time [arb_units];x [arb_units]",
-                1);
+                   "x-coordinate of the center of mass as a function of "
+                   "time;time [arb_units];x [arb_units]",
+                   1);
   // Second graph : showing the projection on the y_axis
   graph_1d_proj_3d(canvas_proj, "./data/pos3d.txt",
-                "y-coordinate of the center of mass as a function of "
-                "time;time [arb_units];y [arb_units]",
-                2);
+                   "y-coordinate of the center of mass as a function of "
+                   "time;time [arb_units];y [arb_units]",
+                   2);
   // Second graph : showing the projection on the z_axis
   graph_1d_proj_3d(canvas_proj, "./data/pos3d.txt",
-                "z-coordinate of the center of mass as a function of "
-                "time;time [arb_units];z [arb_units]",
-                3);
+                   "z-coordinate of the center of mass as a function of "
+                   "time;time [arb_units];z [arb_units]",
+                   3);
   canvas_proj->SaveAs("x_y_z_projections.png");
 }
 void vel_data_3d()
@@ -303,19 +304,19 @@ void vel_data_3d()
   canvas_vel_proj->cd();
   // Fifth graph: showing the projection on the x_axis
   graph_1d_proj_3d(canvas_vel_proj, "./data/vel3d.txt",
-                "x-coordinate of the mean velocity as a function of "
-                "time;time [arb_units];x [arb_units]",
-                1);
+                   "x-coordinate of the mean velocity as a function of "
+                   "time;time [arb_units];x [arb_units]",
+                   1);
   // Sixth graph : showing the projection on the y_axis
   graph_1d_proj_3d(canvas_vel_proj, "./data/vel3d.txt",
-                "y-coordinate of the mean velocity as a function of "
-                "time;time [arb_units];y [arb_units]",
-                2);
+                   "y-coordinate of the mean velocity as a function of "
+                   "time;time [arb_units];y [arb_units]",
+                   2);
   // Sixth graph : showing the projection on the y_axis
   graph_1d_proj_3d(canvas_vel_proj, "./data/vel3d.txt",
-                "z-coordinate of the mean velocity as a function of "
-                "time;time [arb_units];z [arb_units]",
-                3);
+                   "z-coordinate of the mean velocity as a function of "
+                   "time;time [arb_units];z [arb_units]",
+                   3);
   canvas_vel_proj->SaveAs("x_y_z_vel_projections.png");
 }
 
