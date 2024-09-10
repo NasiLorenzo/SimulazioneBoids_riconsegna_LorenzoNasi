@@ -25,7 +25,7 @@ void graph_2d(std::string file, const char* title, const char* save_as, TCanvas*
   std::getline(infile, line);
   std::istringstream iss(line);
   iss >> points_number;
-  _x      = new Double_t[points_number];
+  _x      = new Double_t[points_number]; // auto _x{new Double_t[points_number]}
   _y      = new Double_t[points_number];
   time    = new Double_t[points_number];
   sigma_x = new Double_t[points_number];
@@ -38,7 +38,7 @@ void graph_2d(std::string file, const char* title, const char* save_as, TCanvas*
   }
   // first graph: Drawing the 2D graph of the center of mass as a function of
   // time
-  auto graph2D = new TGraph2DErrors(points_number, _x, time, _y, sigma_x,
+  auto graph2D =  new TGraph2DErrors(points_number, _x, time, _y, sigma_x,
                                     nullptr, sigma_y);
   graph2D->SetTitle(title);
   graph2D->SetFillColor(kRed);
