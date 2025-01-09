@@ -26,7 +26,7 @@ endif()
 #include_directories(YOUR_INCLUDE_PATH)
 
 find_package(TBB REQUIRED)
-find_package(SFML 2.5 COMPONENTS window graphics REQUIRED)
+find_package(SFML 3.0 COMPONENTS window graphics REQUIRED)
 find_package(OpenGL REQUIRED)
 
 # Function to make the setting shorter
